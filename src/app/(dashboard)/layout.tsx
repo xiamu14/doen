@@ -27,14 +27,14 @@ const MockNavbar = () => {
   return (
     <div id="nav" className="border-b border-dashed flex items-center justify-between">
       <div id="brand" className="h-full md:border-r border-dashed w-[300px] flex items-center justify-center">
-        <Button variant="ghost" className="w-full h-full font-heading text-2xl font-bold" asChild>
+        <Button variant="ghost" className="w-full h-full font-heading text-lg md:text-2xl font-bold" asChild>
           <Link href="/">
             <span>{siteConfig.name}</span>
           </Link>
         </Button>
       </div>
       <div className="flex-1 flex items-center justify-end h-full border-dashed divide-x">
-      <Button className="h-full border-l border-dashed" size="lg" variant="ghost" asChild>
+        <Button className="h-full border-l border-dashed" size="lg" variant="ghost" asChild>
           <a href={siteConfig.socials.x} target="_blank" className="flex items-center gap-2 group/nav">
             <span>X</span>
             <div className="relative z-10 size-4 overflow-hidden flex items-center justify-center">
@@ -52,8 +52,8 @@ const MockNavbar = () => {
             </div>
           </a>
         </Button>
-        <ThemeToggler className="h-full border-dashed" />
-        <UserProfile />
+        <ThemeToggler className="h-full border-dashed size-10 md:size-14" />
+        <UserProfile className="size-10 md:size-14" />
       </div>
     </div>
   )

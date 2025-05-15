@@ -59,15 +59,15 @@ export default function Home() {
                   </Link>
                 </Button>
               ))}
-              <UserProfile className="border-dashed" />
-              <ThemeToggler className="border-dashed" />
+              <UserProfile className="border-dashed size-10 md:size-14" />
+              <ThemeToggler className="border-dashed size-10 md:size-14" />
             </div>
             <div id="hero" className="flex flex-col p-4">
               <h1 className="head-text-md">Titan</h1>
               <p className="text-muted-foreground max-w-3xl">{siteConfig.description}</p>
             </div>
             <div id="code" className="flex flex-col p-4">
-              <div className="p-2 border border-dashed hover:border-primary/50 bg-card text-sm flex items-center justify-between transition-all duration-200 delay-75">
+              <div className="p-2 border border-dashed hover:border-primary/50 bg-card text-xs md:text-sm flex items-center justify-between transition-all duration-200 delay-75">
                 <pre className="font-mono bg-linear-to-r from-muted-foreground to-foreground bg-clip-text text-transparent">
                   git clone {siteConfig.socials.github}
                 </pre>

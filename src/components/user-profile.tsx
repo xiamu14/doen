@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -22,13 +23,14 @@ import { ExternalLinkIcon, LogOutIcon } from "lucide-react"
 import { cn } from "@/lib/utils";
 
 export function UserProfile({ className }: { className?: string }) {
+  const [signingOut, setSigningOut] = useState(false);
   const { data: session, isPending } = useSession();
   const router = useRouter();
 
   if (isPending) {
     return (
-      <div className="size-14 aspect-square flex items-center justify-center p-3">
-        <div className="size-8 rounded-full bg-muted/50 animate-pulse"></div>
+      <div className="size-10 md:size-14 aspect-square flex items-center justify-center p-3">
+        <div className="size-4 md:size-8 rounded-full bg-muted/50 animate-pulse"></div>
       </div>
     );
   }
@@ -40,7 +42,7 @@ export function UserProfile({ className }: { className?: string }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className={cn("size-14 aspect-square p-3", className)} asChild>
+        <Button variant="ghost" className={cn("size-14 aspect-square p-2 md:p-3", signingOut && "animate-pulse", className)} asChild>
           <Avatar>
             <AvatarImage src={session.user.image ?? ""} alt={session.user.name ?? ""} className="rounded-full" />
             <AvatarFallback className="rounded-full">{session.user.name?.charAt(0)}</AvatarFallback>
@@ -82,9 +84,19 @@ export function UserProfile({ className }: { className?: string }) {
           className="cursor-pointer w-full flex items-center justify-between gap-2"
           onClick={() => signOut({
             fetchOptions: {
+              onRequest: () => {
+                setSigningOut(true);
+                toast.loading("Signing out...");
+              },
               onSuccess: () => {
+                setSigningOut(false);
                 toast.success("Signed out successfully");
+                toast.dismiss();
                 router.push("/");
+              },
+              onError: () => {
+                setSigningOut(false);
+                toast.error("Failed to sign out");
               },
             }
           })}
