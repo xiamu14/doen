@@ -8,9 +8,17 @@ export const env = createEnv({
     BETTER_AUTH_SECRET: z.string().min(1),
     // Database
     DATABASE_URL: z.string().min(1),
+    // Resend
+    RESEND_API_KEY: z.string().min(1),
     // Github
     GITHUB_CLIENT_ID: z.string().min(1),
     GITHUB_CLIENT_SECRET: z.string().min(1),
+    // Google
+    GOOGLE_CLIENT_ID: z.string().min(1),
+    GOOGLE_CLIENT_SECRET: z.string().min(1),
+    // Discord
+    DISCORD_CLIENT_ID: z.string().min(1),
+    DISCORD_CLIENT_SECRET: z.string().min(1),
   },
   client: {},
   experimental__runtimeEnv: {},
