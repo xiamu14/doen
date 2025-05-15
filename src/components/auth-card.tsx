@@ -23,7 +23,7 @@ export default function AuthCard({
   const [discordLoading, setDiscordLoading] = useState(false);
 
   return (
-    <Card className="max-w-md w-full rounded-none">
+    <Card className="max-w-md w-full rounded-none border-dashed">
       <CardHeader>
         <CardTitle className="text-lg md:text-xl">{title}</CardTitle>
         <CardDescription className="text-xs md:text-sm">{description}</CardDescription>
@@ -61,7 +61,7 @@ export default function AuthCard({
           </div>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-center border-t pt-4">
+      <CardFooter className="flex justify-center border-t border-dashed pt-4">
         <p className="text-sm text-muted-foreground">
           {mode === "sign-in" ? (
             <>
@@ -103,7 +103,7 @@ const SignInButton = ({
     <Button
       variant="outline"
       size="lg"
-      className={cn("w-full gap-2")}
+      className={cn("w-full gap-2 border-dashed")}
       disabled={loading}
       onClick={async () => {
         await signIn.social(
