@@ -17,14 +17,12 @@ Next.js 15 fullstack template with better-auth for authentication.
 ## Features
 
 - Authentication
-  - Email/password
-  - Social login (Google, Github)
-  - Magic link
-  - Forgot password
-  - Change password
-  - Email verification
+  - Social login
+    - Google
+    - Github
+    - Discord
 - Database
-  - Postgres
+  - Postgres (Neon)
   - ORM: drizzle-orm
 - Next.js API, server actions, and middleware
 
@@ -48,32 +46,22 @@ bun install
 cp .env.example .env
 ```
 
-4. Run the development server
+4. Generate database schema
+
+```bash
+bun run db:generate
+```
+
+5. Migrate database
+
+```bash
+bun run db:migrate
+```
+
+6. Run the development server
 
 ```bash
 bun dev
 ```
 
-5. Open the browser and navigate to `http://localhost:3000`
-
-Todos:
-
-- [ ] Landing page
-- [ ] Dashboard page
-- [ ] Auth pages
-  - [ ] Sign in
-  - [ ] Sign up
-  - [ ] Forgot password
-  - [ ] Reset password
-- [ ] Email / Password login
-- [ ] Email verification
-- [ ] Forgot password
-- [ ] Reset password
-- [ ] Social login
-  - [ ] Google
-  - [x] Github
-  - [ ] Discord
-- [ ] Custom sign-in, sign-up, and password reset pages
-- [ ] Resend integration
-- [ ] Email templates
-- [ ] 
+7. Open the browser and navigate to `http://localhost:3000`
