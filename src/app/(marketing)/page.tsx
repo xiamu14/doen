@@ -24,18 +24,22 @@ export default function Home() {
 
   return (
     <div className="w-full h-auto md:h-screen overflow-y-auto md:overflow-hidden flex flex-col items-center justify-center">
-      <div className="w-full max-w-7xl mx-auto border flex flex-col">
+      <div className="w-full max-w-7xl mx-auto border border-dashed flex flex-col my-2">
         <div className="w-full flex justify-between divide-x">
-          <div className="hidden md:flex w-1/3 aspect-square bg-muted/50 items-center justify-center group/titan">
+          <div className="relative hidden md:flex w-1/3 aspect-square bg-black items-center justify-center group/titan border-dashed">
             <Goku />
+            <div className="absolute top-0 left-0 size-4 border-t-2 border-l-2 border-foreground opacity-0 group-hover/titan:opacity-100 transition-all duration-200"></div>
+            <div className="absolute top-0 right-0 size-4 border-t-2 border-r-2 border-foreground opacity-0 group-hover/titan:opacity-100 transition-all duration-200"></div>
+            <div className="absolute bottom-0 left-0 size-4 border-b-2 border-l-2 border-foreground opacity-0 group-hover/titan:opacity-100 transition-all duration-200"></div>
+            <div className="absolute bottom-0 right-0 size-4 border-b-2 border-r-2 border-foreground opacity-0 group-hover/titan:opacity-100 transition-all duration-200"></div>
           </div>
           <div className="flex-1 flex flex-col">
-            <div id="nav" className="w-full flex items-center justify-end border-b divide-x">
-              <div id="brand" className="font-mono text-sm font-bold flex-1 flex items-center h-full px-3">
+            <div id="nav" className="w-full flex items-center justify-end border-b border-dashed divide-x">
+              <div id="brand" className="font-mono text-sm flex-1 flex items-center h-full px-3 border-dashed">
                 <Link href="/" className="hover:underline">{siteConfig.origin.replace("https://", "")}</Link>
               </div>
               {!isPending && (session ? (
-                <Button className="h-full" size="lg" variant="ghost" asChild>
+                <Button className="h-full border-dashed" size="lg" variant="ghost" asChild>
                   <Link href="/dashboard" className="flex items-center gap-2 group/nav">
                     <span>Dashboard</span>
                     <div className="relative z-10 size-4 overflow-hidden flex items-center justify-center">
@@ -45,7 +49,7 @@ export default function Home() {
                   </Link>
                 </Button>
               ) : (
-                <Button className="h-full" size="lg" variant="ghost" asChild>
+                <Button className="h-full border-dashed" size="lg" variant="ghost" asChild>
                   <Link href="/sign-in" className="flex items-center gap-2 group/nav">
                     <span>Sign In</span>
                     <div className="relative z-10 size-4 overflow-hidden flex items-center justify-center">
@@ -55,15 +59,15 @@ export default function Home() {
                   </Link>
                 </Button>
               ))}
-              <UserProfile />
-              <ThemeToggler />
+              <UserProfile className="border-dashed" />
+              <ThemeToggler className="border-dashed" />
             </div>
             <div id="hero" className="flex flex-col p-4">
               <h1 className="head-text-md">Titan</h1>
               <p className="text-muted-foreground max-w-3xl">{siteConfig.description}</p>
             </div>
             <div id="code" className="flex flex-col p-4">
-              <div className="p-2 border bg-card text-sm flex items-center justify-between">
+              <div className="p-2 border border-dashed bg-card text-sm flex items-center justify-between">
                 <pre className="font-mono bg-linear-to-r from-muted-foreground to-foreground bg-clip-text text-transparent">
                   git clone {siteConfig.socials.github}
                 </pre>
@@ -89,7 +93,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div id="grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-t">
+        <div id="grid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-t border-dashed">
           {techConfig.map((tech, index) => (
             <a
               key={index}

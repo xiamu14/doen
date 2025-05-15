@@ -19,8 +19,9 @@ import Link from "next/link"
 import { siteConfig } from "@/config/site.config"
 import { toast } from "sonner"
 import { ExternalLinkIcon, LogOutIcon } from "lucide-react"
+import { cn } from "@/lib/utils";
 
-export function UserProfile() {
+export function UserProfile({ className }: { className?: string }) {
   const { data: session, isPending } = useSession();
   const router = useRouter();
 
@@ -38,8 +39,8 @@ export function UserProfile() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
-        <Button variant="ghost" className="size-14 aspect-square p-3" asChild>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className={cn("size-14 aspect-square p-3", className)} asChild>
           <Avatar>
             <AvatarImage src={session.user.image ?? ""} alt={session.user.name ?? ""} className="rounded-full" />
             <AvatarFallback className="rounded-full">{session.user.name?.charAt(0)}</AvatarFallback>
@@ -83,6 +84,7 @@ export function UserProfile() {
             fetchOptions: {
               onSuccess: () => {
                 toast.success("Signed out successfully");
+                router.push("/");
               },
             }
           })}
