@@ -47,7 +47,7 @@
 }
 
 :root {
-  --radius: 0.625rem;
+  --radius: 0rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -150,12 +150,12 @@
 
 /* view transition */
 ::view-transition-group(root) {
-  animation-duration: 0.7s;
-  animation-timing-function: var(--expo-out);
+  animation-duration: 0.5s;
+  animation-timing-function: var(--expo-in);
 }
-      
+
 ::view-transition-new(root) {
-  animation-name: reveal-light;
+  animation-name: reveal;
 }
 
 ::view-transition-old(root),
@@ -163,25 +163,12 @@
   animation: none;
   z-index: -1;
 }
-.dark::view-transition-new(root) {
-  animation-name: reveal-dark;
-}
 
-@keyframes reveal-dark {
+@keyframes reveal {
   from {
-    clip-path: polygon(50% -71%, -50% 71%, -50% 71%, 50% -71%);
+    clip-path: polygon(0% 50%, 100% 50%, 100% 50%, 0% 50%);
   }
   to {
-    clip-path: polygon(50% -71%, -50% 71%, 50% 171%, 171% 50%);
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
   }
 }
-
-@keyframes reveal-light {
-  from {
-    clip-path: polygon(171% 50%, 50% 171%, 50% 171%, 171% 50%);
-  }
-  to {
-    clip-path: polygon(171% 50%, 50% 171%, -50% 71%, 50% -71%);
-  }
-}
-

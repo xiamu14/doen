@@ -2,8 +2,8 @@ import { SiteConfig } from "@/types";
 
 export const siteConfig: SiteConfig = {
   name: "Titan",
-  title: "Titan - Powerful Next.js 15 Template with Better-Auth, Drizzle ORM & PostgreSQL",
-  description: "A robust Next.js 15 development stack featuring enhanced authentication, Drizzle ORM, PostgreSQL database, Shadcn UI components, and Tailwind CSS V4 for building secure and scalable applications.",
+  title: "Titan - Powerful Next.js 15 Template with Better-Auth, Drizzle ORM, PostgreSQL, and Shadcn UI",
+  description: "Modern Next.js 15 stack with Better-Auth, Drizzle ORM, PostgreSQL, Shadcn UI, and Tailwind v4 for fast, secure web app development.",
   origin: "https://titan.rdsx.dev",
   keywords: [
     "Next.js 15",
