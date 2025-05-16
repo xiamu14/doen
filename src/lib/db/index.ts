@@ -1,5 +1,5 @@
 import { drizzle } from "drizzle-orm/xata-http";
-import { getXataClient } from "./xata";
+import { getXataClient } from "@/lib/db/xata";
 import { db as dbDev } from "./node-postgres";
 
 function createDB() {

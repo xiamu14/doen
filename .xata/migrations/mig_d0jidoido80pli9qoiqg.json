@@ -1,0 +1,19 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_d0jidoido80pli9qoiqg",
+    "operations": [
+      {
+        "rename_table": {
+          "to": "test-connect",
+          "from": "teset"
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_d0jidoido80pli9qoiqg",
+  "parent": "mig_d0jiceaunsp1bris77u0",
+  "schema": "public",
+  "startedAt": "2025-05-16T11:52:03.465793Z"
+}

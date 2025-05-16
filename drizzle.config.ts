@@ -8,6 +8,6 @@ export default defineConfig({
   out: "./drizzle/migrations",
   dialect: "postgresql",
   dbCredentials: {
-    url: isDev ? process.env.DATABASE_URL! : process.env.XATA_DATABASE_URL!,
+    url: isDev ? process.env.DATABASE_URL! : process.env.XATA_PG_ENDPOINT!,
   },
 });
