@@ -1,7 +1,14 @@
-"use client"
+"use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
 import { useState } from "react";
 import { signIn } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
@@ -26,20 +33,24 @@ export default function AuthCard({
     <Card className="max-w-md w-full rounded-none border-dashed">
       <CardHeader>
         <CardTitle className="text-lg md:text-xl">{title}</CardTitle>
-        <CardDescription className="text-xs md:text-sm">{description}</CardDescription>
+        <CardDescription className="text-xs md:text-sm">
+          {description}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid gap-4">
-          <div className={cn(
-            "w-full gap-2 flex items-center",
-            "justify-between flex-col"
-          )}>
+          <div
+            className={cn(
+              "w-full gap-2 flex items-center",
+              "justify-between flex-col"
+            )}
+          >
             <SignInButton
               title="Sign in with Github"
               provider="github"
               loading={githubLoading}
               setLoading={setGithubLoading}
-              callbackURL="/dashboard"
+              callbackURL="https://9f09-206-237-115-9.ngrok-free.app/api/auth/callback"
               icon={<Icons.Github />}
             />
             <SignInButton
@@ -50,14 +61,6 @@ export default function AuthCard({
               callbackURL="/dashboard"
               icon={<Icons.Google />}
             />
-            <SignInButton
-              title="Sign in with Discord"
-              provider="discord"
-              loading={discordLoading}
-              setLoading={setDiscordLoading}
-              callbackURL="/dashboard"
-              icon={<Icons.Discord />}
-            />
           </div>
         </div>
       </CardContent>
@@ -66,14 +69,20 @@ export default function AuthCard({
           {mode === "sign-in" ? (
             <>
               Don't have an account?{" "}
-              <Link href="/sign-up" className="text-primary font-medium hover:underline">
+              <Link
+                href="/sign-up"
+                className="text-primary font-medium hover:underline"
+              >
                 Sign up
               </Link>
             </>
           ) : (
             <>
               Already have an account?{" "}
-              <Link href="/sign-in" className="text-primary font-medium hover:underline">
+              <Link
+                href="/sign-in"
+                className="text-primary font-medium hover:underline"
+              >
                 Sign in
               </Link>
             </>
@@ -109,18 +118,18 @@ const SignInButton = ({
         await signIn.social(
           {
             provider: provider,
-            callbackURL: callbackURL
+            callbackURL: callbackURL,
           },
           {
             onRequest: (ctx) => {
               setLoading(true);
             },
-          },
+          }
         );
       }}
     >
       {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : icon}
       {title}
     </Button>
-  )
-}
+  );
+};

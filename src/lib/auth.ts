@@ -18,5 +18,6 @@ export const auth = betterAuth({
       clientSecret: env.GOOGLE_CLIENT_SECRET,
     },
   },
+  trustedOrigins: ["https://9f09-206-237-115-9.ngrok-free.app"],
   plugins: [nextCookies()],
 });
