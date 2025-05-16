@@ -1,7 +1,15 @@
-import { drizzle } from "drizzle-orm/neon-http";
-import { neon } from "@neondatabase/serverless";
-import * as schema from "@/lib/db/schema";
-import { env } from "@/env";
+import { drizzle } from "drizzle-orm/xata-http";
+import { getXataClient } from "./xata";
+import { db as dbDev } from "./node-postgres";
 
-const sql = neon(env.DATABASE_URL);
-export const db = drizzle(sql, { schema });
+function createDB() {
+  if (process.env.NODE_ENV === "development") {
+    return dbDev;
+  } else {
+    const xata = getXataClient();
+    const dbProd = drizzle(xata);
+    return dbProd;
+  }
+}
+
+const db = createDB();

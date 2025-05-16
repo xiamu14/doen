@@ -1,0 +1,6 @@
+{
+  "databaseURL": "https://Ben-s-workspace-ptjjn4.us-east-1.xata.sh/db/doen",
+  "codegen": {
+    "output": "src/lib/db/xata.ts"
+  }
+}
