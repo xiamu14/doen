@@ -12,4 +12,4 @@ function createDB() {
   }
 }
 
-const db = createDB();
+export const db = createDB();
