@@ -12,15 +12,15 @@ export default function Container({
   className: ClassNameValue;
 }) {
   return (
-    <div className="flex justify-center items-center pt-[136px]">
+    <div className="flex justify-center items-center pt-[64px]">
       <div
         className={cn(
-          "flex flex-col max-w-[1068px] w-[1068px] max-h-[764px]",
+          "flex flex-col max-w-[1268px] w-[1268px] max-h-[764px]",
           className
         )}
       >
-        <TopBar className="mb-[68px]"></TopBar>
-        <div className="w-full flex flex-row justify-between items-center mb-[44px]">
+        <TopBar className="mb-[64px]"></TopBar>
+        <div className="w-full flex flex-row justify-start mb-[44px] flex-grow-0">
           <Sidebar />
           <TaskPanel />
         </div>

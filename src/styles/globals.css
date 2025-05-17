@@ -46,10 +46,31 @@
   --font-heading: var(--font-inter);
   /* custom */
   --color-topbar-logo: var(--primary-blue-500);
+  --color-create-list: var(--primary-blue-500);
+  --color-calender-main: var(--primary-blue-500);
   --color-content: var(--neutral-black-800);
+  --color-content-secondary: var(--neutral-gray-500);
+  --color-calendar-date: var(--neutral-gray-600);
+  --color-calendar-date-active: var(--primary-blue-300);
+  --color-switch-layout-active: rgba(22, 22, 22, 0.1);
 }
 
 :root {
+  --primary-blue-500: #7390fe;
+  --primary-blue-300: #9cb0fd;
+  --primary-blue-100: #e4e9fd;
+
+  --neutral-black-800: #666666;
+  --neutral-black-500: #8a8a8a;
+
+  --neutral-gray-600: #8e8e93;
+  --neutral-gray-500: #b6b6b6;
+  --neutral-gray-400: #b9b9b9;
+  --neutral-gray-300: #dedede;
+  --neutral-gray-100: #eaeaea;
+
+  --neutral-white-200: #f6f6f6;
+
   --radius: 0rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -57,11 +78,7 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary-blue-500: #7390fe;
-  --primary-blue-300: #9cb0fd;
-  --primary-blue-100: #e4e9fd;
-  --neutral-black-800: #666666;
-  --neutral-black-500: #8a8a8a;
+
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
