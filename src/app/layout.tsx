@@ -1,22 +1,12 @@
 import type { Metadata } from "next";
-import { Manrope, JetBrains_Mono, Inter } from "next/font/google";
+import { Archivo } from "next/font/google";
 import "@/styles/globals.css";
 import { siteConfig } from "@/config/site.config";
 import { cn } from "@/lib/utils";
 import RootProviders from "@/components/providers";
 
-const fontSans = Manrope({
-  variable: "--font-sans",
-  subsets: ["latin"],
-});
-
-const fontMono = JetBrains_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-});
-
-const fontHeading = Inter({
-  variable: "--font-inter",
+const fontArchivo = Archivo({
+  variable: "--font-archivo",
   subsets: ["latin"],
 });
 
@@ -60,7 +50,6 @@ export const metadata: Metadata = {
   },
 };
 
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -70,15 +59,11 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased",
-          fontSans.variable,
-          fontHeading.variable,
-          fontMono.variable
+          "min-h-screen font-archivo antialiased",
+          fontArchivo.variable
         )}
       >
-        <RootProviders>
-          {children}
-        </RootProviders>
+        <RootProviders>{children}</RootProviders>
       </body>
     </html>
   );
