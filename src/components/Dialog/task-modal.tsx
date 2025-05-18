@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import { Dialog, DialogPanel } from "@headlessui/react";
 import { useCallback, useMemo } from "react";
 import { useSnapshot } from "valtio";
 import { modalsState } from "./state";
@@ -10,6 +10,8 @@ import { Modals } from "./type";
 import { cn } from "@/lib/utils";
 import ProjectItem from "../project-item";
 import TagItem from "../tag-item";
+import CustomInput from "../custom-input";
+import ProjectSelect from "../project-select";
 
 export default function TaskModal() {
   const modalsSnap = useSnapshot(modalsState);
@@ -63,20 +65,32 @@ export default function TaskModal() {
                   : {}
               }
             >
-              <div className="flex items-start gap-[18px]">
+              <div className="flex items-start gap-[18px] pr-[22px]">
                 <div className="project flex-shrink-0 w-[4px] h-[20px] rounded-[2px] bg-[#f05252]"></div>
                 <div className="flex flex-col flex-1">
                   <div className="flex items-center gap-[8px] relative top-[-4px]">
                     <Circle size={18} color="#8A8A8A" className="relative" />
                     <div className="flex flex-col">
-                      <p className="text-[18px] font-medium text-content">
+                      {/* <p className="text-[18px] font-medium text-content">
                         develop doen
-                      </p>
+                      </p> */}
+                      <CustomInput
+                        className="text-[18px] font-medium text-content"
+                        value={"develop doen"}
+                        onChange={() => {}}
+                      />
                     </div>
                   </div>
-                  <div className="text-[14px] font-medium text-content-description ml-[26px]">
+                  {/* <div className="text-[14px] font-medium text-content-description ml-[26px]">
                     something about this task
-                  </div>
+                  </div> */}
+                  <CustomInput
+                    value="something about this task"
+                    className="px-[4px] py-[2px] text-[14px] font-medium text-content-description rounded-[6px] ml-[24px] focus:bg-[#eee] focus:text-[#666]"
+                    onChange={(e) => {
+                      console.log(e);
+                    }}
+                  />
                   <div className="flex items-center gap-[8px] relative top-[-4px] mt-[24px]">
                     <Clock size={18} color="#8A8A8A" className="relative" />
                     <div className="flex flex-col">
@@ -93,14 +107,16 @@ export default function TaskModal() {
                       item={{ name: "AiVideo", color: "#F05252" }}
                       tight
                       textColor="#B9B9B9"
+                      isSelection
                     />
                     <TagItem
                       item={{ name: "easy", color: "#69D571" }}
                       tight
                       textColor="#B9B9B9"
+                      isSelection
                     />
                   </div>
-                  <div className="w-full flex items-center justify-between gap-[16px] mt-[20px] pr-[22px]">
+                  <div className="w-full flex items-center justify-between gap-[16px] mt-[20px]">
                     <div className="flex-1 h-[36px] rounded-[10px] bg-primary center font-semibold text-[14px] text-white cursor-pointer">
                       Apply
                     </div>
