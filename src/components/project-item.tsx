@@ -18,6 +18,7 @@ export default function ProjectItem({
   item,
   className,
   tight,
+  textColor = "",
 }: React.ComponentProps<"div"> &
   VariantProps<typeof variants> & {
     item: { name: string; color: string };
@@ -35,6 +36,7 @@ export default function ProjectItem({
           //   `${index === 0 ? "text-content" : ""}`,
           className
         )}
+        style={{ color: textColor }}
       >
         {item.name}
       </p>

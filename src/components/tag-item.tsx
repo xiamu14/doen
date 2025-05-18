@@ -21,7 +21,9 @@ export default function TagItem({
         className={cn("w-[10px] h-[10px] rounded-full")}
         style={{ backgroundColor: item.color }}
       ></div>
-      <p className="text-[16px] font-medium">{item.name}</p>
+      <p className="text-[16px] font-medium" style={{ color: textColor }}>
+        {item.name}
+      </p>
     </div>
   );
 }

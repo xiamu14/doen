@@ -1,5 +1,5 @@
-import { unknown } from "zod";
 import TaskModal from "./task-modal";
+import ProjectModal from "./project-modal";
 
 export default function DialogProvider({
   children,
@@ -10,6 +10,7 @@ export default function DialogProvider({
     <>
       {children}
       <TaskModal />
+      <ProjectModal />
     </>
   );
 }
