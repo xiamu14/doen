@@ -38,9 +38,9 @@ export default function TaskCalendar() {
           })}
         </div>
       </div>
-      <div className="w-full h-[500px] overflow-y-scroll flex">
+      <div className="w-full h-[500px] overflow-y-scroll flex scrollbar-hide">
         <div className="w-[96px] flex-shrink-0 flex flex-col items-center">
-          {Array.from({ length: 15 }, (_, index) => index + 8).map(
+          {Array.from({ length: 16 }, (_, index) => index + 7).map(
             (hour, index) => {
               return (
                 <div
@@ -77,7 +77,7 @@ export default function TaskCalendar() {
               <div
                 key={`date-col-${index}`}
                 className={cn(
-                  "w-[150px] h-[1620px] border-r-[#eee] border-r-1 relative"
+                  "w-[150px] h-[1800px] border-r-[#eee] border-r-1 relative"
                   //   `${index === dates.length - 1 ? "border-r-1" : "border-r-1"}`
                 )}
               >
@@ -89,22 +89,22 @@ export default function TaskCalendar() {
                     develop doen web app
                   </p>
                   <p className="text-[8px] mt-[4px] text-[#96753B] my-0">
-                    8:00 -
+                    8:00 - 9:00
                   </p>
-                  <p className="text-[8px] text-[#96753B] my-0">9:00</p>
+                  {/* <p className="text-[8px] text-[#96753B] my-0">9:00</p> */}
                 </div>
                 <div
-                  className="absolute top-[200px] left-[10%] w-[80%] h-[60px] bg-[#FDF1E0] rounded-[6px] flex flex-col justify-around px-[10px] overflow-hidden cursor-pointer"
-                  style={{ top: 140 }}
+                  className="absolute top-[200px] left-[10%] w-[80%] h-[60px] bg-[#FDF1E0] rounded-[6px] flex flex-col justify-around px-[10px] py-[2px] overflow-hidden cursor-pointer"
+                  style={{ top: 140, lineHeight: "16px" }}
                 >
-                  <p className="text-[12px] font-semibold text-[#96753B] truncate flex-shrink-0">
+                  <p className="text-[12px] font-semibold text-[#96753B] flex-shrink-0 line-clamp-2">
                     develop doen web app
                   </p>
                   <div>
                     <p className="text-[8px] mt-[4px] text-[#96753B] my-0">
-                      8:00 -
+                      8:00 - 9:00
                     </p>
-                    <p className="text-[8px] text-[#96753B] my-0">9:00</p>
+                    {/* <p className="text-[8px] text-[#96753B] my-0">9:00</p> */}
                   </div>
                 </div>
                 {isNow && (
