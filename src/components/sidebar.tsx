@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 import { ChevronDown, Folder, Plus, Tag } from "lucide-react";
+import ProjectItem from "./project-item";
+import TagItem from "./tag-item";
 
 export default function Sidebar() {
   return (
@@ -39,23 +41,11 @@ function ListMenu() {
           { color: "#F05252", name: "AiVideo" },
         ].map((item, index) => {
           return (
-            <div
+            <ProjectItem
+              item={item}
               key={item.name}
-              className="flex justify-start items-center gap-[16px] cursor-pointer"
-            >
-              <div
-                className={cn("w-[12px] h-[6px] rounded-[3px]")}
-                style={{ backgroundColor: item.color }}
-              ></div>
-              <p
-                className={cn(
-                  "text-[16px] font-medium",
-                  `${index === 0 ? "text-content" : ""}`
-                )}
-              >
-                {item.name}
-              </p>
-            </div>
+              className={`${index === 0 ? "text-content" : ""}`}
+            />
           );
         })}
       </div>
@@ -89,18 +79,7 @@ function TagMenu() {
           { color: "#697ED5", name: "pressing" },
           { color: "#D5C169", name: "later" },
         ].map((item) => {
-          return (
-            <div
-              key={item.name}
-              className="flex justify-start items-center gap-[16px] cursor-pointer"
-            >
-              <div
-                className={cn("w-[10px] h-[10px] rounded-full")}
-                style={{ backgroundColor: item.color }}
-              ></div>
-              <p className="text-[16px] font-medium">{item.name}</p>
-            </div>
-          );
+          return <TagItem key={item.name} item={item} />;
         })}
       </div>
     </div>

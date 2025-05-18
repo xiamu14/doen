@@ -5,10 +5,8 @@ import Sidebar from "../sidebar";
 import TaskPanel from "../task-panel";
 
 export default function Container({
-  children,
   className,
 }: {
-  children: React.ReactNode;
   className: ClassNameValue;
 }) {
   return (
@@ -19,7 +17,7 @@ export default function Container({
           className
         )}
       >
-        <TopBar className="mb-[64px]"></TopBar>
+        <TopBar className="mb-[56px]"></TopBar>
         <div className="w-full flex flex-row justify-start mb-[44px] flex-grow-0 px-[48px] select-none">
           <Sidebar />
           <TaskPanel />

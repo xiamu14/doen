@@ -49,10 +49,13 @@
   --color-create-list: var(--primary-blue-500);
   --color-calender-main: var(--primary-blue-500);
   --color-content: var(--neutral-black-800);
+  --color-content-date: var(--neutral-black-500);
   --color-content-secondary: var(--neutral-gray-500);
+  --color-content-description: var(--neutral-gray-400);
   --color-calendar-date: var(--neutral-gray-600);
   --color-calendar-date-active: var(--primary-blue-300);
   --color-switch-layout-active: rgba(22, 22, 22, 0.1);
+  --color-task-process: var(--neutral-white-300);
 }
 
 :root {
@@ -69,6 +72,7 @@
   --neutral-gray-300: #dedede;
   --neutral-gray-100: #eaeaea;
 
+  --neutral-white-300: #eaeaea;
   --neutral-white-200: #f6f6f6;
 
   --radius: 0rem;
@@ -212,4 +216,8 @@
 
 @utility scrollbar-hide {
   @apply [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
+}
+
+@utility shadow-modal {
+  box-shadow: 0px 2px 12px 0px rgba(249, 249, 249, 1);
 }

@@ -1,6 +1,8 @@
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 import { useMemo } from "react";
+import { DialogUtils } from "./Dialog";
+import TaskCalendarCard from "./task/task-calendar-card";
 
 export default function TaskCalendar() {
   const dates = useMemo(() => {
@@ -12,7 +14,7 @@ export default function TaskCalendar() {
   }, []);
   return (
     <div className="w-full">
-      <div className="calendar-header w-full h-[50px] bg-[rgba(238,238,238,.3)] rounded-[10px] overflow-hidden flex items-center">
+      <div className="calendar-header w-full h-[46px] bg-[rgba(238,238,238,.3)] rounded-[12px] overflow-hidden flex items-center">
         <div className="w-[96px] flex-shrink-0 h-full center font-bold text-[18px] text-calender-main">
           May
         </div>
@@ -27,7 +29,7 @@ export default function TaskCalendar() {
                 className={"w-[150px] h-full center font-semibold text-[14px] "}
               >
                 {isNow ? (
-                  <div className="bg-[#DCECFF] w-[68px] h-[28px] rounded-[18px] center">
+                  <div className="bg-[#DCECFF] w-[68px] h-[26px] rounded-[18px] center">
                     <p className="text-calender-main">{formatted}</p>
                   </div>
                 ) : (
@@ -81,18 +83,7 @@ export default function TaskCalendar() {
                   //   `${index === dates.length - 1 ? "border-r-1" : "border-r-1"}`
                 )}
               >
-                <div
-                  className="absolute left-[10%] w-[80%] h-[35px] bg-[#FDF1E0] rounded-[6px] flex flex-col justify-start px-[10px] overflow-hidden"
-                  style={{ top: 30 }}
-                >
-                  <p className="text-[12px] font-semibold text-[#96753B] truncate flex-shrink-0">
-                    develop doen web app
-                  </p>
-                  <p className="text-[8px] mt-[4px] text-[#96753B] my-0">
-                    8:00 - 9:00
-                  </p>
-                  {/* <p className="text-[8px] text-[#96753B] my-0">9:00</p> */}
-                </div>
+                <TaskCalendarCard />
                 <div
                   className="absolute top-[200px] left-[10%] w-[80%] h-[60px] bg-[#FDF1E0] rounded-[6px] flex flex-col justify-around px-[10px] py-[2px] overflow-hidden cursor-pointer"
                   style={{ top: 140, lineHeight: "16px" }}
