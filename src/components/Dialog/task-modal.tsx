@@ -7,7 +7,7 @@ import { modalsState } from "./state";
 import { DialogUtils } from "./utils";
 import { Circle, Clock } from "lucide-react";
 import { Modals } from "./type";
-import { cn } from "@/lib/utils";
+import { cn } from "@/components/ui/utils";
 import ProjectItem from "../project-item";
 import TagItem from "../tag-item";
 import CustomInput from "../custom-input";

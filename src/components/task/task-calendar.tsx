@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/components/ui/utils";
 import dayjs from "dayjs";
 import { useMemo } from "react";
 import TaskCalendarRow from "./task-calendar-row";

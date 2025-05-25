@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Archivo } from "next/font/google";
 import "@/styles/globals.css";
 import { siteConfig } from "@/config/site.config";
-import { cn } from "@/lib/utils";
+import { cn } from "@/components/ui/utils";
 import RootProviders from "@/components/providers";
 
 const fontArchivo = Archivo({

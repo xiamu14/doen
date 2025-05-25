@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/components/ui/utils";
 import { Select } from "@headlessui/react";
 import { ClassNameValue } from "tailwind-merge";
 

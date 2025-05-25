@@ -51,7 +51,7 @@ export default function TaskCalendarCard() {
 
   return (
     <div
-      className="absolute left-[10%] w-[120px] h-[35px] bg-[#FDF1E0] rounded-[6px] flex flex-col justify-start px-[10px] overflow-hidden cursor-pointer"
+      className="absolute left-[10%] w-[120px] h-[35px] bg-[#FDF1E0] rounded-[6px] flex flex-col justify-start px-[10px] overflow-hidden cursor-pointer z-12"
       ref={cardRef}
       style={{ left: 15, top: 30 }}
       onClick={(e) => {

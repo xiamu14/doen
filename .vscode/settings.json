@@ -12,6 +12,7 @@
         "gsap",
         "rgba",
         "topbar",
-        "valtio"
+        "valtio",
+        "xata"
     ]
 }

@@ -1,5 +1,4 @@
 import { ThemeProvider } from "@/components/theme/provider";
-import { Toaster } from "@/components/ui/sonner";
 
 export default function RootProviders({
   children,
@@ -13,7 +12,6 @@ export default function RootProviders({
       enableSystem
       disableTransitionOnChange
     >
-      <Toaster position="top-right" />
       {children}
     </ThemeProvider>
   );

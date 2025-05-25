@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/components/ui/utils";
 import { ClassNameValue } from "tailwind-merge";
 import TopBar from "../topbar";
 import Sidebar from "../sidebar";

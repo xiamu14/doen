@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/components/ui/utils";
 import { cva, VariantProps } from "class-variance-authority";
 import { Select } from "@headlessui/react";
 

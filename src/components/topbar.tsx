@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/components/ui/utils";
 import { Search } from "lucide-react";
 import Image from "next/image";
 import { ClassNameValue } from "tailwind-merge";

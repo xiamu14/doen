@@ -5,7 +5,7 @@ import { useSnapshot } from "valtio";
 import { modalsState } from "./state";
 import { DialogUtils } from "./utils";
 import { Modals } from "./type";
-import { cn } from "@/lib/utils";
+import { cn } from "@/components/ui/utils";
 
 export default function ProjectModal() {
   const modalsSnap = useSnapshot(modalsState);
