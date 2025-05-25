@@ -10,11 +10,6 @@ export async function GET(request: NextRequest) {
       tasks: true,
     },
   });
-  const result =
-    inbox ??
-    (await db.insert(project).values({
-      name: "inbox",
-      color: "#F2BB59",
-    }));
-  return NextResponse.json(result);
+
+  return NextResponse.json(inbox);
 }
