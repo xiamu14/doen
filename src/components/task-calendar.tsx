@@ -3,6 +3,7 @@ import dayjs from "dayjs";
 import { useMemo } from "react";
 import { DialogUtils } from "./Dialog";
 import TaskCalendarCard from "./task/task-calendar-card";
+import TaskCalendarRow from "./task-calendar-row";
 
 export default function TaskCalendar() {
   const dates = useMemo(() => {
@@ -75,34 +76,7 @@ export default function TaskCalendar() {
         <div className="flex-1 w-0 h-full flex flex-row">
           {dates.map((item, index) => {
             const isNow = dayjs().isSame(item.date, "day");
-            return (
-              <div
-                key={`date-col-${index}`}
-                className={cn(
-                  "w-[150px] h-[1800px] border-r-[#eee] border-r-1 relative"
-                  //   `${index === dates.length - 1 ? "border-r-1" : "border-r-1"}`
-                )}
-              >
-                <TaskCalendarCard />
-                <div
-                  className="absolute top-[200px] left-[10%] w-[80%] h-[60px] bg-[#FDF1E0] rounded-[6px] flex flex-col justify-around px-[10px] py-[2px] overflow-hidden cursor-pointer"
-                  style={{ top: 140, lineHeight: "16px" }}
-                >
-                  <p className="text-[12px] font-semibold text-[#96753B] flex-shrink-0 line-clamp-2">
-                    develop doen web app
-                  </p>
-                  <div>
-                    <p className="text-[8px] mt-[4px] text-[#96753B] my-0">
-                      8:00 - 9:00
-                    </p>
-                    {/* <p className="text-[8px] text-[#96753B] my-0">9:00</p> */}
-                  </div>
-                </div>
-                {isNow && (
-                  <div className="w-full h-[1px] absolute top-[40px] left-[0] bg-[#f16767] z-10"></div>
-                )}
-              </div>
-            );
+            return <TaskCalendarRow key={`date-col-${index}`} isNow={isNow} />;
           })}
         </div>
       </div>

@@ -7,6 +7,7 @@ export default function TaskCalendarCard() {
       className="absolute left-[10%] w-[80%] h-[35px] bg-[#FDF1E0] rounded-[6px] flex flex-col justify-start px-[10px] overflow-hidden cursor-pointer"
       style={{ top: 30 }}
       onClick={(e) => {
+        e.stopPropagation();
         const rect = e.currentTarget.getBoundingClientRect();
         // console.log("[rect]", rect);
         DialogUtils.show("taskModal", {
