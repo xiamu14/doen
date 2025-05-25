@@ -1,14 +1,30 @@
+"use client";
+
 import { cn } from "@/components/ui/utils";
 import { ClassNameValue } from "tailwind-merge";
 import TopBar from "../topbar";
 import Sidebar from "../sidebar";
 import TaskPanel from "../task/task-panel";
+import { useQuery } from "@tanstack/react-query";
+import { getList } from "@/client/api/task";
+import { useEffect } from "react";
 
 export default function Container({
   className,
 }: {
   className: ClassNameValue;
 }) {
+  const list = useQuery({
+    queryKey: ["list"],
+    queryFn: getList,
+  });
+
+  useEffect(() => {
+    if (list.isFetched) {
+      console.log(list.data);
+    }
+  }, [list]);
+
   return (
     <div className="flex justify-center items-center pt-[32px]">
       <div
