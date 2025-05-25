@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { ClassNameValue } from "tailwind-merge";
 import TopBar from "../topbar";
 import Sidebar from "../sidebar";
-import TaskPanel from "../task-panel";
+import TaskPanel from "../task/task-panel";
 
 export default function Container({
   className,

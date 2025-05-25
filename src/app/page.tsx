@@ -4,7 +4,7 @@ import Container from "@/components/layouts/container";
 export default function Page() {
   return (
     <DialogProvider>
-      <Container className="flex justify-center items-center"></Container>;
+      <Container className="flex justify-center items-center"></Container>
     </DialogProvider>
   );
 }

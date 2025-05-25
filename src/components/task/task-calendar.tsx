@@ -1,9 +1,8 @@
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 import { useMemo } from "react";
-import { DialogUtils } from "./Dialog";
-import TaskCalendarCard from "./task/task-calendar-card";
 import TaskCalendarRow from "./task-calendar-row";
+import TaskCalendarCard from "./task-calendar-card";
 
 export default function TaskCalendar() {
   const dates = useMemo(() => {
@@ -13,8 +12,10 @@ export default function TaskCalendar() {
     }));
     return days;
   }, []);
+
   return (
     <div className="w-full">
+      {/* 日期区域 */}
       <div className="calendar-header w-full h-[46px] bg-[rgba(238,238,238,.3)] rounded-[12px] overflow-hidden flex items-center">
         <div className="w-[96px] flex-shrink-0 h-full center font-bold text-[18px] text-calender-main">
           May
@@ -74,10 +75,18 @@ export default function TaskCalendar() {
           )}
         </div>
         <div className="flex-1 w-0 h-full flex flex-row">
-          {dates.map((item, index) => {
-            const isNow = dayjs().isSame(item.date, "day");
-            return <TaskCalendarRow key={`date-col-${index}`} isNow={isNow} />;
-          })}
+          <div
+            id="task-calendar-draggable"
+            className=" relative h-[1800px] flex flex-row"
+          >
+            {dates.map((item, index) => {
+              const isNow = dayjs().isSame(item.date, "day");
+              return (
+                <TaskCalendarRow key={`date-col-${index}`} isNow={isNow} />
+              );
+            })}
+            <TaskCalendarCard />
+          </div>
         </div>
       </div>
     </div>

@@ -12,6 +12,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@gsap/react": "^2.1.2",
     "@headlessui/react": "^2.2.3",
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-avatar": "^1.1.9",
@@ -28,6 +29,7 @@
     "dayjs": "^1.11.13",
     "dotenv": "^16.5.0",
     "drizzle-orm": "^0.43.1",
+    "gsap": "^3.13.0",
     "lucide-react": "^0.503.0",
     "nanoid": "^5.1.5",
     "next": "15.4.0-canary.34",
