@@ -8,6 +8,7 @@ import TaskPanel from "../task/task-panel";
 import { useQuery } from "@tanstack/react-query";
 import { getList } from "@/client/api/task";
 import { useEffect } from "react";
+import { orpcClient } from "@/lib/orpc/client";
 
 export default function Container({
   className,
@@ -23,6 +24,13 @@ export default function Container({
     if (list.isFetched) {
       console.log(list.data);
     }
+    orpcClient.hello({ name: "world" }).then((res) => {
+      console.log(
+        "%c res",
+        "background: #69c0ff; color: white; padding: 4px",
+        res
+      );
+    });
   }, [list]);
 
   return (
