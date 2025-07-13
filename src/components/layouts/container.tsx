@@ -22,7 +22,11 @@ export default function Container({
 
   useEffect(() => {
     if (list.isFetched) {
-      console.log(list.data);
+      console.log(
+        "%c list",
+        "background: #69c0ff; color: white; padding: 4px",
+        list.data
+      );
     }
     orpcClient.hello({ name: "world" }).then((res) => {
       console.log(

@@ -1,5 +1,3 @@
-import { eq } from "drizzle-orm";
-import { project } from "@/lib/db/schema/task";
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
