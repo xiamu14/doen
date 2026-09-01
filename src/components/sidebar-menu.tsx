@@ -17,26 +17,26 @@ export function ListMenu() {
     });
   }, []);
   return (
-    <div className="w-full flex flex-col gap-[24px]">
-      <div className="w-full flex justify-start items-center gap-[24px]">
+    <div className="w-full flex flex-col gap-[10px]">
+      <div className="w-full flex justify-start items-center gap-[20px]">
         <div className="flex justify-start items-center gap-[10px]">
           <ChevronDown
             size={18}
             color="#333"
             className="cursor-pointer mr-[2px]"
           />
-          <Folder size={18} color="#333" />
+          <Folder size={16} color="#333" />
           <p className="text-[18px] font-semibold text-content">List</p>
         </div>
         <div
           className="flex justify-start items-center gap-[4px] cursor-pointer"
           onClick={handleProject}
         >
-          <Plus size={18} color="#7390FE" />
+          <Plus size={16} color="#7390FE" />
           <p className="text-create-list font-medium text-[14px]">new</p>
         </div>
       </div>
-      <div className="pl-[30px] flex flex-col  items-start gap-[16px] text-content-secondary">
+      <div className="pl-[30px] flex flex-col  items-start gap-[8px] text-content-secondary">
         {[
           { color: "#F2BB59", name: "Inbox" },
           { color: "#F05252", name: "AiVideo" },
@@ -56,19 +56,19 @@ export function ListMenu() {
 
 export function TagMenu() {
   return (
-    <div className="w-full flex flex-col gap-[24px]">
-      <div className="w-full flex justify-start items-center gap-[24px]">
+    <div className="w-full flex flex-col gap-[20px]">
+      <div className="w-full flex justify-start items-center gap-[20px]">
         <div className="flex justify-start items-center gap-[10px]">
           <ChevronDown
             size={18}
             color="#333"
             className="cursor-pointer mr-[2px]"
           />
-          <Tag size={18} color="#333" />
+          <Tag size={16} color="#333" />
           <p className="text-[18px] font-semibold text-content">Tag</p>
         </div>
         <div className="flex justify-start items-center gap-[4px] cursor-pointer">
-          <Plus size={18} color="#7390FE" />
+          <Plus size={16} color="#7390FE" />
 
           <p className="text-create-list font-medium text-[14px]">new</p>
         </div>

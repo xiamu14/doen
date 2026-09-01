@@ -50,7 +50,7 @@ export default function ProjectModal() {
           >
             <DialogPanel
               transition
-              className="w-[260px] flex-shrink-0 max-w-md rounded-[16px] bg-white border-1 border-[#f1f1f1] p-6 backdrop-blur-2xl shadow-modal duration-300 ease-out data-closed:transform-[scale(95%)] data-closed:opacity-0"
+              className="w-[220px] flex-shrink-0 max-w-md rounded-[16px] bg-white border-1 border-[#f1f1f1] p-6 backdrop-blur-2xl shadow-modal duration-300 ease-out data-closed:transform-[scale(95%)] data-closed:opacity-0"
               style={
                 position
                   ? {
@@ -72,7 +72,7 @@ export default function ProjectModal() {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-[8px] relative top-[-4px]">
+                <div className="hidden items-center gap-[8px] relative top-[-4px]">
                   {["#FF6767", "#FF67CB", "#A667FF"].map((color, index) => {
                     const isActive = index === activeProject;
                     return (

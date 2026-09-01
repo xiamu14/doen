@@ -38,15 +38,15 @@ export default function Container({
   }, [list]);
 
   return (
-    <div className="flex justify-center items-center pt-[32px]">
+    <div className="flex flex-col justify-center items-center py-[32px] h-dvh">
       <div
         className={cn(
-          "flex flex-col max-w-[1290px] w-[1290px] max-h-[764px]",
+          "flex flex-col max-w-[1290px] w-[1290px] flex-1",
           className
         )}
       >
-        <TopBar className="mb-[56px]"></TopBar>
-        <div className="w-full flex flex-row justify-start mb-[44px] flex-grow-0 px-[48px] select-none">
+        <TopBar className="mb-[20px]"></TopBar>
+        <div className="w-full flex flex-row justify-start flex-grow-0 px-[48px] select-none flex-1">
           <Sidebar />
           <TaskPanel />
         </div>

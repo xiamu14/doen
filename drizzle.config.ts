@@ -1,8 +1,9 @@
 import { config } from "dotenv";
 import { defineConfig } from "drizzle-kit";
 
-config({ path: ".env.local" });
+config({ path: ".env" });
 const isDev = process.env.NODE_ENV === "development";
+console.log("isDev", isDev);
 export default defineConfig({
   schema: "./src/lib/db/schema",
   out: "./drizzle/migrations",

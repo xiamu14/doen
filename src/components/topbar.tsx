@@ -21,7 +21,7 @@ export default function TopBar({ className }: { className?: ClassNameValue }) {
       </div>
       <div className="flex items-center justify-end">
         <p className="text-content-secondary text-[18px] font-medium mr-[10px]">
-          Jack
+          Ben
         </p>
         <div className="w-[30px] h-[30px] rounded-full overflow-hidden border-[2px] border-primary">
           <img

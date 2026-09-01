@@ -68,7 +68,7 @@ export default function TaskCalendarCard() {
       <p className="text-[12px] font-semibold text-[#96753B] truncate flex-shrink-0">
         develop doen web app
       </p>
-      <p className="text-[8px] mt-[4px] text-[#96753B] my-0">8:00 - 9:00</p>
+      <p className="text-[10px] mt-[2px] text-[#96753B] my-0">8:00 - 9:00</p>
       {/* <p className="text-[8px] text-[#96753B] my-0">9:00</p> */}
       <div
         className="resizable-bottom absolute left-0 bottom-0 w-full h-[10px] cursor-s-resize"
