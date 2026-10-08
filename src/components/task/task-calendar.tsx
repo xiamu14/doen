@@ -10,6 +10,12 @@ import TaskCalendarCard from "./task-calendar-card";
 export default function TaskCalendar() {
   const queryClient = useQueryClient();
   const pendingSaves = useRef(new Map<string, Promise<void>>());
+  const headerScrollRef = useRef<HTMLDivElement>(null);
+  const bodyScrollRef = useRef<HTMLDivElement>(null);
+  const syncHorizontalScroll = (source: "header" | "body", scrollLeft: number) => {
+    const target = source === "header" ? bodyScrollRef.current : headerScrollRef.current;
+    if (target && target.scrollLeft !== scrollLeft) target.scrollLeft = scrollLeft;
+  };
   const { data: tasks = [] } = useQuery({ queryKey: ["tasks"], queryFn: getTasks });
   const savePosition = (updated: TaskRecord) => {
     queryClient.setQueryData<TaskRecord[]>(["tasks"], (current) =>
@@ -38,26 +44,32 @@ export default function TaskCalendar() {
         <div className="w-[96px] flex-shrink-0 h-full center font-bold text-[18px] text-calender-main">
           {dayjs().format("MMMM")}
         </div>
-        <div className="flex-1 flex flex-row w-0 items-center">
-          {dates.map((item, index) => {
-            const dateFn = dayjs(item.date);
-            const isNow = dayjs().isSame(dateFn, "day");
-            const formatted = dateFn.format("ddd D");
-            return (
-              <div
-                key={`date-${index}`}
-                className={"w-[150px] flex-shrink-0 h-full center font-semibold text-[14px] "}
-              >
-                {isNow ? (
-                  <div className="bg-[#DCECFF] w-[68px] h-[26px] rounded-[18px] center">
-                    <p className="text-calender-main">{formatted}</p>
-                  </div>
-                ) : (
-                  <p className="text-calendar-date">{formatted}</p>
-                )}
-              </div>
-            );
-          })}
+        <div
+          ref={headerScrollRef}
+          className="flex-1 w-0 overflow-x-auto scrollbar-hide"
+          onScroll={(event) => syncHorizontalScroll("header", event.currentTarget.scrollLeft)}
+        >
+          <div className="flex w-[1050px] min-w-full flex-row items-center">
+            {dates.map((item, index) => {
+              const dateFn = dayjs(item.date);
+              const isNow = dayjs().isSame(dateFn, "day");
+              const formatted = dateFn.format("ddd D");
+              return (
+                <div
+                  key={`date-${index}`}
+                  className={"w-[150px] flex-shrink-0 h-full center font-semibold text-[14px] "}
+                >
+                  {isNow ? (
+                    <div className="bg-[#DCECFF] w-[68px] h-[26px] rounded-[18px] center">
+                      <p className="text-calender-main">{formatted}</p>
+                    </div>
+                  ) : (
+                    <p className="text-calendar-date">{formatted}</p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
       <div className="w-full h-[500px] mt-5 overflow-y-scroll flex scrollbar-hide">
@@ -86,11 +98,16 @@ export default function TaskCalendar() {
             }
           )}
         </div>
-        <div className="flex-1 w-0 h-full flex flex-row">
-          <div
-            id="task-calendar-draggable"
-            className="relative h-[1600px] flex flex-row"
-          >
+        <div
+          ref={bodyScrollRef}
+          className="flex-1 w-0 h-[1600px] overflow-x-auto scrollbar-hide"
+          onScroll={(event) => syncHorizontalScroll("body", event.currentTarget.scrollLeft)}
+        >
+          <div className="w-[1050px] min-w-full h-[1600px]">
+            <div
+              id="task-calendar-draggable"
+              className="relative h-full w-[1050px] flex flex-row"
+            >
             {dates.map((item, index) => {
               const isNow = dayjs().isSame(item.date, "day");
               return (
@@ -113,6 +130,7 @@ export default function TaskCalendar() {
                 onChange={savePosition}
               />;
             })}
+            </div>
           </div>
         </div>
       </div>
