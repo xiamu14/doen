@@ -23,7 +23,7 @@ export default function TaskCalendarRow({ isNow, date, tasks }: Props) {
         if (slot === null) return;
         DialogUtils.show("taskModal", {
           x: taskModalX(rect.left, rect.right, window.innerWidth),
-          y: rect.top + slot * SLOT_HEIGHT - 10,
+          y: e.clientY,
           start: startFromSlot(date, slot),
         });
       }}

@@ -1,7 +1,7 @@
 "use client";
 
 import { Dialog, DialogPanel } from "@headlessui/react";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSnapshot } from "valtio";
 import dayjs from "dayjs";
@@ -32,6 +32,8 @@ export default function TaskModal() {
   const [isStatusSaving, setIsStatusSaving] = useState(false);
   const [error, setError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [modalPosition, setModalPosition] = useState<{ placement: "top" | "middle" | "bottom"; offset: number }>({ placement: "top", offset: 0 });
   const isCompleted = status === "done";
 
   useEffect(() => {
@@ -46,6 +48,42 @@ export default function TaskModal() {
     setEndTime(start.add(data?.task?.duration ?? 30, "minute").format("HH:mm"));
     setError("");
   }, [isOpen, data?.task?.id, data?.task?.status, data?.start]);
+
+  useLayoutEffect(() => {
+    if (!isOpen || !data) return;
+    const margin = 16;
+    const clickY = data.y;
+    const cardTop = data.top ?? clickY;
+    const cardBottom = data.bottom ?? clickY;
+    setModalPosition({ placement: "top", offset: Math.max(margin, cardTop) });
+    let frame = 0;
+    const updatePosition = () => {
+      const panel = panelRef.current;
+      if (!panel) {
+        frame = requestAnimationFrame(updatePosition);
+        return;
+      }
+      const height = panel.offsetHeight;
+      const viewportHeight = window.innerHeight;
+      if (data.top !== undefined && cardTop + height <= viewportHeight - margin) {
+        setModalPosition({ placement: "top", offset: Math.max(margin, cardTop) });
+      } else if (data.bottom !== undefined && cardBottom - height >= margin) {
+        setModalPosition({ placement: "bottom", offset: viewportHeight - cardBottom });
+      } else if (data.top === undefined && clickY + height <= viewportHeight - margin) {
+        setModalPosition({ placement: "top", offset: Math.max(margin, clickY) });
+      } else if (data.top === undefined && clickY - height >= margin) {
+        setModalPosition({ placement: "bottom", offset: viewportHeight - clickY });
+      } else {
+        setModalPosition({ placement: "middle", offset: Math.max(margin, Math.min(clickY - height / 2, viewportHeight - height - margin)) });
+      }
+    };
+    frame = requestAnimationFrame(updatePosition);
+    window.addEventListener("resize", updatePosition);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("resize", updatePosition);
+    };
+  }, [isOpen, data?.x, data?.y, data?.top, data?.bottom, data?.task?.id, status, error, isSaving]);
 
   const close = () => DialogUtils.hide("taskModal");
   const selectedProjectId = projectId === undefined ? projects[0]?.id ?? null : projectId;
@@ -106,7 +144,7 @@ export default function TaskModal() {
   };
 
   const remove = async () => {
-    if (!data?.task || isSaving || isCompleted || !window.confirm(`Delete "${data.task.title}"?`)) return;
+    if (!data?.task || isSaving || isCompleted) return;
     setIsSaving(true);
     setError("");
     try {
@@ -126,9 +164,16 @@ export default function TaskModal() {
       <div className="fixed inset-0 z-50 w-screen overflow-y-auto">
         <div className={`flex min-h-full relative ${data ? "justify-start items-start" : "justify-center items-center"}`}>
           <DialogPanel
+            ref={panelRef}
             transition
-            className="w-[320px] flex-shrink-0 max-w-md rounded-[16px] bg-white border-1 border-[#f1f1f1] p-6 backdrop-blur-2xl shadow-modal duration-300 ease-out data-closed:transform-[scale(95%)] data-closed:opacity-0"
-            style={data ? { position: "absolute", top: `${data.y}px`, left: `${data.x}px` } : {}}
+            className="w-[320px] max-h-[calc(100dvh-32px)] overflow-y-auto flex-shrink-0 max-w-md rounded-[16px] bg-white border-1 border-[#f1f1f1] p-6 backdrop-blur-2xl shadow-modal duration-300 ease-out data-closed:transform-[scale(95%)] data-closed:opacity-0"
+            style={data ? {
+              position: "absolute",
+              left: `${data.x}px`,
+              ...(modalPosition.placement === "bottom"
+                ? { bottom: `${modalPosition.offset}px` }
+                : { top: `${modalPosition.offset}px` }),
+            } : {}}
           >
             <form onSubmit={save} className="flex items-start gap-[10px] pr-[22px]">
               <div className="project flex-shrink-0 w-[4px] h-[20px] rounded-[2px] bg-[#f05252]" />

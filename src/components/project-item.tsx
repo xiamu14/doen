@@ -6,7 +6,7 @@ import type { ProjectRecord } from "@/client/api/task";
 const variants = cva("flex justify-start items-center  cursor-pointer", {
   variants: {
     tight: {
-      false: "gap-[16px]",
+      false: "gap-[14px]",
       true: "gap-[8px]",
     },
   },

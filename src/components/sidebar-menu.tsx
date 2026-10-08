@@ -88,7 +88,7 @@ export function TagMenu() {
           <p className="text-create-list font-medium text-[14px]">new</p>
         </div>
       </div>
-      <div className="pl-[30px] flex flex-col  items-start gap-[16px] text-content-secondary">
+      <div className="pl-[30px] flex flex-col  items-start gap-[14px] text-content-secondary">
         {[
           { color: "#69D571", name: "easy" },
           { color: "#D569B2", name: "difficulty" },

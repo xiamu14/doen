@@ -108,7 +108,13 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
         const rect = event.currentTarget.getBoundingClientRect();
         const column = event.currentTarget.parentElement!.querySelectorAll<HTMLElement>("[data-calendar-day]")[dayIndex];
         const columnRect = column.getBoundingClientRect();
-        DialogUtils.show("taskModal", { x: taskModalX(columnRect.left, columnRect.right, window.innerWidth), y: rect.top - 10, task });
+        DialogUtils.show("taskModal", {
+          x: taskModalX(columnRect.left, columnRect.right, window.innerWidth),
+          y: event.clientY,
+          top: rect.top,
+          bottom: rect.bottom,
+          task,
+        });
       }}
     >
       <p className="text-[12px] font-semibold text-[#96753B] truncate flex-shrink-0">{task.title}</p>
