@@ -6,15 +6,28 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getTasks, updateTask, type TaskRecord } from "@/client/api/task";
 import TaskCalendarRow from "./task-calendar-row";
 import TaskCalendarCard from "./task-calendar-card";
+import { SLOT_HEIGHT, slotFromStart } from "./calendar-time";
 
 export default function TaskCalendar() {
   const queryClient = useQueryClient();
   const pendingSaves = useRef(new Map<string, Promise<void>>());
   const headerScrollRef = useRef<HTMLDivElement>(null);
   const bodyScrollRef = useRef<HTMLDivElement>(null);
+  const calendarScrollRef = useRef<HTMLDivElement>(null);
   const syncHorizontalScroll = (source: "header" | "body", scrollLeft: number) => {
     const target = source === "header" ? bodyScrollRef.current : headerScrollRef.current;
     if (target && target.scrollLeft !== scrollLeft) target.scrollLeft = scrollLeft;
+  };
+  const scrollToCurrentTime = () => {
+    const scroll = calendarScrollRef.current;
+    if (!scroll) return;
+    const currentTop = slotFromStart(new Date().toISOString()) * SLOT_HEIGHT;
+    const centeredTop = currentTop - (scroll.clientHeight - SLOT_HEIGHT) / 2;
+    const maxTop = scroll.scrollHeight - scroll.clientHeight;
+    scroll.scrollTo({
+      top: Math.max(0, Math.min(centeredTop, maxTop)),
+      behavior: "smooth",
+    });
   };
   const { data: tasks = [] } = useQuery({ queryKey: ["tasks"], queryFn: getTasks });
   const savePosition = (updated: TaskRecord) => {
@@ -72,8 +85,11 @@ export default function TaskCalendar() {
           </div>
         </div>
       </div>
-      <div className="w-full h-[500px] mt-5 overflow-y-scroll flex scrollbar-hide">
-        <div className="w-[96px] flex-shrink-0 flex flex-col items-center">
+      <div ref={calendarScrollRef} className="w-full h-[500px] mt-5 overflow-y-scroll flex scrollbar-hide">
+        <div
+          className="w-[96px] flex-shrink-0 flex flex-col items-center"
+          onDoubleClick={scrollToCurrentTime}
+        >
           {Array.from({ length: 16 }, (_, index) => index + 7).map(
             (hour, index) => {
               return (
