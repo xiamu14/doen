@@ -12,7 +12,7 @@ export default function TopBar({ className }: { className?: ClassNameValue }) {
     >
       <div className="flex justify-start items-baseline gap-[10px]">
         <div className="font-extrabold text-[32px] text-topbar-logo">Doen</div>
-        <div className="text-[16px] font-medium text-content-secondary">
+        <div className="text-[16px] font-medium text-content-secondary translate-y-[-2px]">
           personal task
         </div>
       </div>

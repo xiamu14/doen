@@ -29,8 +29,10 @@ export default function TaskModal() {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [status, setStatus] = useState<TaskRecord["status"]>("idle");
+  const [isStatusSaving, setIsStatusSaving] = useState(false);
   const [error, setError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const isCompleted = status === "done";
 
   useEffect(() => {
     if (!isOpen) return;
@@ -43,15 +45,35 @@ export default function TaskModal() {
     setStartTime(start.format("HH:mm"));
     setEndTime(start.add(data?.task?.duration ?? 30, "minute").format("HH:mm"));
     setError("");
-  }, [isOpen, data?.task?.id, data?.start]);
+  }, [isOpen, data?.task?.id, data?.task?.status, data?.start]);
 
   const close = () => DialogUtils.hide("taskModal");
   const selectedProjectId = projectId === undefined ? projects[0]?.id ?? null : projectId;
   const selectedProject = projects.find((project) => project.id === selectedProjectId);
 
+  const toggleStatus = async () => {
+    if (isStatusSaving) return;
+    const nextStatus = status === "done" ? "idle" : "done";
+    const previousStatus = status;
+    setStatus(nextStatus);
+    if (!data?.task) return;
+    setIsStatusSaving(true);
+    setError("");
+    try {
+      const task = await updateTask({ ...data.task, status: nextStatus });
+      queryClient.setQueryData<TaskRecord[]>(["tasks"], (current = []) =>
+        current.map((item) => item.id === task.id ? task : item));
+    } catch (cause) {
+      setStatus(previousStatus);
+      setError(cause instanceof Error ? cause.message : "Could not update task status.");
+    } finally {
+      setIsStatusSaving(false);
+    }
+  };
+
   const save = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (isSaving) return;
+    if (isSaving || isCompleted) return;
     if (!list) {
       setError("Could not load projects. Try again.");
       return;
@@ -84,7 +106,7 @@ export default function TaskModal() {
   };
 
   const remove = async () => {
-    if (!data?.task || isSaving || !window.confirm(`Delete "${data.task.title}"?`)) return;
+    if (!data?.task || isSaving || isCompleted || !window.confirm(`Delete "${data.task.title}"?`)) return;
     setIsSaving(true);
     setError("");
     try {
@@ -115,9 +137,9 @@ export default function TaskModal() {
                   <button
                     type="button"
                     aria-label={status === "done" ? "Mark task incomplete" : "Mark task complete"}
-                    disabled={isSaving}
-                    onClick={() => setStatus((current) => current === "done" ? "idle" : "done")}
-                    className="flex-shrink-0 cursor-pointer disabled:opacity-50"
+                    disabled={isSaving || isStatusSaving}
+                    onClick={toggleStatus}
+                    className="flex-shrink-0 cursor-pointer disabled:cursor-default disabled:opacity-50"
                   >
                     {status === "done" ? <CircleCheck size={18} color="#69D571" /> : <Circle size={18} color="#8A8A8A" />}
                   </button>
@@ -125,6 +147,7 @@ export default function TaskModal() {
                     <CustomInput
                       ariaLabel="Task title"
                       singleLine
+                      disable={isCompleted}
                       value={title}
                       onChange={(event) => setTitle((event.target as HTMLDivElement).textContent ?? "")}
                       className="min-h-[22px] text-[18px] font-medium text-content"
@@ -133,6 +156,7 @@ export default function TaskModal() {
                 </div>
                 <CustomInput
                   ariaLabel="Task description"
+                  disable={isCompleted}
                   value={content}
                   onChange={(event) => setContent((event.target as HTMLDivElement).textContent ?? "")}
                   className="px-[4px] py-[2px] min-h-[20px] text-[14px] font-medium text-content-description rounded-[6px] ml-[24px] focus:bg-[#eee] focus:text-[#666]"
@@ -145,20 +169,37 @@ export default function TaskModal() {
                 </div>
                 <div className="text-[14px] font-medium text-content-date ml-[26px]">{date && dayjs(date).format("MMM D")}</div>
                 <div className="flex items-center justify-start gap-[16px] mt-[14px]">
-                  <ProjectItem
-                    item={selectedProject ?? { name: "No project", color: "#B9B9B9" }}
-                    projects={projects}
-                    projectId={selectedProjectId}
-                    onProjectChange={(id) => setProjectId(id || null)}
-                    tight textColor="#B9B9B9" isSelection
-                  />
-                  <TagItem item={{ name: "easy", color: "#69D571" }} tight textColor="#B9B9B9" isSelection />
+                  {isCompleted ? (
+                    <>
+                      <div className="flex items-center gap-[8px]">
+                        <div className="w-[12px] h-[6px] rounded-[3px] bg-[#B9B9B9]" />
+                        <span className="text-[16px] font-medium text-[#B9B9B9]">{selectedProject?.name ?? "No project"}</span>
+                      </div>
+                      <div className="flex items-center gap-[8px]">
+                        <div className="w-[10px] h-[10px] rounded-full bg-[#69D571]" />
+                        <span className="text-[16px] font-medium text-[#B9B9B9]">easy</span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <ProjectItem
+                        item={selectedProject ?? { name: "No project", color: "#B9B9B9" }}
+                        projects={projects}
+                        projectId={selectedProjectId}
+                        onProjectChange={(id) => setProjectId(id || null)}
+                        tight textColor="#B9B9B9" isSelection
+                      />
+                      <TagItem item={{ name: "easy", color: "#69D571" }} tight textColor="#B9B9B9" isSelection />
+                    </>
+                  )}
                 </div>
                 {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
-                <div className="w-full flex items-center justify-between gap-[16px] mt-[20px]">
-                  {data?.task && <button type="button" onClick={remove} disabled={isSaving} className="flex-1 h-[36px] bg-white text-content text-[14px] font-semibold center border-1 rounded-[10px] cursor-pointer disabled:opacity-50">Delete</button>}
-                  <button type="submit" disabled={isSaving} className="flex-1 h-[36px] rounded-[10px] bg-primary center font-semibold text-[14px] text-white cursor-pointer disabled:opacity-50">{isSaving ? "Saving..." : "Apply"}</button>
-                </div>
+                {!isCompleted && (
+                  <div className="w-full flex items-center justify-between gap-[16px] mt-[20px]">
+                    {data?.task && <button type="button" onClick={remove} disabled={isSaving} className="flex-1 h-[36px] bg-white text-content text-[14px] font-semibold center border-1 rounded-[10px] cursor-pointer disabled:opacity-50">Delete</button>}
+                    <button type="submit" disabled={isSaving} className="flex-1 h-[36px] rounded-[10px] bg-primary center font-semibold text-[14px] text-white cursor-pointer disabled:opacity-50">{isSaving ? "Saving..." : "Apply"}</button>
+                  </div>
+                )}
               </div>
             </form>
           </DialogPanel>

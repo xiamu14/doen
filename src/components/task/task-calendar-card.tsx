@@ -23,6 +23,7 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
   const durationSlots = task.duration / SLOT_MINUTES;
 
   useEffect(() => {
+    if (task.status === "done") return;
     const card = cardRef.current!;
     const columns = Array.from(card.parentElement!.querySelectorAll<HTMLElement>("[data-calendar-day]"));
     const columnFor = (x: number) => {
@@ -95,12 +96,12 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
       main[0].kill();
       resize[0].kill();
     };
-  }, [task.start, task.duration, dayIndex]);
+  }, [task.start, task.duration, task.status, dayIndex]);
 
   return (
     <div
       ref={cardRef}
-      className="absolute w-[120px] bg-[#FDF1E0] py-[2px] rounded-[6px] flex flex-col px-[10px] overflow-hidden cursor-pointer z-12"
+      className={`absolute w-[120px] bg-[#FDF1E0] py-[2px] rounded-[6px] flex flex-col px-[10px] overflow-hidden z-12 ${task.status === "done" ? "cursor-default" : "cursor-pointer"}`}
       style={{ left: dayIndex * 150 + 15, top: slotFromStart(task.start) * SLOT_HEIGHT, height: durationSlots * SLOT_HEIGHT }}
       onClick={(event) => {
         event.stopPropagation();
