@@ -7,6 +7,7 @@ import gsap from "gsap";
 import { Draggable } from "gsap/Draggable";
 import { useEffect, useRef } from "react";
 import { clampSlot, SLOT_COUNT, SLOT_HEIGHT, SLOT_MINUTES, slotFromStart, startFromSlot, taskModalX } from "./calendar-time";
+import { TASK_TAGS } from "@/lib/task-tags";
 
 gsap.registerPlugin(Draggable);
 
@@ -20,7 +21,10 @@ type Props = {
 export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Props) {
   const cardRef = useRef<HTMLDivElement>(null);
   const resizeRef = useRef<HTMLDivElement>(null);
+  const taskRef = useRef(task);
+  taskRef.current = task;
   const durationSlots = task.duration / SLOT_MINUTES;
+  const tag = TASK_TAGS.find((tag) => tag.name === (task.tagId ?? "easy")) ?? TASK_TAGS[0];
   const minDurationSlots = 2;
   const maxDurationSlots = 4;
 
@@ -64,7 +68,7 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
           onComplete: () => {
             gsap.set(card, { left, top, x: 0, y: 0 });
             if (new Date(start).getTime() !== new Date(task.start).getTime()) {
-              onChange({ ...task, start });
+              onChange({ ...taskRef.current, start });
             }
             main[0].update();
           },
@@ -93,7 +97,7 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
       onRelease() {
         main[0].enable();
         const duration = (card.offsetHeight / SLOT_HEIGHT) * SLOT_MINUTES;
-        if (duration !== task.duration) onChange({ ...task, duration });
+        if (duration !== taskRef.current.duration) onChange({ ...taskRef.current, duration });
       },
     });
     return () => {
@@ -106,8 +110,8 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
   return (
     <div
       ref={cardRef}
-      className={`absolute w-[120px] bg-[#FDF1E0] py-[2px] rounded-[6px] flex flex-col px-[10px] overflow-hidden z-12 ${task.status === "done" ? "cursor-default" : "cursor-pointer"}`}
-      style={{ left: dayIndex * 150 + 15, top: slotFromStart(task.start) * SLOT_HEIGHT, height: durationSlots * SLOT_HEIGHT }}
+      className={`absolute w-[120px] py-[2px] rounded-[6px] flex flex-col px-[10px] overflow-hidden z-12 ${task.status === "done" ? "cursor-default" : "cursor-pointer"}`}
+      style={{ left: dayIndex * 150 + 15, top: slotFromStart(task.start) * SLOT_HEIGHT, height: durationSlots * SLOT_HEIGHT, backgroundColor: tag.backgroundColor }}
       onClick={(event) => {
         event.stopPropagation();
         const rect = event.currentTarget.getBoundingClientRect();
@@ -122,8 +126,8 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
         });
       }}
     >
-      <p className="text-[12px] font-semibold text-[#96753B] truncate flex-shrink-0">{task.title}</p>
-      <p className="text-[10px] mt-[2px] text-[#96753B] my-0">
+      <p className="text-[12px] font-semibold truncate flex-shrink-0" style={{ color: tag.color }}>{task.title}</p>
+      <p className="text-[10px] mt-[2px] my-0" style={{ color: tag.color }}>
         {dayjs(task.start).format("H:mm")} - {dayjs(task.start).add(task.duration, "minute").format("H:mm")}
       </p>
       <div ref={resizeRef} className="absolute left-0 bottom-0 w-full h-[10px] cursor-s-resize" />

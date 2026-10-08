@@ -7,6 +7,7 @@ import { DialogUtils } from "./utils";
 import { Modals } from "./type";
 import { cn } from "@/components/ui/utils";
 import { useQueryClient } from "@tanstack/react-query";
+import { PROJECT_COLORS } from "@/lib/project-colors";
 
 export default function ProjectModal() {
   const modalsSnap = useSnapshot(modalsState);
@@ -58,7 +59,7 @@ export default function ProjectModal() {
   };
 
   const remove = async () => {
-    if (!project?.projectId || isSaving || !window.confirm(`Delete "${project.name}"?`)) return;
+    if (!project?.projectId || isSaving) return;
     setIsSaving(true);
     setError("");
     try {
@@ -73,6 +74,7 @@ export default function ProjectModal() {
         return;
       }
       await queryClient.invalidateQueries({ queryKey: ["list"] });
+      await queryClient.invalidateQueries({ queryKey: ["tasks"] });
       close();
     } catch {
       setError("Could not delete project.");
@@ -144,7 +146,7 @@ export default function ProjectModal() {
             >
               <form onSubmit={save} className="flex flex-col items-start gap-[16px]">
                 <div className="flex gap-[10px]">
-                  <div className="project w-[6px] h-[16px] rounded-[3px]" style={{ backgroundColor: project?.color ?? "#F05252" }}></div>
+                  <div className="project w-[6px] h-[16px] rounded-[3px]" style={{ backgroundColor: project?.color ?? PROJECT_COLORS[0] }}></div>
                   <div className="flex items-center gap-[8px] relative top-[-6px]">
                     <div className="flex flex-col relative">
                       <input
@@ -169,7 +171,7 @@ export default function ProjectModal() {
                   </div>
                 </div>
                 <div className="hidden items-center gap-[8px] relative top-[-4px]">
-                  {["#FF6767", "#FF67CB", "#A667FF"].map((color, index) => {
+                  {PROJECT_COLORS.map((color, index) => {
                     const isActive = index === activeProject;
                     return (
                       <div
@@ -187,7 +189,7 @@ export default function ProjectModal() {
                 {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
                 <div className="center w-full justify-end gap-[8px]">
                   {project?.projectId && (
-                    <button type="button" onClick={remove} disabled={isSaving} className="flex-1 h-[30px] rounded-[15px] bg-[#F05252] center font-semibold text-[14px] text-white cursor-pointer disabled:opacity-50">
+                    <button type="button" onClick={remove} disabled={isSaving} className="flex-1 h-[30px] rounded-[15px] bg-[#fff] border-[#eee] border-[1px] center font-semibold text-[14px] text-red-600 cursor-pointer disabled:opacity-50">
                       Delete
                     </button>
                   )}

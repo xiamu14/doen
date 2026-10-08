@@ -12,6 +12,7 @@ type Props = {
   className?: ClassNameValue;
   ariaLabel?: string;
   singleLine?: boolean;
+  onFocus?: React.FocusEventHandler<HTMLDivElement>;
 };
 
 export default function CustomInput({
@@ -21,6 +22,7 @@ export default function CustomInput({
   className,
   ariaLabel,
   singleLine = false,
+  onFocus,
 }: Props) {
   const editableRef = useRef<HTMLDivElement>(null);
   const [caret, setCaret] = useState<{ left: number; top: number; height: number } | null>(null);
@@ -75,7 +77,10 @@ export default function CustomInput({
         role="textbox"
         aria-label={ariaLabel}
         aria-multiline={!singleLine}
-        onFocus={updateCaret}
+        onFocus={(event) => {
+          onFocus?.(event);
+          updateCaret();
+        }}
         onBlur={() => setCaret(null)}
         onKeyUp={updateCaret}
         onMouseUp={updateCaret}

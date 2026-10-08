@@ -7,6 +7,8 @@ import ProjectItem from "./project-item";
 import TagItem from "./tag-item";
 import { useQuery } from "@tanstack/react-query";
 import { getList } from "@/client/api/task";
+import { PROJECT_COLORS } from "@/lib/project-colors";
+import { TASK_TAGS } from "@/lib/task-tags";
 
 export function ListMenu() {
   const { data } = useQuery({ queryKey: ["list"], queryFn: getList });
@@ -17,8 +19,9 @@ export function ListMenu() {
       x: rect.left,
       y: rect.bottom + 10,
       projectId: "",
+      color: PROJECT_COLORS[(data?.data.project.length ?? 0) % PROJECT_COLORS.length],
     });
-  }, []);
+  }, [data?.data.project.length]);
   return (
     <div className="w-full flex flex-col gap-[10px]">
       <div className="w-full flex justify-start items-center gap-[20px]">
@@ -59,7 +62,7 @@ export function ListMenu() {
             >
               <ProjectItem
                 item={item}
-                className={`${index === 0 ? "text-content" : ""}`}
+                className={"text-content"}
               />
             </button>
           );
@@ -89,12 +92,7 @@ export function TagMenu() {
         </div>
       </div>
       <div className="pl-[30px] flex flex-col  items-start gap-[14px] text-content-secondary">
-        {[
-          { color: "#69D571", name: "easy" },
-          { color: "#D569B2", name: "difficulty" },
-          { color: "#697ED5", name: "pressing" },
-          { color: "#D5C169", name: "later" },
-        ].map((item) => {
+        {TASK_TAGS.map((item) => {
           return <TagItem key={item.name} item={item} />;
         })}
       </div>

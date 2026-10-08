@@ -8,6 +8,20 @@
       "when": 1752408895925,
       "tag": "0000_lean_pandemic",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791468000000,
+      "tag": "0001_project_colors",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791468060000,
+      "tag": "0002_fixed_task_tags",
+      "breakpoints": true
     }
   ]
 }

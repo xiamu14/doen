@@ -2,14 +2,14 @@
 
 import { cn } from "@/components/ui/utils";
 import type { TaskRecord } from "@/client/api/task";
-import { DialogUtils } from "../Dialog";
 import { nearestFreeSlot, SLOT_HEIGHT, SLOT_MINUTES, slotFromStart, startFromSlot, taskModalX } from "./calendar-time";
 type Props = {
   isNow: boolean;
   date: string;
   tasks: TaskRecord[];
+  onCreateTask: (start: string, x: number, y: number, top: number, bottom: number) => void;
 };
-export default function TaskCalendarRow({ isNow, date, tasks }: Props) {
+export default function TaskCalendarRow({ isNow, date, tasks, onCreateTask }: Props) {
   return (
     <div
       data-calendar-day
@@ -21,11 +21,14 @@ export default function TaskCalendarRow({ isNow, date, tasks }: Props) {
           tasks.map((task) => ({ start: slotFromStart(task.start), duration: task.duration / SLOT_MINUTES })),
         );
         if (slot === null) return;
-        DialogUtils.show("taskModal", {
-          x: taskModalX(rect.left, rect.right, window.innerWidth),
-          y: e.clientY,
-          start: startFromSlot(date, slot),
-        });
+        const top = rect.top + slot * SLOT_HEIGHT;
+        onCreateTask(
+          startFromSlot(date, slot),
+          taskModalX(rect.left, rect.right, window.innerWidth),
+          e.clientY,
+          top,
+          top + 2 * SLOT_HEIGHT,
+        );
       }}
     >
       {isNow && (

@@ -14,6 +14,7 @@ import { FIRST_HOUR, LAST_HOUR, SLOT_MINUTES } from "@/components/task/calendar-
 import { modalsState } from "./state";
 import { DialogUtils } from "./utils";
 import type { Modals } from "./type";
+import { TASK_TAGS, type TaskTagName } from "@/lib/task-tags";
 
 export default function TaskModal() {
   const modal = useSnapshot(modalsState);
@@ -25,6 +26,7 @@ export default function TaskModal() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [projectId, setProjectId] = useState<string | null | undefined>();
+  const [tagId, setTagId] = useState<TaskTagName>("easy");
   const [date, setDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -35,13 +37,29 @@ export default function TaskModal() {
   const panelRef = useRef<HTMLDivElement>(null);
   const [modalPosition, setModalPosition] = useState<{ placement: "top" | "middle" | "bottom"; offset: number }>({ placement: "top", offset: 0 });
   const isCompleted = status === "done";
+  const clearDefaultOnFocus = (
+    event: React.FocusEvent<HTMLDivElement>,
+    defaultValue: string,
+    setValue: (value: string) => void,
+  ) => {
+    if (event.currentTarget.textContent !== defaultValue) return;
+    event.currentTarget.textContent = "";
+    setValue("");
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.setStart(event.currentTarget, 0);
+    range.collapse(true);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  };
 
   useEffect(() => {
     if (!isOpen) return;
     const start = dayjs(data?.task?.start ?? data?.start ?? new Date());
-    setTitle(data?.task?.title ?? "New Task Name");
-    setContent(data?.task?.content ?? "something about this task");
+    setTitle(data?.task?.title ?? "New Task");
+    setContent(data?.task?.content ?? "about this task");
     setProjectId(data?.task ? data.task.projectId : undefined);
+    setTagId(data?.task?.tagId ?? "easy");
     setStatus(data?.task?.status ?? "idle");
     setDate(start.format("YYYY-MM-DD"));
     setStartTime(start.format("HH:mm"));
@@ -88,6 +106,7 @@ export default function TaskModal() {
   const close = () => DialogUtils.hide("taskModal");
   const selectedProjectId = projectId === undefined ? projects[0]?.id ?? null : projectId;
   const selectedProject = projects.find((project) => project.id === selectedProjectId);
+  const selectedTag = TASK_TAGS.find((tag) => tag.name === tagId) ?? TASK_TAGS[0];
 
   const toggleStatus = async () => {
     if (isStatusSaving) return;
@@ -128,9 +147,9 @@ export default function TaskModal() {
     setIsSaving(true);
     setError("");
     try {
-      const values = { title: title.trim(), content: content.trim(), start, duration, status, projectId: selectedProjectId, tagId: null };
+      const values = { title: title.trim(), content: content.trim(), start, duration, status, projectId: selectedProjectId, tagId };
       const task = data?.task
-        ? await updateTask({ ...data.task, ...values, tagId: data.task.tagId })
+        ? await updateTask({ ...data.task, ...values })
         : await createTask(values);
       queryClient.setQueryData<TaskRecord[]>(["tasks"], (current = []) => data?.task
         ? current.map((item) => item.id === task.id ? task : item)
@@ -175,8 +194,8 @@ export default function TaskModal() {
                 : { top: `${modalPosition.offset}px` }),
             } : {}}
           >
-            <form onSubmit={save} className="flex items-start gap-[10px] pr-[22px]">
-              <div className="project flex-shrink-0 w-[4px] h-[20px] rounded-[2px] bg-[#f05252]" />
+            <form onSubmit={save} className="flex items-start gap-[10px]">
+              <div className="hidden project flex-shrink-0 w-[4px] h-[20px] rounded-[2px] bg-[#f05252]" />
               <div className="flex flex-col flex-1 min-w-0">
                 <div className="flex items-center gap-[8px] relative top-[-4px]">
                   <button
@@ -195,6 +214,7 @@ export default function TaskModal() {
                       disable={isCompleted}
                       value={title}
                       onChange={(event) => setTitle((event.target as HTMLDivElement).textContent ?? "")}
+                      onFocus={(event) => clearDefaultOnFocus(event, "New Task", setTitle)}
                       className="min-h-[22px] text-[18px] font-medium text-content"
                     />
                   </div>
@@ -204,10 +224,11 @@ export default function TaskModal() {
                   disable={isCompleted}
                   value={content}
                   onChange={(event) => setContent((event.target as HTMLDivElement).textContent ?? "")}
+                  onFocus={(event) => clearDefaultOnFocus(event, "about this task", setContent)}
                   className="px-[4px] py-[2px] min-h-[20px] text-[14px] font-medium text-content-description rounded-[6px] ml-[24px] focus:bg-[#eee] focus:text-[#666]"
                 />
                 <div className="flex items-center gap-[8px] relative top-[-4px] mt-[14px]">
-                  <Clock size={18} color="#8A8A8A" className="relative" />
+                  <Clock size={17} color="#8A8A8A" className="relative" />
                   <div className="flex flex-col">
                     <p className="text-[18px] font-medium text-content">{startTime} - {endTime}</p>
                   </div>
@@ -217,12 +238,15 @@ export default function TaskModal() {
                   {isCompleted ? (
                     <>
                       <div className="flex items-center gap-[8px]">
-                        <div className="w-[12px] h-[6px] rounded-[3px] bg-[#B9B9B9]" />
+                        <div
+                          className="w-[12px] h-[6px] rounded-[3px]"
+                          style={{ backgroundColor: selectedProject?.color ?? "#B9B9B9" }}
+                        />
                         <span className="text-[16px] font-medium text-[#B9B9B9]">{selectedProject?.name ?? "No project"}</span>
                       </div>
                       <div className="flex items-center gap-[8px]">
                         <div className="w-[10px] h-[10px] rounded-full bg-[#69D571]" />
-                        <span className="text-[16px] font-medium text-[#B9B9B9]">easy</span>
+                        <span className="text-[16px] font-medium text-[#B9B9B9]">{selectedTag.name}</span>
                       </div>
                     </>
                   ) : (
@@ -234,15 +258,20 @@ export default function TaskModal() {
                         onProjectChange={(id) => setProjectId(id || null)}
                         tight textColor="#B9B9B9" isSelection
                       />
-                      <TagItem item={{ name: "easy", color: "#69D571" }} tight textColor="#B9B9B9" isSelection />
+                      <TagItem
+                        item={selectedTag}
+                        tagId={tagId}
+                        onTagChange={setTagId}
+                        tight textColor="#B9B9B9" isSelection
+                      />
                     </>
                   )}
                 </div>
                 {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
                 {!isCompleted && (
                   <div className="w-full flex items-center justify-between gap-[16px] mt-[20px]">
-                    {data?.task && <button type="button" onClick={remove} disabled={isSaving} className="flex-1 h-[36px] bg-white text-content text-[14px] font-semibold center border-1 rounded-[10px] cursor-pointer disabled:opacity-50">Delete</button>}
-                    <button type="submit" disabled={isSaving} className="flex-1 h-[36px] rounded-[10px] bg-primary center font-semibold text-[14px] text-white cursor-pointer disabled:opacity-50">{isSaving ? "Saving..." : "Apply"}</button>
+                    {data?.task && <button type="button" onClick={remove} disabled={isSaving} className="rounded-full flex-1 h-[34px] bg-white text-[14px] font-semibold center border-1 text-red-600  cursor-pointer disabled:opacity-50">Delete</button>}
+                    <button type="submit" disabled={isSaving} className="flex-1 h-[34px] rounded-full bg-primary center font-semibold text-[14px] text-white cursor-pointer disabled:opacity-50">{isSaving ? "Saving..." : "Apply"}</button>
                   </div>
                 )}
               </div>

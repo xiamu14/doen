@@ -1,14 +1,14 @@
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { project, task } from "@/lib/db/schema/task";
-import { asc, eq } from "drizzle-orm";
+import { asc, count, eq } from "drizzle-orm";
 import { z } from "zod";
+import { PROJECT_COLORS } from "@/lib/project-colors";
 
 export async function GET(request: NextRequest) {
   const projects = await db.select().from(project).orderBy(asc(project.createdAt), asc(project.id));
-  const tags = await db.query.tag.findMany();
 
-  return NextResponse.json({ data: { project: projects, tag: tags } });
+  return NextResponse.json({ data: { project: projects } });
 }
 
 export async function POST(request: NextRequest) {
@@ -18,8 +18,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Project name must be 1–20 characters." }, { status: 400 });
   }
 
+  const [{ projectCount }] = await db.select({ projectCount: count() }).from(project);
   const [created] = await db.insert(project)
-    .values({ name, color: "#F05252" })
+    .values({ name, color: PROJECT_COLORS[Number(projectCount) % PROJECT_COLORS.length] })
     .onConflictDoNothing({ target: project.name })
     .returning();
   if (!created) {

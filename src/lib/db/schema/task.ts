@@ -23,21 +23,6 @@ export const projectRelations = relations(project, ({ many }) => ({
   tasks: many(task),
 }));
 
-export const tag = pgTable("tag", {
-  id: uuid().defaultRandom().primaryKey(),
-  name: varchar("name", { length: 20 }).notNull().unique(),
-  color: varchar("color", { length: 10 }).notNull(),
-
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at")
-    .notNull()
-    .$onUpdate(() => new Date()),
-});
-
-export const tagRelations = relations(tag, ({ many }) => ({
-  tasks: many(task),
-}));
-
 export const taskStatusEnum = pgEnum("status", ["idle", "doing", "done"]);
 
 export const task = pgTable("task", {
@@ -57,16 +42,12 @@ export const task = pgTable("task", {
     .notNull()
     .$onUpdate(() => new Date()),
   projectId: uuid("project_id"),
-  tagId: uuid("tag_id"),
+  tagId: varchar("tag_id", { length: 20 }),
 });
 
 export const taskRelations = relations(task, ({ one }) => ({
   project: one(project, {
     fields: [task.projectId],
     references: [project.id],
-  }),
-  tag: one(tag, {
-    fields: [task.tagId],
-    references: [tag.id],
   }),
 }));

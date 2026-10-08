@@ -1,6 +1,6 @@
 export type ProjectRecord = { id: string; name: string; color: string };
 
-export async function getList(): Promise<{ data: { project: ProjectRecord[]; tag: { id: string; name: string; color: string }[] } }> {
+export async function getList(): Promise<{ data: { project: ProjectRecord[] } }> {
   const response = await fetch("/api/list");
   if (!response.ok) throw new Error("Could not load projects.");
   return response.json();
@@ -14,7 +14,7 @@ export type TaskRecord = {
   duration: number;
   status: "idle" | "doing" | "done";
   projectId: string | null;
-  tagId: string | null;
+  tagId: "easy" | "difficulty" | "pressing" | "later" | null;
 };
 
 export async function getTasks(): Promise<TaskRecord[]> {

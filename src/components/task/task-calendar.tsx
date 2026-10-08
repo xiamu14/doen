@@ -1,9 +1,12 @@
 "use client";
 
 import dayjs from "dayjs";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getTasks, updateTask, type TaskRecord } from "@/client/api/task";
+import { getList, getTasks, updateTask, type TaskRecord } from "@/client/api/task";
+import { useSnapshot } from "valtio";
+import { DialogUtils } from "../Dialog";
+import { modalsState } from "../Dialog/state";
 import TaskCalendarRow from "./task-calendar-row";
 import TaskCalendarCard from "./task-calendar-card";
 import { SLOT_HEIGHT, slotFromStart } from "./calendar-time";
@@ -11,6 +14,8 @@ import { SLOT_HEIGHT, slotFromStart } from "./calendar-time";
 export default function TaskCalendar() {
   const queryClient = useQueryClient();
   const pendingSaves = useRef(new Map<string, Promise<void>>());
+  const modal = useSnapshot(modalsState);
+  const [draftTask, setDraftTask] = useState<TaskRecord | null>(null);
   const headerScrollRef = useRef<HTMLDivElement>(null);
   const bodyScrollRef = useRef<HTMLDivElement>(null);
   const calendarScrollRef = useRef<HTMLDivElement>(null);
@@ -30,6 +35,23 @@ export default function TaskCalendar() {
     });
   };
   const { data: tasks = [] } = useQuery({ queryKey: ["tasks"], queryFn: getTasks });
+  const { data: list } = useQuery({ queryKey: ["list"], queryFn: getList });
+  useEffect(() => {
+    if (modal.activeModalId !== "taskModal") setDraftTask(null);
+  }, [modal.activeModalId]);
+  const openDraftTask = (start: string, x: number, y: number, top: number, bottom: number) => {
+    setDraftTask({
+      id: `draft-${Date.now()}`,
+      title: "New Task",
+      content: "about this task",
+      start,
+      duration: 30,
+      status: "idle",
+      projectId: list?.data.project[0]?.id ?? null,
+      tagId: "easy",
+    });
+    DialogUtils.show("taskModal", { x, y, top, bottom, start });
+  };
   const savePosition = (updated: TaskRecord) => {
     queryClient.setQueryData<TaskRecord[]>(["tasks"], (current) =>
       current?.map((item) => item.id === updated.id ? updated : item));
@@ -132,6 +154,7 @@ export default function TaskCalendar() {
                   isNow={isNow}
                   date={item.date}
                   tasks={tasks.filter((task) => dayjs(task.start).format("YYYY-MM-DD") === item.date)}
+                  onCreateTask={openDraftTask}
                 />
               );
             })}
@@ -146,6 +169,15 @@ export default function TaskCalendar() {
                 onChange={savePosition}
               />;
             })}
+            {draftTask && (
+              <TaskCalendarCard
+                key={draftTask.id}
+                task={draftTask}
+                dates={dates.map((day) => day.date)}
+                dayIndex={dates.findIndex((day) => day.date === dayjs(draftTask.start).format("YYYY-MM-DD"))}
+                onChange={setDraftTask}
+              />
+            )}
             </div>
           </div>
         </div>

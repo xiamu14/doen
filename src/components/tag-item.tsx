@@ -1,17 +1,21 @@
 import { cn } from "@/components/ui/utils";
 import { Select } from "@headlessui/react";
-import { ClassNameValue } from "tailwind-merge";
+import { TASK_TAGS, type TaskTagName } from "@/lib/task-tags";
 
 export default function TagItem({
   item,
   textColor,
   tight = false,
   isSelection = false,
+  tagId,
+  onTagChange,
 }: {
   textColor?: string;
   tight?: boolean;
   item: { name: string; color: string };
   isSelection?: boolean;
+  tagId?: TaskTagName;
+  onTagChange?: (id: TaskTagName) => void;
 }) {
   return (
     <div
@@ -26,15 +30,14 @@ export default function TagItem({
       ></div>
       {isSelection ? (
         <Select
+          value={tagId}
+          onChange={(event) => onTagChange?.(event.target.value as TaskTagName)}
           className={
             "text-[16px] font-medium focus:not-data-focus:outline-none data-focus:outline-2 appearance-none cursor-pointer"
           }
           style={{ color: textColor }}
         >
-          <option value="1">easy</option>
-          <option value="2">difficult</option>
-          <option value="3">pressing</option>
-          <option value="4">later</option>
+          {TASK_TAGS.map((tag) => <option key={tag.name} value={tag.name}>{tag.name}</option>)}
         </Select>
       ) : (
         <p className="text-[16px] font-medium" style={{ color: textColor }}>

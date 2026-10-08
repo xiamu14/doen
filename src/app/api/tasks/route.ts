@@ -13,6 +13,7 @@ const fields = z.object({
   duration: z.number().int().min(15).max(960).refine((value) => value % 15 === 0),
   status: z.enum(["idle", "doing", "done"]).optional(),
   projectId: z.string().uuid().nullable().optional(),
+  tagId: z.enum(["easy", "difficulty", "pressing", "later"]).nullable().optional(),
 });
 
 const serializeTask = (value: typeof task.$inferSelect) => ({
