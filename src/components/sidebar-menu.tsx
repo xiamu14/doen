@@ -5,8 +5,11 @@ import { DialogUtils } from "./Dialog";
 import { ChevronDown, Folder, Plus, Tag } from "lucide-react";
 import ProjectItem from "./project-item";
 import TagItem from "./tag-item";
+import { useQuery } from "@tanstack/react-query";
+import { getList } from "@/client/api/task";
 
 export function ListMenu() {
+  const { data } = useQuery({ queryKey: ["list"], queryFn: getList });
   const handleProject: MouseEventHandler<HTMLDivElement> = useCallback((e) => {
     const rect = e.currentTarget.getBoundingClientRect();
 
@@ -37,16 +40,28 @@ export function ListMenu() {
         </div>
       </div>
       <div className="pl-[30px] flex flex-col  items-start gap-[8px] text-content-secondary">
-        {[
-          { color: "#F2BB59", name: "Inbox" },
-          { color: "#F05252", name: "AiVideo" },
-        ].map((item, index) => {
+        {data?.data.project.map((item: { id: string; name: string; color: string }, index: number) => {
           return (
-            <ProjectItem
-              item={item}
-              key={item.name}
-              className={`${index === 0 ? "text-content" : ""}`}
-            />
+            <button
+              type="button"
+              key={item.id}
+              className="text-left"
+              onClick={(event) => {
+                const rect = event.currentTarget.getBoundingClientRect();
+                DialogUtils.show("projectModal", {
+                  projectId: item.id,
+                  name: item.name,
+                  color: item.color,
+                  x: rect.left,
+                  y: rect.bottom + 10,
+                });
+              }}
+            >
+              <ProjectItem
+                item={item}
+                className={`${index === 0 ? "text-content" : ""}`}
+              />
+            </button>
           );
         })}
       </div>

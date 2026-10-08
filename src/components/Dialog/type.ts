@@ -1,6 +1,8 @@
+import type { TaskRecord } from "@/client/api/task";
+
 export type Modals = {
-  taskModal?: { x: number; y: number; taskId: string };
-  projectModal?: { projectId: string; x: number; y: number };
+  taskModal?: { x: number; y: number; task?: TaskRecord; start?: string };
+  projectModal?: { projectId: string; name?: string; color?: string; x: number; y: number };
 };
 export type ModalIds = keyof Modals;
 

@@ -1,6 +1,7 @@
 import { cn } from "@/components/ui/utils";
 import { cva, VariantProps } from "class-variance-authority";
 import { Select } from "@headlessui/react";
+import type { ProjectRecord } from "@/client/api/task";
 
 const variants = cva("flex justify-start items-center  cursor-pointer", {
   variants: {
@@ -20,11 +21,17 @@ export default function ProjectItem({
   tight,
   textColor = "",
   isSelection = false,
+  projects = [],
+  projectId,
+  onProjectChange,
 }: React.ComponentProps<"div"> &
   VariantProps<typeof variants> & {
     item: { name: string; color: string };
     textColor?: string;
     isSelection?: boolean;
+    projects?: ProjectRecord[];
+    projectId?: string | null;
+    onProjectChange?: (id: string) => void;
   }) {
   return (
     <div className={cn("cursor-pointer", variants({ tight }), className)}>
@@ -34,6 +41,8 @@ export default function ProjectItem({
       ></div>
       {isSelection ? (
         <Select
+          value={projectId ?? ""}
+          onChange={(event) => onProjectChange?.(event.target.value)}
           className={cn(
             "text-[16px] font-medium focus:not-data-focus:outline-none data-focus:outline-2 appearance-none cursor-pointer",
             //   `${index === 0 ? "text-content" : ""}`,
@@ -41,8 +50,8 @@ export default function ProjectItem({
           )}
           style={{ color: textColor }}
         >
-          <option value="1">AiVideo</option>
-          <option value="2">InBox</option>
+          <option value="">No project</option>
+          {projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}
         </Select>
       ) : (
         <p

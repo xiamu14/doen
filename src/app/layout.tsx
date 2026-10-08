@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
-import { Archivo } from "next/font/google";
+import localFont from "next/font/local";
 import "@/styles/globals.css";
 import { siteConfig } from "@/config/site.config";
 import { cn } from "@/components/ui/utils";
 import RootProviders from "@/components/providers";
 
-const fontArchivo = Archivo({
+const fontArchivo = localFont({
+  src: "../../public/fonts/archivo-latin.woff2",
   variable: "--font-archivo",
-  subsets: ["latin"],
+  weight: "100 900",
 });
 
 export const metadata: Metadata = {

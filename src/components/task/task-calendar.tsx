@@ -1,10 +1,28 @@
-import { cn } from "@/components/ui/utils";
+"use client";
+
 import dayjs from "dayjs";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getTasks, updateTask, type TaskRecord } from "@/client/api/task";
 import TaskCalendarRow from "./task-calendar-row";
 import TaskCalendarCard from "./task-calendar-card";
 
 export default function TaskCalendar() {
+  const queryClient = useQueryClient();
+  const pendingSaves = useRef(new Map<string, Promise<void>>());
+  const { data: tasks = [] } = useQuery({ queryKey: ["tasks"], queryFn: getTasks });
+  const savePosition = (updated: TaskRecord) => {
+    queryClient.setQueryData<TaskRecord[]>(["tasks"], (current) =>
+      current?.map((item) => item.id === updated.id ? updated : item));
+    const previousSave = pendingSaves.current.get(updated.id) ?? Promise.resolve();
+    const save = previousSave.catch(() => {}).then(() => updateTask(updated)).then(() => {}).catch(async () => {
+      if (pendingSaves.current.get(updated.id) === save) {
+        await queryClient.invalidateQueries({ queryKey: ["tasks"] });
+        window.alert("Could not save task position.");
+      }
+    });
+    pendingSaves.current.set(updated.id, save);
+  };
   const dates = useMemo(() => {
     const start = dayjs().startOf("day");
     const days = Array.from({ length: 7 }, (_, i) => ({
@@ -28,7 +46,7 @@ export default function TaskCalendar() {
             return (
               <div
                 key={`date-${index}`}
-                className={"w-[150px] h-full center font-semibold text-[14px] "}
+                className={"w-[150px] flex-shrink-0 h-full center font-semibold text-[14px] "}
               >
                 {isNow ? (
                   <div className="bg-[#DCECFF] w-[68px] h-[26px] rounded-[18px] center">
@@ -42,19 +60,13 @@ export default function TaskCalendar() {
           })}
         </div>
       </div>
-      <div className="w-full h-[500px] overflow-y-scroll flex scrollbar-hide">
+      <div className="w-full h-[500px] mt-5 overflow-y-scroll flex scrollbar-hide">
         <div className="w-[96px] flex-shrink-0 flex flex-col items-center">
           {Array.from({ length: 16 }, (_, index) => index + 7).map(
             (hour, index) => {
               return (
-                <div
-                  key={`hour-${hour}`}
-                  className={cn(
-                    "flex flex-col items-end",
-                    `${index === 0 ? "mt-[30px]" : ""}`
-                  )}
-                >
-                  <div className="h-[35px]">
+                <div key={`hour-${hour}`} className="flex flex-col items-end">
+                  <div className="h-[25px]">
                     <p
                       className="text-calender-main text-[12px] font-semibold "
                       style={{ lineHeight: "10px" }}
@@ -77,15 +89,30 @@ export default function TaskCalendar() {
         <div className="flex-1 w-0 h-full flex flex-row">
           <div
             id="task-calendar-draggable"
-            className=" relative h-[1800px] flex flex-row"
+            className="relative h-[1600px] flex flex-row"
           >
             {dates.map((item, index) => {
               const isNow = dayjs().isSame(item.date, "day");
               return (
-                <TaskCalendarRow key={`date-col-${index}`} isNow={isNow} />
+                <TaskCalendarRow
+                  key={`date-col-${index}`}
+                  isNow={isNow}
+                  date={item.date}
+                  tasks={tasks.filter((task) => dayjs(task.start).format("YYYY-MM-DD") === item.date)}
+                />
               );
             })}
-            <TaskCalendarCard />
+            {tasks.map((task) => {
+              const dayIndex = dates.findIndex((day) => day.date === dayjs(task.start).format("YYYY-MM-DD"));
+              if (dayIndex < 0) return null;
+              return <TaskCalendarCard
+                key={task.id}
+                task={task}
+                dates={dates.map((day) => day.date)}
+                dayIndex={dayIndex}
+                onChange={savePosition}
+              />;
+            })}
           </div>
         </div>
       </div>

@@ -42,28 +42,25 @@ git clone https://github.com/rudrodip/titan.git
 bun install
 ```
 
-3. Create environment file
+3. Start PostgreSQL and create the local environment file
 
 ```bash
+docker compose up -d
 cp .env.example .env
 ```
 
-4. Generate database schema
+Set `BETTER_AUTH_SECRET` in `.env` to a random secret (for example, run `openssl rand -base64 32`). `BETTER_AUTH_URL` is the local app URL, and `DATABASE_URL` uses the PostgreSQL username, password, database, and host port from `docker-compose.yml` (`postgres`, `postgres`, `titan`, and `5436`). The GitHub and Google client IDs and secrets are optional; to enable either provider, fill in both values and register `http://localhost:3000/api/auth/callback/github` or `http://localhost:3000/api/auth/callback/google` as its OAuth callback URL.
 
-```bash
-bun run db:generate
-```
-
-5. Migrate database
+4. Apply the included database migration
 
 ```bash
 bun run db:migrate
 ```
 
-6. Run the development server
+5. Run the development server
 
 ```bash
 bun dev
 ```
 
-7. Open the browser and navigate to `http://localhost:3000`
+6. Open the browser and navigate to `http://localhost:3000`

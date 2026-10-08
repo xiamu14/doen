@@ -201,6 +201,18 @@
   }
 }
 
+@keyframes custom-caret-blink {
+  50% { opacity: 0; }
+}
+
+.custom-caret-blink {
+  animation: custom-caret-blink 1s steps(1, end) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .custom-caret-blink { animation: none; }
+}
+
 @utility center {
   display: flex;
   justify-content: center;
