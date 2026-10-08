@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSnapshot } from "valtio";
 import dayjs from "dayjs";
-import { Circle, Clock } from "lucide-react";
+import { Circle, CircleCheck, Clock } from "lucide-react";
 import { createTask, deleteTask, getList, updateTask, type TaskRecord } from "@/client/api/task";
 import CustomInput from "@/components/custom-input";
 import ProjectItem from "@/components/project-item";
@@ -28,6 +28,7 @@ export default function TaskModal() {
   const [date, setDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+  const [status, setStatus] = useState<TaskRecord["status"]>("idle");
   const [error, setError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
@@ -37,6 +38,7 @@ export default function TaskModal() {
     setTitle(data?.task?.title ?? "New Task Name");
     setContent(data?.task?.content ?? "something about this task");
     setProjectId(data?.task ? data.task.projectId : undefined);
+    setStatus(data?.task?.status ?? "idle");
     setDate(start.format("YYYY-MM-DD"));
     setStartTime(start.format("HH:mm"));
     setEndTime(start.add(data?.task?.duration ?? 30, "minute").format("HH:mm"));
@@ -66,7 +68,7 @@ export default function TaskModal() {
     setIsSaving(true);
     setError("");
     try {
-      const values = { title: title.trim(), content: content.trim(), start, duration, projectId: selectedProjectId, tagId: null };
+      const values = { title: title.trim(), content: content.trim(), start, duration, status, projectId: selectedProjectId, tagId: null };
       const task = data?.task
         ? await updateTask({ ...data.task, ...values, tagId: data.task.tagId })
         : await createTask(values);
@@ -110,7 +112,15 @@ export default function TaskModal() {
               <div className="project flex-shrink-0 w-[4px] h-[20px] rounded-[2px] bg-[#f05252]" />
               <div className="flex flex-col flex-1 min-w-0">
                 <div className="flex items-center gap-[8px] relative top-[-4px]">
-                  <Circle size={18} color="#8A8A8A" className="relative" />
+                  <button
+                    type="button"
+                    aria-label={status === "done" ? "Mark task incomplete" : "Mark task complete"}
+                    disabled={isSaving}
+                    onClick={() => setStatus((current) => current === "done" ? "idle" : "done")}
+                    className="flex-shrink-0 cursor-pointer disabled:opacity-50"
+                  >
+                    {status === "done" ? <CircleCheck size={18} color="#69D571" /> : <Circle size={18} color="#8A8A8A" />}
+                  </button>
                   <div className="flex flex-col flex-1 min-w-0">
                     <CustomInput
                       ariaLabel="Task title"

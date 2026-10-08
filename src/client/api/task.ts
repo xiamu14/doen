@@ -12,6 +12,7 @@ export type TaskRecord = {
   content: string;
   start: string;
   duration: number;
+  status: "idle" | "doing" | "done";
   projectId: string | null;
   tagId: string | null;
 };
