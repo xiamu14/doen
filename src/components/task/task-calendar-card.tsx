@@ -100,7 +100,7 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
   return (
     <div
       ref={cardRef}
-      className="absolute w-[120px] bg-[#FDF1E0] rounded-[6px] flex flex-col px-[10px] overflow-hidden cursor-pointer z-12"
+      className="absolute w-[120px] bg-[#FDF1E0] py-[2px] rounded-[6px] flex flex-col px-[10px] overflow-hidden cursor-pointer z-12"
       style={{ left: dayIndex * 150 + 15, top: slotFromStart(task.start) * SLOT_HEIGHT, height: durationSlots * SLOT_HEIGHT }}
       onClick={(event) => {
         event.stopPropagation();
