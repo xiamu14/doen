@@ -21,6 +21,8 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
   const cardRef = useRef<HTMLDivElement>(null);
   const resizeRef = useRef<HTMLDivElement>(null);
   const durationSlots = task.duration / SLOT_MINUTES;
+  const minDurationSlots = 2;
+  const maxDurationSlots = 4;
 
   useEffect(() => {
     if (task.status === "done") return;
@@ -81,7 +83,10 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
         main[0].disable();
       },
       onDrag() {
-        const slots = Math.max(1, Math.min(SLOT_COUNT - slotFromStart(task.start),
+        const remainingSlots = SLOT_COUNT - slotFromStart(task.start);
+        const maxSlots = Math.min(maxDurationSlots, remainingSlots);
+        const minSlots = Math.min(minDurationSlots, maxSlots);
+        const slots = Math.max(minSlots, Math.min(maxSlots,
           durationSlots + Math.round((this.y - initialY) / SLOT_HEIGHT)));
         gsap.set(card, { height: slots * SLOT_HEIGHT });
       },
