@@ -15,6 +15,7 @@ export default function TaskCalendar() {
   const queryClient = useQueryClient();
   const pendingSaves = useRef(new Map<string, Promise<void>>());
   const modal = useSnapshot(modalsState);
+  const [activeDay] = useState(() => dayjs().startOf("day"));
   const [draftTask, setDraftTask] = useState<TaskRecord | null>(null);
   const headerScrollRef = useRef<HTMLDivElement>(null);
   const bodyScrollRef = useRef<HTMLDivElement>(null);
@@ -65,19 +66,19 @@ export default function TaskCalendar() {
     pendingSaves.current.set(updated.id, save);
   };
   const dates = useMemo(() => {
-    const start = dayjs().startOf("day");
+    const firstDay = activeDay.subtract(2, "day");
     const days = Array.from({ length: 7 }, (_, i) => ({
-      date: start.add(i, "day").format("YYYY-MM-DD"),
+      date: firstDay.add(i, "day").format("YYYY-MM-DD"),
     }));
     return days;
-  }, []);
+  }, [activeDay]);
 
   return (
     <div className="w-full">
       {/* 日期区域 */}
       <div className="calendar-header w-full h-[46px] bg-[rgba(238,238,238,.3)] rounded-[12px] overflow-hidden flex items-center">
         <div className="w-[96px] flex-shrink-0 h-full center font-bold text-[18px] text-calender-main">
-          {dayjs().format("MMMM")}
+          {activeDay.format("MMMM")}
         </div>
         <div
           ref={headerScrollRef}
@@ -87,19 +88,26 @@ export default function TaskCalendar() {
           <div className="flex w-[1050px] min-w-full flex-row items-center">
             {dates.map((item, index) => {
               const dateFn = dayjs(item.date);
-              const isNow = dayjs().isSame(dateFn, "day");
+              const isActiveDay = activeDay.isSame(dateFn, "day");
+              const isWeekend = dateFn.day() === 0 || dateFn.day() === 6;
               const formatted = dateFn.format("ddd D");
               return (
                 <div
                   key={`date-${index}`}
                   className={"w-[150px] flex-shrink-0 h-full center font-semibold text-[14px] "}
                 >
-                  {isNow ? (
+                  {isActiveDay ? (
                     <div className="bg-[#DCECFF] w-[68px] h-[26px] rounded-[18px] center">
-                      <p className="text-calender-main">{formatted}</p>
+                      <p className="inline-flex items-center gap-[4px] text-calender-main">
+                        {isWeekend && <span className="size-[6px] rounded-full bg-orange-500" />}
+                        {formatted}
+                      </p>
                     </div>
                   ) : (
-                    <p className="text-calendar-date">{formatted}</p>
+                    <p className="inline-flex items-center gap-[4px] text-calendar-date">
+                      {isWeekend && <span className="size-[6px] rounded-full bg-orange-500" />}
+                      {formatted}
+                    </p>
                   )}
                 </div>
               );
@@ -147,11 +155,11 @@ export default function TaskCalendar() {
               className="relative h-full w-[1050px] flex flex-row"
             >
             {dates.map((item, index) => {
-              const isNow = dayjs().isSame(item.date, "day");
+              const isToday = dayjs().isSame(item.date, "day");
               return (
                 <TaskCalendarRow
                   key={`date-col-${index}`}
-                  isNow={isNow}
+                  isNow={isToday}
                   date={item.date}
                   tasks={tasks.filter((task) => dayjs(task.start).format("YYYY-MM-DD") === item.date)}
                   onCreateTask={openDraftTask}

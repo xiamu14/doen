@@ -92,11 +92,11 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
         const minSlots = Math.min(minDurationSlots, maxSlots);
         const slots = Math.max(minSlots, Math.min(maxSlots,
           durationSlots + Math.round((this.y - initialY) / SLOT_HEIGHT)));
-        gsap.set(card, { height: slots * SLOT_HEIGHT });
+        gsap.set(card, { height: slots * SLOT_HEIGHT - 2 });
       },
       onRelease() {
         main[0].enable();
-        const duration = (card.offsetHeight / SLOT_HEIGHT) * SLOT_MINUTES;
+        const duration = ((card.offsetHeight + 2) / SLOT_HEIGHT) * SLOT_MINUTES;
         if (duration !== taskRef.current.duration) onChange({ ...taskRef.current, duration });
       },
     });
@@ -111,7 +111,7 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
     <div
       ref={cardRef}
       className={`absolute w-[120px] py-[2px] rounded-[6px] flex flex-col px-[10px] overflow-hidden z-12 ${task.status === "done" ? "cursor-default" : "cursor-pointer"}`}
-      style={{ left: dayIndex * 150 + 15, top: slotFromStart(task.start) * SLOT_HEIGHT, height: durationSlots * SLOT_HEIGHT, backgroundColor: tag.backgroundColor }}
+      style={{ left: dayIndex * 150 + 15, top: slotFromStart(task.start) * SLOT_HEIGHT, height: durationSlots * SLOT_HEIGHT - 2, backgroundColor: tag.backgroundColor }}
       onClick={(event) => {
         event.stopPropagation();
         const rect = event.currentTarget.getBoundingClientRect();
