@@ -14,7 +14,7 @@ import { FIRST_HOUR, LAST_HOUR, SLOT_MINUTES } from "@/components/task/calendar-
 import { modalsState } from "./state";
 import { DialogUtils } from "./utils";
 import type { Modals } from "./type";
-import { TASK_TAGS, type TaskTagName } from "@/lib/task-tags";
+import { normalizeTaskTagId, TASK_TAGS, type TaskTagName } from "@/lib/task-tags";
 
 export default function TaskModal() {
   const modal = useSnapshot(modalsState);
@@ -59,7 +59,7 @@ export default function TaskModal() {
     setTitle(data?.task?.title ?? "New Task");
     setContent(data?.task?.content ?? "about this task");
     setProjectId(data?.task ? data.task.projectId : undefined);
-    setTagId(data?.task?.tagId ?? "easy|pressing");
+    setTagId((normalizeTaskTagId(data?.task?.tagId) as TaskTagName | null | undefined) ?? "easy|pressing");
     setStatus(data?.task?.status ?? "idle");
     setDate(start.format("YYYY-MM-DD"));
     setStartTime(start.format("HH:mm"));

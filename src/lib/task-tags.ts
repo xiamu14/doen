@@ -6,3 +6,9 @@ export const TASK_TAGS = [
 ] as const;
 
 export type TaskTagName = (typeof TASK_TAGS)[number]["name"];
+
+export function normalizeTaskTagId(tagId: unknown) {
+  if (tagId === "easy") return "easy|pressing";
+  if (tagId === "difficulty") return "difficulty|pressing";
+  return tagId;
+}

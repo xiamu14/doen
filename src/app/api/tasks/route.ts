@@ -3,6 +3,7 @@ import { project, task } from "@/lib/db/schema/task";
 import { and, eq, gt, lt, ne, sql } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { normalizeTaskTagId } from "@/lib/task-tags";
 
 const fields = z.object({
   title: z.string().trim().min(1).max(256),
@@ -13,14 +14,14 @@ const fields = z.object({
   duration: z.number().int().min(15).max(960).refine((value) => value % 15 === 0),
   status: z.enum(["idle", "doing", "done"]).optional(),
   projectId: z.string().uuid().nullable().optional(),
-  tagId: z.preprocess((value) => value === "easy" ? "easy|pressing" : value,
+  tagId: z.preprocess(normalizeTaskTagId,
     z.enum(["easy|pressing", "easy|later", "difficulty|pressing", "difficulty|later"]).nullable().optional()),
 });
 
 const serializeTask = (value: typeof task.$inferSelect) => ({
   ...value,
   start: new Date(value.start).toISOString(),
-  tagId: value.tagId === "easy" ? "easy|pressing" : value.tagId,
+  tagId: normalizeTaskTagId(value.tagId),
 });
 
 async function overlapsTask(start: string, duration: number, excludeId?: string) {
