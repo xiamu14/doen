@@ -90,6 +90,7 @@ export default function TaskCalendar() {
               const dateFn = dayjs(item.date);
               const isActiveDay = activeDay.isSame(dateFn, "day");
               const isWeekend = dateFn.day() === 0 || dateFn.day() === 6;
+              const showWeekendDot = isWeekend && !isActiveDay;
               const formatted = dateFn.format("ddd D");
               return (
                 <div
@@ -99,13 +100,13 @@ export default function TaskCalendar() {
                   {isActiveDay ? (
                     <div className="bg-[#DCECFF] w-[68px] h-[26px] rounded-[18px] center">
                       <p className="inline-flex items-center gap-[4px] text-calender-main">
-                        {isWeekend && <span className="size-[6px] rounded-full bg-orange-500" />}
+                        {showWeekendDot && <span className="size-[6px] rounded-full bg-orange-500" />}
                         {formatted}
                       </p>
                     </div>
                   ) : (
                     <p className="inline-flex items-center gap-[4px] text-calendar-date">
-                      {isWeekend && <span className="size-[6px] rounded-full bg-orange-500" />}
+                      {showWeekendDot && <span className="size-[6px] rounded-full bg-orange-500" />}
                       {formatted}
                     </p>
                   )}
