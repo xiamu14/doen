@@ -114,7 +114,7 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
     <div
       ref={cardRef}
       className={`absolute w-[120px] py-[3px] rounded-[6px] flex flex-col px-[10px] overflow-hidden z-12 ${task.status === "done" ? "cursor-default" : "cursor-pointer"}`}
-      style={{ left: dayIndex * 150 + 15, top: slotFromStart(task.start) * SLOT_HEIGHT, height: durationSlots * SLOT_HEIGHT - 2, backgroundColor: isDone || isOverdue ? "#eee" : tag.backgroundColor }}
+      style={{ left: dayIndex * 150 + 15, top: slotFromStart(task.start) * SLOT_HEIGHT + 1, height: durationSlots * SLOT_HEIGHT - 2, backgroundColor: isDone || isOverdue ? "#eee" : tag.backgroundColor }}
       onClick={(event) => {
         event.stopPropagation();
         const rect = event.currentTarget.getBoundingClientRect();
