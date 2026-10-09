@@ -49,7 +49,7 @@ export default function TaskCalendar() {
       duration: 30,
       status: "idle",
       projectId: list?.data.project[0]?.id ?? null,
-      tagId: "easy",
+      tagId: "easy|pressing",
     });
     DialogUtils.show("taskModal", { x, y, top, bottom, start });
   };

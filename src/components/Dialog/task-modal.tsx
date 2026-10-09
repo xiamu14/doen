@@ -26,7 +26,7 @@ export default function TaskModal() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [projectId, setProjectId] = useState<string | null | undefined>();
-  const [tagId, setTagId] = useState<TaskTagName>("easy");
+  const [tagId, setTagId] = useState<TaskTagName>("easy|pressing");
   const [date, setDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -59,7 +59,7 @@ export default function TaskModal() {
     setTitle(data?.task?.title ?? "New Task");
     setContent(data?.task?.content ?? "about this task");
     setProjectId(data?.task ? data.task.projectId : undefined);
-    setTagId(data?.task?.tagId ?? "easy");
+    setTagId(data?.task?.tagId ?? "easy|pressing");
     setStatus(data?.task?.status ?? "idle");
     setDate(start.format("YYYY-MM-DD"));
     setStartTime(start.format("HH:mm"));

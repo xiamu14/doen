@@ -14,7 +14,7 @@ export type TaskRecord = {
   duration: number;
   status: "idle" | "doing" | "done";
   projectId: string | null;
-  tagId: "easy" | "difficulty" | "pressing" | "later" | null;
+  tagId: "easy|pressing" | "easy|later" | "difficulty|pressing" | "difficulty|later" | null;
 };
 
 export async function getTasks(): Promise<TaskRecord[]> {

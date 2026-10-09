@@ -24,7 +24,7 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
   const taskRef = useRef(task);
   taskRef.current = task;
   const durationSlots = task.duration / SLOT_MINUTES;
-  const tag = TASK_TAGS.find((tag) => tag.name === (task.tagId ?? "easy")) ?? TASK_TAGS[0];
+  const tag = TASK_TAGS.find((tag) => tag.name === (task.tagId ?? "easy|pressing")) ?? TASK_TAGS[0];
   const minDurationSlots = 2;
   const maxDurationSlots = 4;
   const isDone = task.status === "done";
