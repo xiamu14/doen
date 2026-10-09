@@ -51,7 +51,7 @@ export function ListMenu() {
           <p className="text-create-list font-medium text-[14px]">new</p>
         </div>
       </div>
-      <div className="pl-[30px] flex flex-col items-start gap-[8px] text-content-secondary">
+      <div className="h-[88px] flex-shrink-0 overflow-y-auto scrollbar-hide pl-[30px] flex flex-col items-start gap-[8px] text-content-secondary">
         {data?.data.project.map(
           (
             item: { id: string; name: string; color: string },
@@ -138,7 +138,7 @@ export function EventList() {
           <p className="text-create-list font-medium text-[14px]">new</p>
         </button>
       </div>
-      <div className="pl-[30px] flex flex-col items-start gap-[8px] text-content-secondary">
+      <div className="h-[138px] flex-shrink-0 overflow-y-auto scrollbar-hide pl-[30px] flex flex-col items-start gap-[8px] text-content-secondary">
         {upcoming.map(({ event, next }) => (
           <button
             type="button"
