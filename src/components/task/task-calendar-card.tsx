@@ -129,8 +129,8 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
         });
       }}
     >
-      <p className="text-[14px] font-semibold truncate flex-shrink-0" style={{ color: isDone ? "#999" : isOverdue ? "oklch(70.4% 0.191 22.216)" : tag.name === "easy|pressing" ? "lab(66.9756% -58.27 19.5419)" : tag.color }}>{task.title}</p>
-      <p className="text-[12px] mt-[2px] my-0" style={{ color: isDone ? "#999" : isOverdue ? "oklch(70.4% 0.191 22.216)" : tag.name === "easy|pressing" ? "lab(66.9756% -58.27 19.5419)" : tag.color }}>
+      <p className="text-[14px] font-semibold truncate flex-shrink-0" style={{ color: isDone ? "#999" : isOverdue ? "oklch(70.4% 0.191 22.216)" : tag.name === "easy|pressing" ? "lab(66.9756% -58.27 19.5419)" : tag.name === "difficulty|later" ? "lab(76.3898% 14.5258 98.4589)" : tag.color }}>{task.title}</p>
+      <p className="text-[12px] mt-[2px] my-0" style={{ color: isDone ? "#999" : isOverdue ? "oklch(70.4% 0.191 22.216)" : tag.name === "easy|pressing" ? "lab(66.9756% -58.27 19.5419)" : tag.name === "difficulty|later" ? "lab(76.3898% 14.5258 98.4589)" : tag.color }}>
         {dayjs(task.start).format("H:mm")} - {dayjs(task.start).add(task.duration, "minute").format("H:mm")}
       </p>
       <div ref={resizeRef} className="absolute left-0 bottom-0 w-full h-[10px] cursor-s-resize" />
