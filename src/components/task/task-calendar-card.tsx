@@ -41,6 +41,7 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
       bounds: card.parentElement,
       autoScroll: 1,
       edgeResistance: 0,
+      zIndexBoost: false,
       type: "x,y",
       liveSnap: {
         x: (x) => {
