@@ -1,0 +1,1 @@
+ALTER TABLE "event" ADD COLUMN "color" varchar(10) DEFAULT '#69D571' NOT NULL;

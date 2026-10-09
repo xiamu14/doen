@@ -10,6 +10,10 @@ import { modalsState } from "../Dialog/state";
 import TaskCalendarRow from "./task-calendar-row";
 import TaskCalendarCard from "./task-calendar-card";
 import { SLOT_HEIGHT, slotFromStart } from "./calendar-time";
+import { toast } from "sonner";
+import { getEvents } from "@/client/api/event";
+import { eventOccursOn } from "@/lib/event-recurrence";
+import EventCalendarMarker from "./event-calendar-marker";
 
 export default function TaskCalendar() {
   const queryClient = useQueryClient();
@@ -36,6 +40,7 @@ export default function TaskCalendar() {
     });
   };
   const { data: tasks = [] } = useQuery({ queryKey: ["tasks"], queryFn: getTasks });
+  const { data: events = [] } = useQuery({ queryKey: ["events"], queryFn: getEvents });
   const { data: list } = useQuery({ queryKey: ["list"], queryFn: getList });
   useEffect(() => {
     if (modal.activeModalId !== "taskModal") setDraftTask(null);
@@ -57,10 +62,10 @@ export default function TaskCalendar() {
     queryClient.setQueryData<TaskRecord[]>(["tasks"], (current) =>
       current?.map((item) => item.id === updated.id ? updated : item));
     const previousSave = pendingSaves.current.get(updated.id) ?? Promise.resolve();
-    const save = previousSave.catch(() => {}).then(() => updateTask(updated)).then(() => {}).catch(async () => {
+    const save = previousSave.catch(() => {}).then(() => updateTask(updated)).then(() => {}).catch(async (cause) => {
       if (pendingSaves.current.get(updated.id) === save) {
         await queryClient.invalidateQueries({ queryKey: ["tasks"] });
-        window.alert("Could not save task position.");
+        toast.error(cause instanceof Error ? cause.message : "Could not save task position.");
       }
     });
     pendingSaves.current.set(updated.id, save);
@@ -178,6 +183,9 @@ export default function TaskCalendar() {
                 onChange={savePosition}
               />;
             })}
+            {dates.flatMap((day, dayIndex) => events
+              .filter((event) => eventOccursOn(event, day.date))
+              .map((event) => <EventCalendarMarker key={`${event.id}-${day.date}`} event={event} date={day.date} dayIndex={dayIndex} />))}
             {draftTask && (
               <TaskCalendarCard
                 key={draftTask.id}

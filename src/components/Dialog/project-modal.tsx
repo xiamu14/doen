@@ -154,7 +154,7 @@ export default function ProjectModal() {
                         autoFocus
                         required
                         maxLength={20}
-                        placeholder="New Project Name"
+                        placeholder="Project Name"
                         value={name}
                         onChange={(event) => {
                           setName(event.target.value);
@@ -194,7 +194,7 @@ export default function ProjectModal() {
                     </button>
                   )}
                   <button type="submit" disabled={isSaving} className="flex-1 h-[30px] rounded-[15px] bg-primary center font-semibold text-[14px] text-white cursor-pointer disabled:opacity-50">
-                    {isSaving ? "Saving..." : "Apply"}
+                    {isSaving ? "Saving..." : "Create"}
                   </button>
                 </div>
               </form>

@@ -9,6 +9,9 @@ import { useQuery } from "@tanstack/react-query";
 import { getList } from "@/client/api/task";
 import { PROJECT_COLORS } from "@/lib/project-colors";
 import { TASK_TAGS } from "@/lib/task-tags";
+import { getEvents } from "@/client/api/event";
+import { nextEventOccurrence } from "@/lib/event-recurrence";
+import dayjs from "dayjs";
 
 export function ListMenu() {
   const { data } = useQuery({ queryKey: ["list"], queryFn: getList });
@@ -82,7 +85,7 @@ export function ListMenu() {
 
 export function TagMenu() {
   return (
-    <div className="w-full flex flex-col gap-[20px]">
+    <div className="w-full flex flex-col gap-[14px]">
       <div className="w-full flex justify-start items-center gap-[20px]">
         <div className="flex justify-start items-center gap-[10px]">
           <ChevronDown
@@ -91,9 +94,9 @@ export function TagMenu() {
             className="cursor-pointer mr-[2px]"
           />
           <Tag size={16} color="#333" />
-          <p className="text-[18px] font-semibold text-content">Tag</p>
+          <p className="text-[18px] font-semibold text-content">Tags</p>
         </div>
-        <div className="flex justify-start items-center gap-[4px] cursor-pointer">
+        <div className=" justify-start items-center gap-[4px] cursor-pointer hidden">
           <Plus size={16} color="#7390FE" />
 
           <p className="text-create-list font-medium text-[14px]">new</p>
@@ -109,6 +112,12 @@ export function TagMenu() {
 }
 
 export function EventList() {
+  const { data: events = [] } = useQuery({ queryKey: ["events"], queryFn: getEvents });
+  const upcoming = events
+    .map((event) => ({ event, next: nextEventOccurrence(event) }))
+    .filter((item) => item.next)
+    .sort((a, b) => `${a.next!.date} ${a.next!.time}`.localeCompare(`${b.next!.date} ${b.next!.time}`));
+
   return (
     <div className="w-full flex flex-col gap-[14px]">
       <div className="w-full flex justify-start items-center gap-[20px]">
@@ -121,16 +130,40 @@ export function EventList() {
           <Milestone size={18} color="#333" />
           <p className="text-[18px] font-semibold text-content">Events</p>
         </div>
-        <div className="flex justify-start items-center gap-[4px] cursor-pointer">
+        <button type="button" className="flex justify-start items-center gap-[4px] cursor-pointer" onClick={(click) => {
+          const rect = click.currentTarget.getBoundingClientRect();
+          DialogUtils.show("eventModal", { x: rect.left, y: rect.bottom + 8 });
+        }}>
           <Plus size={16} color="#7390FE" />
-
           <p className="text-create-list font-medium text-[14px]">new</p>
-        </div>
+        </button>
       </div>
-      <div className="pl-[30px] flex flex-col  items-start gap-[8px] text-content-secondary">
-        {TASK_TAGS.map((item) => {
-          return <TagItem key={item.name} item={item} />;
-        })}
+      <div className="pl-[30px] flex flex-col items-start gap-[8px] text-content-secondary">
+        {upcoming.map(({ event, next }) => (
+          <button
+            type="button"
+            key={event.id}
+            className="w-full text-left flex flex-col items-start"
+            onClick={(click) => {
+              const rect = click.currentTarget.getBoundingClientRect();
+              DialogUtils.show("eventModal", { x: rect.left, y: rect.bottom + 8, event });
+            }}
+          >
+            <span className="flex items-center gap-[8px] text-[15px] font-medium text-content truncate max-w-full">
+              <span className="size-[10px] flex-shrink-0 rounded-full" style={{ backgroundColor: event.color }} />
+              <span className="ml-[10px] truncate">{event.title}</span>
+            </span>
+            <span className="ml-[28px] text-[12px] text-content-secondary">
+              {event.recurrence === "once"
+                ? dayjs(`${next!.date}T${next!.time}`).format("MMM D · HH:mm")
+                : event.recurrence === "daily"
+                  ? `Every day · ${event.time}`
+                  : event.recurrence === "weekly"
+                    ? `Every ${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][event.repeatDay ?? 0]} · ${event.time}`
+                    : `Day ${event.repeatDay ?? 1} each month · ${event.time}`}
+            </span>
+          </button>
+        ))}
       </div>
     </div>
   );

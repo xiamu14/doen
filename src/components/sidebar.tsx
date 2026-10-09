@@ -15,6 +15,8 @@ export default function Sidebar() {
       <ListMenu />
       <div className="h-[20px]" />
       <EventList />
+      <div className="h-[20px]" />
+      <TagMenu />
     </div>
   );
 }

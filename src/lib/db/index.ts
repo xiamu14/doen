@@ -3,9 +3,10 @@ import { drizzle as nodePostgres } from "drizzle-orm/node-postgres";
 import { getXataClient } from "@/lib/db/xata";
 import * as userSchema from "./schema/user";
 import * as taskSchema from "./schema/task";
+import * as eventSchema from "./schema/event";
 
 function initDB() {
-  const schema = { ...userSchema, ...taskSchema };
+  const schema = { ...userSchema, ...taskSchema, ...eventSchema };
   if (process.env.NODE_ENV === "development") {
     const dbDev = nodePostgres(process.env.DATABASE_URL!, { schema });
     return dbDev;

@@ -13,12 +13,14 @@ const fields = z.object({
   duration: z.number().int().min(15).max(960).refine((value) => value % 15 === 0),
   status: z.enum(["idle", "doing", "done"]).optional(),
   projectId: z.string().uuid().nullable().optional(),
-  tagId: z.enum(["easy|pressing", "easy|later", "difficulty|pressing", "difficulty|later"]).nullable().optional(),
+  tagId: z.preprocess((value) => value === "easy" ? "easy|pressing" : value,
+    z.enum(["easy|pressing", "easy|later", "difficulty|pressing", "difficulty|later"]).nullable().optional()),
 });
 
 const serializeTask = (value: typeof task.$inferSelect) => ({
   ...value,
   start: new Date(value.start).toISOString(),
+  tagId: value.tagId === "easy" ? "easy|pressing" : value.tagId,
 });
 
 async function overlapsTask(start: string, duration: number, excludeId?: string) {

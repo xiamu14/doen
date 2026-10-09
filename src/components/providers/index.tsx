@@ -1,5 +1,6 @@
 import { ThemeProvider } from "@/components/theme/provider";
 import QueryProvider from "./query";
+import { Toaster } from "sonner";
 
 export default function RootProviders({
   children,
@@ -15,6 +16,7 @@ export default function RootProviders({
         disableTransitionOnChange
       >
         {children}
+        <Toaster />
       </ThemeProvider>
     </QueryProvider>
   );

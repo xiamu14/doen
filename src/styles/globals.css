@@ -57,6 +57,8 @@
   --color-calendar-date-active: var(--primary-blue-300);
   --color-switch-layout-active: rgba(22, 22, 22, 0.1);
   --color-task-process: var(--neutral-white-300);
+  --color-scrollbar-track: #eee;
+  --color-scrollbar-thumb: #c4c4c4;
 }
 
 :root {
@@ -230,6 +232,12 @@
 @utility scrollbar-hide {
   @apply [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
 }
+
+@utility scrollbar-rounded-corner {
+  @apply [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-scrollbar-track [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-scrollbar-thumb;
+}
+
+
 
 @utility shadow-modal {
   box-shadow: 2px 2 4px 0px #f6f6f6;
