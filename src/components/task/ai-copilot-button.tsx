@@ -48,7 +48,7 @@ function CopilotForm({ activeDay, close, onApply }: {
         <textarea
           value={taskInstruction}
           onChange={(event) => setTaskInstruction(event.target.value)}
-          placeholder="e.g. Schedule weekly planning in the morning and extend design review to 1 hour"
+          placeholder="Task changes…"
           rows={3}
           maxLength={2000}
           className="resize-y rounded-[8px] border border-[#e7e7e7] px-2.5 py-2 text-[14px] text-content outline-none focus:border-primary"
@@ -68,7 +68,7 @@ function CopilotForm({ activeDay, close, onApply }: {
       <textarea
         value={eventInstruction}
         onChange={(event) => setEventInstruction(event.target.value)}
-        placeholder="e.g. Leave no tasks between lunch and the weekly meeting; schedule nothing after the meeting"
+        placeholder="Event rules…"
         rows={2}
         maxLength={2000}
         disabled={busy || !eventConstraintsEnabled}
