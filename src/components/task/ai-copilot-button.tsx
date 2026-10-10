@@ -16,6 +16,7 @@ import styles from "./ai-copilot-button.module.css";
 gsap.registerPlugin(Flip);
 
 type FormValues = { taskInstruction: string; eventConstraintsEnabled: boolean; eventInstruction: string };
+const eventInstructionStorageKey = "ai-copilot-event-instruction";
 
 function CopilotForm({ activeDay, close, onApply }: {
   activeDay: string;
@@ -27,6 +28,13 @@ function CopilotForm({ activeDay, close, onApply }: {
   const [eventInstruction, setEventInstruction] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  useEffect(() => {
+    try {
+      setEventInstruction(localStorage.getItem(eventInstructionStorageKey) ?? "");
+    } catch {
+      // Keep the form usable when browser storage is unavailable.
+    }
+  }, []);
   const activeDayLabel = new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
@@ -49,10 +57,9 @@ function CopilotForm({ activeDay, close, onApply }: {
   };
 
   return (
-    <form className="flex flex-col gap-3" onSubmit={submit}>
-      <p className="text-[14px] font-semibold text-content">AI Copilot · {activeDay.slice(5).replace("-", ".")}</p>
+    <form className="flex flex-col gap-4" onSubmit={submit}>
+      <p className="text-[14px] font-bold text-content">AI Copilot</p>
       <div className="flex flex-col gap-1 text-[14px] text-content-secondary">
-        <Label.Root htmlFor="copilot-task-instruction">Task adjustments</Label.Root>
         <TextArea
           id="copilot-task-instruction"
           value={taskInstruction}
@@ -60,7 +67,7 @@ function CopilotForm({ activeDay, close, onApply }: {
           placeholder={`Tell AI Copilot how to change ${activeDayLabel}'s tasks…`}
           rows={3}
           maxLength={2000}
-          className="rounded-[8px] border-0 bg-[#eee] px-2.5 py-2 text-[14px] text-content outline-none focus:outline-none focus-visible:outline-none"
+          className="rounded-[8px] border-0 bg-[#e8e8e8] px-2.5 py-2 text-[14px] text-content placeholder:text-[#666] outline-none focus:outline-none focus-visible:outline-none"
           disabled={busy}
         />
       </div>
@@ -70,29 +77,37 @@ function CopilotForm({ activeDay, close, onApply }: {
           checked={eventConstraintsEnabled}
           onCheckedChange={(checked) => setEventConstraintsEnabled(checked === true)}
           disabled={busy}
-          className="flex size-5 shrink-0 items-center justify-center rounded-[4px] border border-primary bg-white text-primary data-[state=checked]:bg-primary data-[state=checked]:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50"
+          className="flex size-4 shrink-0 items-center justify-center rounded-[4px] border border-primary bg-white text-primary data-[state=checked]:bg-primary data-[state=checked]:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50"
         >
-          <Checkbox.Indicator><Check size={14} strokeWidth={3} /></Checkbox.Indicator>
+          <Checkbox.Indicator><Check size={12} strokeWidth={3} /></Checkbox.Indicator>
         </Checkbox.Root>
         <Label.Root htmlFor="copilot-event-constraints">Event constraints</Label.Root>
       </div>
       <TextArea
         id="copilot-event-instruction"
         value={eventInstruction}
-        onChange={(event) => setEventInstruction(event.target.value)}
+        onChange={(event) => {
+          const value = event.target.value;
+          setEventInstruction(value);
+          try {
+            localStorage.setItem(eventInstructionStorageKey, value);
+          } catch {
+            // Keep the form usable when browser storage is unavailable.
+          }
+        }}
         placeholder="Tell AI Copilot how to schedule around events…"
-        rows={2}
+        rows={3}
         maxLength={2000}
         disabled={busy}
-        className="rounded-[8px] border-0 bg-[#eee] px-2.5 py-2 text-[14px] text-content outline-none focus:outline-none focus-visible:outline-none disabled:bg-[#eee]"
+        className="rounded-[8px] border-0 bg-[#e8e8e8] px-2.5 py-2 text-[14px] text-content placeholder:text-[#666] outline-none focus:outline-none focus-visible:outline-none disabled:bg-[#e8e8e8]"
       />
       {error && <p role="alert" className="text-[14px] text-red-600">{error}</p>}
       <Button
         type="submit"
         disabled={busy}
-        className="flex h-[40px] items-center justify-center rounded-[10px] bg-primary px-3 text-[14px] font-semibold text-white disabled:opacity-60"
+        className="flex h-[40px] items-center justify-center rounded-full bg-primary px-3 text-[14px] font-semibold text-white disabled:opacity-60 mt-2 mb-2"
       >
-        AI Copilot
+        Plan My Day
       </Button>
     </form>
   );
