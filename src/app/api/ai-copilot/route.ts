@@ -25,20 +25,17 @@ const requestSchema = z.object({
   eventInstruction: z.string().trim().max(2000).default(""),
 });
 
-const scheduleSchema = z.discriminatedUnion("action", [
-  z.object({
-    action: z.literal("apply"),
-    tasks: z.array(z.object({
-      id: z.string().uuid(),
-      startTime: z.string().regex(/^(?:0[7-9]|1\d|2[0-3]):[0-5]\d$/),
-      duration: z.number().int().min(MIN_TASK_DURATION).max(MAX_TASK_DURATION),
-    })),
-  }),
-  z.object({ action: z.literal("reject"), reason: z.string().trim().max(500).optional() }),
-]);
+const scheduleSchema = z.object({
+  action: z.enum(["apply", "reject"]),
+  tasks: z.array(z.object({
+    id: z.string().uuid(),
+    startTime: z.string().regex(/^(?:0[7-9]|1\d|2[0-3]):[0-5]\d$/),
+    duration: z.number().int().min(MIN_TASK_DURATION).max(MAX_TASK_DURATION),
+  })).max(100),
+  reason: z.string().trim().max(500).optional(),
+});
 
 type ScheduleInput = z.infer<typeof scheduleSchema>;
-type ApplyScheduleInput = Extract<ScheduleInput, { action: "apply" }>;
 type TaskRow = typeof task.$inferSelect;
 const taskPriorityOrder = ["easy|pressing", "difficulty|pressing", "easy|later", "difficulty|later"] as const;
 
@@ -85,7 +82,7 @@ async function getDayTasks(activeDay: string, timeZone: string) {
 }
 
 async function applySchedule(
-  input: ApplyScheduleInput,
+  input: { tasks: ScheduleInput["tasks"] },
   activeDay: string,
   timeZone: string,
   originalTasks: TaskRow[],
@@ -180,10 +177,11 @@ export async function POST(request: NextRequest) {
     let resultTasks: ReturnType<typeof serializeTask>[] | undefined;
     let applyError = "The AI did not apply a schedule.";
 
-    const generateSchedule = () => generateText({
+    const generateSchedule = (repairIncompleteToolCall = false) => generateText({
       model: openrouter.chat(modelName),
       system: [
-        "You arrange existing tasks for one local calendar day. Return no user-facing prose; call apply_task_schedule exactly once. If the user requests a task be moved to another date, choose action=reject and do not save anything. When an instruction names a project, apply it to tasks whose supplied projectName matches; if no project matches, reject with a short reason.",
+        "You arrange existing tasks for one local calendar day. Return no user-facing prose; call apply_task_schedule exactly once. For action=apply include every task in tasks; for action=reject set tasks to an empty array and provide a short reason. If the user requests a task be moved to another date, reject and do not save anything. When an instruction names a project, apply it to tasks whose supplied projectName matches; if no project matches, reject with a short reason.",
+        ...(repairIncompleteToolCall ? ["Your previous tool call failed validation because required schedule fields were missing. Call the tool again with both action and tasks. For apply, include every supplied task ID exactly once, with id, startTime, and duration; for reject, use an empty tasks array and include a reason. Do not return only the action."] : []),
         `The day is ${activeDay}. Tasks may start no earlier than ${FIRST_HOUR}:00, must end by ${LAST_HOUR}:00, last ${MIN_TASK_DURATION}-${MAX_TASK_DURATION} minutes in ${SLOT_MINUTES}-minute steps, and must not overlap or cross midnight. All supplied event times and task start times are already expressed in the active day's local clock; do not perform timezone conversion.`,
         `The current local date and time is ${currentLocalTime.date} ${currentLocalTime.time}. An incomplete task whose original time has passed is overdue, not completed: include it and reschedule it later today. Every incomplete task's new start time must be at or after the current time; never schedule one in the past.`,
         "Include every supplied task exactly once, keep its ID, and only choose a local startTime and duration. Never invent, delete, rename, or move a task to another date. Keep completed tasks unchanged. Completed tasks do not participate in tag-priority ordering, but remain fixed and occupy their time intervals, so no other task may overlap them.",
@@ -211,7 +209,7 @@ export async function POST(request: NextRequest) {
       }),
       tools: {
         apply_task_schedule: tool({
-          description: "Submit the schedule result, not the user's input. Return action=apply with every task's id, startTime, and duration, or action=reject with a short reason if the request cannot satisfy the task constraints.",
+          description: "Submit the schedule result, not the user's input. Always include action and tasks. For apply, tasks must contain every task's id, startTime, and duration. For reject, use an empty tasks array and include a short reason.",
           inputSchema: scheduleSchema,
           execute: async (input) => {
             try {
@@ -234,8 +232,10 @@ export async function POST(request: NextRequest) {
     let generation = await generateSchedule();
     const hasScheduleToolCall = generation.steps.some((step) =>
       step.toolCalls.some(({ toolName }) => toolName === "apply_task_schedule"));
-    if (!resultTasks && !hasScheduleToolCall && applyError === "The AI did not apply a schedule.") {
-      generation = await generateSchedule();
+    const hasInvalidToolInput = generation.steps.some((step) =>
+      step.content.some((part) => part.type === "tool-call" && part.invalid));
+    if (!resultTasks && applyError === "The AI did not apply a schedule." && (!hasScheduleToolCall || hasInvalidToolInput)) {
+      generation = await generateSchedule(hasInvalidToolInput);
     }
 
     if (!resultTasks) {
