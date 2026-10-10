@@ -12,12 +12,14 @@ import { Flip } from "gsap/Flip";
 import type { TaskRecord } from "@/client/api/task";
 import { scheduleActiveDay } from "@/client/api/task";
 import { Button, TextArea } from "@/components/ui/form-controls";
+import { DEFAULT_REST_RULE } from "@/lib/task-schedule-config";
 import styles from "./ai-copilot-button.module.css";
 
 gsap.registerPlugin(Flip);
 
-type FormValues = { taskInstruction: string; eventConstraintsEnabled: boolean; eventInstruction: string };
+type FormValues = { taskInstruction: string; eventConstraintsEnabled: boolean; eventInstruction: string; restInstruction: string };
 const eventInstructionStorageKey = "ai-copilot-event-instruction";
+const restInstructionStorageKey = "ai-copilot-rest-instruction";
 
 function CopilotForm({ activeDay, close, onApply }: {
   activeDay: string;
@@ -27,11 +29,13 @@ function CopilotForm({ activeDay, close, onApply }: {
   const [taskInstruction, setTaskInstruction] = useState("");
   const [eventConstraintsEnabled, setEventConstraintsEnabled] = useState(true);
   const [eventInstruction, setEventInstruction] = useState("");
+  const [restInstruction, setRestInstruction] = useState(DEFAULT_REST_RULE);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   useEffect(() => {
     try {
       setEventInstruction(localStorage.getItem(eventInstructionStorageKey) ?? "");
+      setRestInstruction(localStorage.getItem(restInstructionStorageKey) ?? DEFAULT_REST_RULE);
     } catch {
       // Keep the form usable when browser storage is unavailable.
     }
@@ -48,7 +52,7 @@ function CopilotForm({ activeDay, close, onApply }: {
     setBusy(true);
     setError("");
     try {
-      await onApply({ taskInstruction, eventConstraintsEnabled, eventInstruction });
+      await onApply({ taskInstruction, eventConstraintsEnabled, eventInstruction, restInstruction });
       toast.success("Your day is planned.", {
         position: "top-center",
         icon: <CircleCheck size={20} color="#69D571" strokeWidth={2.5} />,
@@ -102,6 +106,44 @@ function CopilotForm({ activeDay, close, onApply }: {
         }}
         placeholder="Tell AI Copilot how to schedule around events…"
         rows={3}
+        maxLength={2000}
+        disabled={busy}
+        className="rounded-[8px] border-0 bg-[#e8e8e8] px-2.5 py-2 text-[14px] text-[#333] placeholder:text-[#666] outline-none focus:outline-none focus-visible:outline-none disabled:bg-[#e8e8e8]"
+      />
+      <div className="flex items-center justify-between text-[14px] text-content">
+        <Label.Root htmlFor="copilot-rest-instruction">Rest rules</Label.Root>
+        {restInstruction !== DEFAULT_REST_RULE && (
+          <Button
+            type="button"
+            disabled={busy}
+            onClick={() => {
+              setRestInstruction(DEFAULT_REST_RULE);
+              try {
+                localStorage.setItem(restInstructionStorageKey, DEFAULT_REST_RULE);
+              } catch {
+                // Keep the form usable when browser storage is unavailable.
+              }
+            }}
+            className="text-[14px] text-primary disabled:opacity-50"
+          >
+            Reset
+          </Button>
+        )}
+      </div>
+      <TextArea
+        id="copilot-rest-instruction"
+        value={restInstruction}
+        onChange={(event) => {
+          const value = event.target.value;
+          setRestInstruction(value);
+          try {
+            localStorage.setItem(restInstructionStorageKey, value);
+          } catch {
+            // Keep the form usable when browser storage is unavailable.
+          }
+        }}
+        placeholder="Describe when to take breaks…"
+        rows={2}
         maxLength={2000}
         disabled={busy}
         className="rounded-[8px] border-0 bg-[#e8e8e8] px-2.5 py-2 text-[14px] text-[#333] placeholder:text-[#666] outline-none focus:outline-none focus-visible:outline-none disabled:bg-[#e8e8e8]"

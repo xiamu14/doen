@@ -28,6 +28,7 @@ export async function scheduleActiveDay(input: {
   taskInstruction: string;
   eventConstraintsEnabled: boolean;
   eventInstruction: string;
+  restInstruction: string;
 }): Promise<TaskRecord[]> {
   const response = await fetch("/api/ai-copilot", {
     method: "POST",
