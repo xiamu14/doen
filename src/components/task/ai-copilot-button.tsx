@@ -3,9 +3,10 @@
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import * as Label from "@radix-ui/react-label";
-import { Check, Sparkles } from "lucide-react";
+import { Check, LoaderCircle, Sparkles } from "lucide-react";
 import { memo, useEffect, useRef, useState, type FormEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import gsap from "gsap";
 import { Flip } from "gsap/Flip";
 import type { TaskRecord } from "@/client/api/task";
@@ -48,6 +49,7 @@ function CopilotForm({ activeDay, close, onApply }: {
     setError("");
     try {
       await onApply({ taskInstruction, eventConstraintsEnabled, eventInstruction });
+      toast.success("Your day is planned.", { position: "top-center" });
       close();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Scheduling failed. Please try again.");
@@ -67,7 +69,7 @@ function CopilotForm({ activeDay, close, onApply }: {
           placeholder={`Tell AI Copilot how to change ${activeDayLabel}'s tasks…`}
           rows={3}
           maxLength={2000}
-          className="rounded-[8px] border-0 bg-[#e8e8e8] px-2.5 py-2 text-[14px] text-content placeholder:text-[#666] outline-none focus:outline-none focus-visible:outline-none"
+          className="rounded-[8px] border-0 bg-[#e8e8e8] px-2.5 py-2 text-[14px] text-[#333] placeholder:text-[#666] outline-none focus:outline-none focus-visible:outline-none"
           disabled={busy}
         />
       </div>
@@ -99,15 +101,17 @@ function CopilotForm({ activeDay, close, onApply }: {
         rows={3}
         maxLength={2000}
         disabled={busy}
-        className="rounded-[8px] border-0 bg-[#e8e8e8] px-2.5 py-2 text-[14px] text-content placeholder:text-[#666] outline-none focus:outline-none focus-visible:outline-none disabled:bg-[#e8e8e8]"
+        className="rounded-[8px] border-0 bg-[#e8e8e8] px-2.5 py-2 text-[14px] text-[#333] placeholder:text-[#666] outline-none focus:outline-none focus-visible:outline-none disabled:bg-[#e8e8e8]"
       />
       {error && <p role="alert" className="text-[14px] text-red-600">{error}</p>}
       <Button
         type="submit"
         disabled={busy}
+        aria-busy={busy}
         className="flex h-[40px] items-center justify-center rounded-full bg-primary px-3 text-[14px] font-semibold text-white disabled:opacity-60 mt-2 mb-2"
       >
-        Plan My Day
+        {busy && <LoaderCircle size={16} aria-hidden="true" className="mr-2 animate-spin" />}
+        {busy ? "Planning..." : "Plan My Day"}
       </Button>
     </form>
   );
