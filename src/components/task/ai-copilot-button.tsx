@@ -3,7 +3,7 @@
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import * as Label from "@radix-ui/react-label";
-import { Check, LoaderCircle, Sparkles } from "lucide-react";
+import { Check, CircleCheck, LoaderCircle, Sparkles } from "lucide-react";
 import { memo, useEffect, useRef, useState, type FormEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -49,7 +49,10 @@ function CopilotForm({ activeDay, close, onApply }: {
     setError("");
     try {
       await onApply({ taskInstruction, eventConstraintsEnabled, eventInstruction });
-      toast.success("Your day is planned.", { position: "top-center" });
+      toast.success("Your day is planned.", {
+        position: "top-center",
+        icon: <CircleCheck size={20} color="#69D571" strokeWidth={2.5} />,
+      });
       close();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Scheduling failed. Please try again.");
