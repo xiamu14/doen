@@ -80,7 +80,7 @@ function CopilotForm({ activeDay, close, onApply }: {
         disabled={busy}
         className="flex h-[40px] items-center justify-center rounded-[10px] bg-primary px-3 text-[14px] font-semibold text-white disabled:opacity-60"
       >
-        AI Copilot Boot
+        AI Copilot
       </button>
     </form>
   );
