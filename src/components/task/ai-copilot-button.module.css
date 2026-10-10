@@ -1,0 +1,78 @@
+.button {
+  position: relative;
+  isolation: isolate;
+}
+
+.button::before {
+  position: absolute;
+  z-index: -1;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgb(124 91 255 / 38%);
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+}
+
+.button:hover::before {
+  animation: shadowBreath 2.4s ease-in-out infinite;
+}
+
+@keyframes shadowBreath {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.95);
+    box-shadow: 0 0 8px 3px rgb(124 91 255 / 35%);
+  }
+
+  50% {
+    opacity: 0.55;
+    transform: scale(1.15);
+    box-shadow: 0 0 10px 4px rgb(124 91 255 / 36%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button:hover::before {
+    animation: none;
+  }
+}
+
+.orb {
+  position: relative;
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, #dfcaff, #6932d3 55%, #1467d9);
+  box-shadow: inset 0 0 6px rgb(255 255 255 / 85%), 0 0 10px rgb(124 91 255 / 48%), 0 2px 5px rgb(64 38 144 / 24%);
+}
+
+.video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.orb::after {
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgb(255 255 255 / 45%);
+  border-radius: inherit;
+  background: linear-gradient(145deg, rgb(255 255 255 / 30%), transparent 40%, rgb(29 14 96 / 12%));
+  content: "";
+  pointer-events: none;
+}
+
+.icon {
+  z-index: 1;
+  color: white;
+  filter: drop-shadow(0 0 2px rgb(76 31 174 / 70%));
+}
