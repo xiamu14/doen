@@ -227,8 +227,9 @@ export default function DaySummaryModal() {
                   <div className="px-[10px]">
                     <div className="flex flex-col gap-1">
                     {projectTotals.length ? (
-                      projectTotals.map((project) => (
-                        <div
+                      projectTotals.map((project) => {
+                        const tag = TASK_TAGS.find((item) => item.color === project.color);
+                        return <div
                           key={project.id}
                           className="flex items-center gap-1"
                         >
@@ -240,15 +241,15 @@ export default function DaySummaryModal() {
                               className="h-full rounded-full"
                               style={{
                                 width: `${(project.duration / maxProjectDuration) * 100}%`,
-                                backgroundColor: project.color,
+                                backgroundColor: tag ? `color-mix(in srgb, ${project.color} 40%, ${tag.backgroundColor})` : project.color,
                               }}
                             />
                           </div>
                           <span className="w-[52px] text-right text-[12px] text-content">
                             {formatDuration(project.duration)}
                           </span>
-                        </div>
-                      ))
+                        </div>;
+                      })
                     ) : (
                       <p className="text-[12px] text-content">
                         No planned tasks
