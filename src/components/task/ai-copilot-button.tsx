@@ -55,7 +55,7 @@ function CopilotForm({ activeDay, close, onApply }: {
           placeholder="Task changes…"
           rows={3}
           maxLength={2000}
-          className="resize-y rounded-[8px] border border-[#e7e7e7] px-2.5 py-2 text-[14px] text-content outline-none focus:border-primary"
+          className="rounded-[8px] border border-[#e7e7e7] px-2.5 py-2 text-[14px] text-content outline-none focus:border-primary"
           disabled={busy}
         />
       </div>
@@ -79,7 +79,7 @@ function CopilotForm({ activeDay, close, onApply }: {
         rows={2}
         maxLength={2000}
         disabled={busy || !eventConstraintsEnabled}
-        className="resize-y rounded-[8px] border border-[#e7e7e7] px-2.5 py-2 text-[14px] text-content outline-none focus:border-primary disabled:bg-[#f7f7f7]"
+        className="rounded-[8px] border border-[#e7e7e7] px-2.5 py-2 text-[14px] text-content outline-none focus:border-primary disabled:bg-[#f7f7f7]"
       />
       {error && <p role="alert" className="text-[14px] text-red-600">{error}</p>}
       <Button
