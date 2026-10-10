@@ -4,12 +4,12 @@ import { Dialog, DialogPanel } from "@headlessui/react";
 import * as Popover from "@radix-ui/react-popover";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useEffect, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { CalendarDays, Clock3 } from "lucide-react";
 import CustomInput from "@/components/custom-input";
 import MonthCalendar from "@/components/ui/month-calendar";
-import { createEvent, deleteEvent, updateEvent, type EventRecord, type EventRecurrence } from "@/client/api/event";
+import { createEvent, deleteEvent, getEvents, updateEvent, type EventRecord, type EventRecurrence } from "@/client/api/event";
 import { modalsState } from "./state";
 import { DialogUtils } from "./utils";
 import type { Modals } from "./type";
@@ -17,6 +17,7 @@ import { useSnapshot } from "valtio";
 
 const repeatLabels: Record<EventRecurrence, string> = {
   once: "Once",
+  someday: "Someday",
   daily: "Every day",
   weekly: "Every week",
   monthly: "Every month",
@@ -26,6 +27,7 @@ const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Frida
 export default function EventModal() {
   const modal = useSnapshot(modalsState);
   const queryClient = useQueryClient();
+  const { data: events = [] } = useQuery({ queryKey: ["events"], queryFn: getEvents });
   const isOpen = modal.activeModalId === "eventModal";
   const data = modal.extraData as Modals["eventModal"];
   const [title, setTitle] = useState("");
@@ -60,7 +62,7 @@ export default function EventModal() {
     setTitle(currentEvent?.title ?? "New Event");
     setDescription(currentEvent?.description ?? "about this event");
     const selectedDate = currentEvent?.date ?? data?.date ?? now.format("YYYY-MM-DD");
-    setDate(currentEvent ? currentEvent.recurrence === "once" ? currentEvent.date ?? selectedDate : null : selectedDate);
+    setDate(currentEvent ? currentEvent.recurrence === "once" || currentEvent.recurrence === "someday" ? currentEvent.date ?? selectedDate : null : selectedDate);
     setTime(currentEvent?.time ?? defaultTime);
     setRecurrence(currentEvent?.recurrence ?? "once");
     setRepeatDay(currentEvent?.repeatDay ?? (currentEvent?.date
@@ -82,7 +84,7 @@ export default function EventModal() {
     setIsSaving(true);
     setError("");
     try {
-      const values = { title: title.trim(), description: description.trim(), date, time, recurrence, repeatDay };
+      const values = { title: title.trim(), description: description.trim(), date, time: recurrence === "someday" ? null : time, recurrence, repeatDay };
       const saved = currentEvent
         ? await updateEvent({ ...currentEvent, ...values })
         : await createEvent(values);
@@ -119,9 +121,10 @@ export default function EventModal() {
 
   const changeRecurrence = (value: EventRecurrence) => {
     setRecurrence(value);
-    if (value === "once") {
+    if (value === "once" || value === "someday") {
       setDate(date ?? dayjs().format("YYYY-MM-DD"));
       setRepeatDay(null);
+      if (value === "once") setTime(dayjs().hour() < 7 ? "07:00" : dayjs().hour() >= 23 ? "23:00" : dayjs().format("HH:mm"));
       return;
     }
     setDate(null);
@@ -164,59 +167,59 @@ export default function EventModal() {
             <div className="flex items-center gap-[6px]">
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
-                  <button type="button" className="flex h-[34px] flex-shrink-0 items-center whitespace-nowrap rounded-[8px] bg-[#f6f6f6] px-2.5 text-[13px] text-content">{repeatLabels[recurrence]}</button>
+                  <button type="button" className="flex h-[34px] flex-shrink-0 items-center whitespace-nowrap rounded-[8px] bg-[#f6f6f6] px-2.5 text-[14px] text-content">{repeatLabels[recurrence]}</button>
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Portal>
                   <DropdownMenu.Content align="start" sideOffset={6} className="z-[60] min-w-[160px] rounded-[10px] border border-[#eee] bg-white p-1 outline-none">
                     {(Object.keys(repeatLabels) as EventRecurrence[]).map((value) => (
-                      <DropdownMenu.Item key={value} onSelect={() => changeRecurrence(value)} className={`cursor-pointer rounded px-3 py-2 text-[13px] text-content outline-none data-[highlighted]:bg-[#f6f6f6] ${recurrence === value ? "bg-primary text-white data-[highlighted]:bg-primary" : ""}`}>{repeatLabels[value]}</DropdownMenu.Item>
+                      <DropdownMenu.Item key={value} onSelect={() => changeRecurrence(value)} className={`cursor-pointer rounded px-3 py-2 text-[14px] text-content outline-none data-[highlighted]:bg-[#f6f6f6] ${recurrence === value ? "bg-primary text-white data-[highlighted]:bg-primary" : ""}`}>{repeatLabels[value]}</DropdownMenu.Item>
                     ))}
                   </DropdownMenu.Content>
                 </DropdownMenu.Portal>
               </DropdownMenu.Root>
-              {recurrence === "once" && <Popover.Root open={calendarOpen} onOpenChange={setCalendarOpen}>
+              {(recurrence === "once" || recurrence === "someday") && <Popover.Root open={calendarOpen} onOpenChange={setCalendarOpen}>
                 <Popover.Trigger asChild>
-                  <button type="button" className="flex h-[34px] flex-shrink-0 items-center gap-1 rounded-[8px] bg-[#f6f6f6] px-2.5 text-[13px] text-content">
+                  <button type="button" className="flex h-[34px] flex-shrink-0 items-center gap-1 rounded-[8px] bg-[#f6f6f6] px-2.5 text-[14px] text-content">
                     <CalendarDays size={14} />{dayjs(`${date}T00:00:00`).format("MMM D")}
                   </button>
                 </Popover.Trigger>
                 <Popover.Portal>
                   <Popover.Content side="bottom" align="start" sideOffset={6} className="z-[60] w-[260px] rounded-[12px] border border-[#eee] bg-white p-3 outline-none">
-                    <MonthCalendar month={calendarMonth} value={date} onMonthChange={setCalendarMonth} onSelect={chooseDate} />
+                    <MonthCalendar month={calendarMonth} value={date} onMonthChange={setCalendarMonth} onSelect={chooseDate} events={events} />
                   </Popover.Content>
                 </Popover.Portal>
               </Popover.Root>}
               {recurrence === "weekly" && <DropdownMenu.Root>
-                <DropdownMenu.Trigger asChild><button type="button" aria-label={`Every week on ${weekdays[repeatDay ?? 0]}`} className="h-[34px] whitespace-nowrap rounded-[8px] bg-[#f6f6f6] px-2.5 text-[13px] text-content">{weekdays[repeatDay ?? 0]}</button></DropdownMenu.Trigger>
+                <DropdownMenu.Trigger asChild><button type="button" aria-label={`Every week on ${weekdays[repeatDay ?? 0]}`} className="h-[34px] whitespace-nowrap rounded-[8px] bg-[#f6f6f6] px-2.5 text-[14px] text-content">{weekdays[repeatDay ?? 0]}</button></DropdownMenu.Trigger>
                 <DropdownMenu.Portal><DropdownMenu.Content align="start" sideOffset={6} className="z-[60] max-h-[220px] min-w-[150px] overflow-y-auto scrollbar-hide rounded-[10px] border border-[#eee] bg-white p-1 outline-none">
-                  {weekdays.map((weekday, index) => <DropdownMenu.Item key={weekday} onSelect={() => setRepeatDay(index)} className="cursor-pointer rounded px-3 py-2 text-[13px] text-content outline-none data-[highlighted]:bg-[#f6f6f6]">{weekday}</DropdownMenu.Item>)}
+                  {weekdays.map((weekday, index) => <DropdownMenu.Item key={weekday} onSelect={() => setRepeatDay(index)} className="cursor-pointer rounded px-3 py-2 text-[14px] text-content outline-none data-[highlighted]:bg-[#f6f6f6]">{weekday}</DropdownMenu.Item>)}
                 </DropdownMenu.Content></DropdownMenu.Portal>
               </DropdownMenu.Root>}
               {recurrence === "monthly" && <DropdownMenu.Root>
-                <DropdownMenu.Trigger asChild><button type="button" aria-label={`Day ${repeatDay ?? 1} of the month`} className="h-[34px] whitespace-nowrap rounded-[8px] bg-[#f6f6f6] px-2.5 text-[13px] text-content">Day {repeatDay ?? 1}</button></DropdownMenu.Trigger>
+                <DropdownMenu.Trigger asChild><button type="button" aria-label={`Day ${repeatDay ?? 1} of the month`} className="h-[34px] whitespace-nowrap rounded-[8px] bg-[#f6f6f6] px-2.5 text-[14px] text-content">Day {repeatDay ?? 1}</button></DropdownMenu.Trigger>
                 <DropdownMenu.Portal><DropdownMenu.Content align="start" sideOffset={6} className="z-[60] max-h-[220px] min-w-[150px] overflow-y-auto scrollbar-hide rounded-[10px] border border-[#eee] bg-white p-1 outline-none">
-                  {Array.from({ length: 31 }, (_, index) => index + 1).map((day) => <DropdownMenu.Item key={day} onSelect={() => setRepeatDay(day)} className="cursor-pointer rounded px-3 py-2 text-[13px] text-content outline-none data-[highlighted]:bg-[#f6f6f6]">Day {day}</DropdownMenu.Item>)}
+                  {Array.from({ length: 31 }, (_, index) => index + 1).map((day) => <DropdownMenu.Item key={day} onSelect={() => setRepeatDay(day)} className="cursor-pointer rounded px-3 py-2 text-[14px] text-content outline-none data-[highlighted]:bg-[#f6f6f6]">Day {day}</DropdownMenu.Item>)}
                 </DropdownMenu.Content></DropdownMenu.Portal>
               </DropdownMenu.Root>}
-              <Popover.Root open={timeOpen} onOpenChange={setTimeOpen}>
+              {recurrence !== "someday" && <Popover.Root open={timeOpen} onOpenChange={setTimeOpen}>
                 <Popover.Trigger asChild>
-                  <button type="button" className="flex h-[34px] flex-shrink-0 items-center gap-1 rounded-[8px] bg-[#f6f6f6] px-2.5 text-[13px] text-content"><Clock3 size={14} />{time}</button>
+                  <button type="button" className="flex h-[34px] flex-shrink-0 items-center gap-1 rounded-[8px] bg-[#f6f6f6] px-2.5 text-[14px] text-content"><Clock3 size={14} />{time}</button>
                 </Popover.Trigger>
                 <Popover.Portal>
                   <Popover.Content side="bottom" align="start" sideOffset={6} className="z-[60] flex h-[220px] rounded-[12px] border border-[#eee] bg-white p-2 outline-none">
                     <div aria-label="Hour" className="h-full overflow-y-auto scrollbar-hide px-1">
                       {Array.from({ length: 17 }, (_, index) => index + 7).map((hour) => (
-                        <button key={hour} type="button" onClick={() => setTime(`${String(hour).padStart(2, "0")}:${time.slice(3)}`)} className={`block w-12 rounded py-1 text-center text-[13px] ${time.slice(0, 2) === String(hour).padStart(2, "0") ? "bg-primary text-white" : "text-content hover:bg-[#f6f6f6]"}`}>{String(hour).padStart(2, "0")}</button>
+                        <button key={hour} type="button" onClick={() => setTime(`${String(hour).padStart(2, "0")}:${time.slice(3)}`)} className={`block w-12 rounded py-1 text-center text-[14px] ${time.slice(0, 2) === String(hour).padStart(2, "0") ? "bg-primary text-white" : "text-content hover:bg-[#f6f6f6]"}`}>{String(hour).padStart(2, "0")}</button>
                       ))}
                     </div>
                     <div aria-label="Minute" className="h-full overflow-y-auto border-l border-[#eee] px-1 scrollbar-hide">
                       {Array.from({ length: 60 }, (_, minute) => minute).map((minute) => (
-                        <button key={minute} type="button" onClick={() => setTime(`${time.slice(0, 2)}:${String(minute).padStart(2, "0")}`)} className={`block w-12 rounded py-1 text-center text-[13px] ${time.slice(3) === String(minute).padStart(2, "0") ? "bg-primary text-white" : "text-content hover:bg-[#f6f6f6]"}`}>{String(minute).padStart(2, "0")}</button>
+                        <button key={minute} type="button" onClick={() => setTime(`${time.slice(0, 2)}:${String(minute).padStart(2, "0")}`)} className={`block w-12 rounded py-1 text-center text-[14px] ${time.slice(3) === String(minute).padStart(2, "0") ? "bg-primary text-white" : "text-content hover:bg-[#f6f6f6]"}`}>{String(minute).padStart(2, "0")}</button>
                       ))}
                     </div>
                   </Popover.Content>
                 </Popover.Portal>
-              </Popover.Root>
+              </Popover.Root>}
             </div>
             {error && <p role="alert" className="text-[12px] text-red-600">{error}</p>}
             <div className="flex gap-2 pt-1">

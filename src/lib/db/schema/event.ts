@@ -6,7 +6,7 @@ export const event = pgTable("event", {
   description: varchar("description", { length: 1024 }).notNull().default(""),
   color: varchar("color", { length: 10 }).notNull().default("#69D571"),
   date: date("event_date", { mode: "string" }),
-  time: varchar("event_time", { length: 5 }).notNull(),
+  time: varchar("event_time", { length: 5 }),
   recurrence: varchar("recurrence", { length: 10 }).notNull().default("once"),
   repeatDay: smallint("repeat_day"),
   createdAt: timestamp("created_at").notNull().defaultNow(),

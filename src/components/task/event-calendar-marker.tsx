@@ -9,6 +9,7 @@ export default function EventCalendarMarker({ event, date, dayIndex }: {
   date: string;
   dayIndex: number;
 }) {
+  if (event.recurrence === "someday" || !event.time) return null;
   const [hour, minute] = event.time.split(":").map(Number);
   const top = Math.min(((hour - FIRST_HOUR) * 60 + minute) * SLOT_HEIGHT / SLOT_MINUTES, ((23 - FIRST_HOUR) * 60 * SLOT_HEIGHT) / SLOT_MINUTES - 2);
 

@@ -1,0 +1,1 @@
+ALTER TABLE "event" ALTER COLUMN "event_time" DROP NOT NULL;

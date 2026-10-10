@@ -43,6 +43,13 @@
       "when": 1791504120000,
       "tag": "0005_event_color",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791504180000,
+      "tag": "0006_event_someday",
+      "breakpoints": true
     }
   ]
 }

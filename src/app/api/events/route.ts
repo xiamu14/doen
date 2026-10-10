@@ -13,17 +13,19 @@ const fields = z.object({
     const parsed = new Date(year, month - 1, day);
     return parsed.getFullYear() === year && parsed.getMonth() === month - 1 && parsed.getDate() === day;
   }).nullable(),
-  time: z.string().regex(/^(?:0[7-9]|1\d|2[0-3]):[0-5]\d$/),
-  recurrence: z.enum(["once", "daily", "weekly", "monthly"]),
+  time: z.string().regex(/^(?:0[7-9]|1\d|2[0-3]):[0-5]\d$/).nullable(),
+  recurrence: z.enum(["once", "someday", "daily", "weekly", "monthly"]),
   repeatDay: z.number().int().nullable(),
-}).superRefine(({ date, recurrence, repeatDay }, context) => {
+}).superRefine(({ date, time, recurrence, repeatDay }, context) => {
   const valid = recurrence === "once"
-    ? date !== null && repeatDay === null
-    : recurrence === "daily"
-      ? date === null && repeatDay === null
+    ? date !== null && time !== null && repeatDay === null
+    : recurrence === "someday"
+      ? date !== null && time === null && repeatDay === null
+      : recurrence === "daily"
+      ? date === null && time !== null && repeatDay === null
       : recurrence === "weekly"
-        ? date === null && repeatDay !== null && repeatDay >= 0 && repeatDay <= 6
-        : date === null && repeatDay !== null && repeatDay >= 1 && repeatDay <= 31;
+        ? date === null && time !== null && repeatDay !== null && repeatDay >= 0 && repeatDay <= 6
+        : date === null && time !== null && repeatDay !== null && repeatDay >= 1 && repeatDay <= 31;
   if (!valid) context.addIssue({ code: z.ZodIssueCode.custom, message: "Invalid repeat settings." });
 });
 

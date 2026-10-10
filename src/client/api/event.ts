@@ -1,4 +1,4 @@
-export type EventRecurrence = "once" | "daily" | "weekly" | "monthly";
+export type EventRecurrence = "once" | "someday" | "daily" | "weekly" | "monthly";
 
 export type EventRecord = {
   id: string;
@@ -6,7 +6,7 @@ export type EventRecord = {
   description: string;
   color: string;
   date: string | null;
-  time: string;
+  time: string | null;
   recurrence: EventRecurrence;
   repeatDay: number | null;
 };

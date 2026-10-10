@@ -113,10 +113,14 @@ export function TagMenu() {
 
 export function EventList() {
   const { data: events = [] } = useQuery({ queryKey: ["events"], queryFn: getEvents });
-  const upcoming = events
-    .map((event) => ({ event, next: nextEventOccurrence(event) }))
-    .filter((item) => item.next)
-    .sort((a, b) => `${a.next!.date} ${a.next!.time}`.localeCompare(`${b.next!.date} ${b.next!.time}`));
+  const orderedEvents = events
+    .map((event) => {
+      const next = nextEventOccurrence(event);
+      return { event, next, group: event.recurrence === "someday" ? next ? 0 : 3 : event.recurrence === "once" ? next ? 1 : 3 : 2 };
+    })
+    .sort((a, b) => a.group - b.group || (a.group === 3
+      ? `${b.event.date ?? ""} ${b.event.time ?? ""}`.localeCompare(`${a.event.date ?? ""} ${a.event.time ?? ""}`)
+      : `${a.next?.date ?? ""} ${a.next?.time ?? ""}`.localeCompare(`${b.next?.date ?? ""} ${b.next?.time ?? ""}`)));
 
   return (
     <div className="w-full flex flex-col gap-[14px]">
@@ -139,7 +143,7 @@ export function EventList() {
         </button>
       </div>
       <div className="h-[138px] flex-shrink-0 overflow-y-auto scrollbar-hide pl-[30px] flex flex-col items-start gap-[8px] text-content-secondary">
-        {upcoming.map(({ event, next }) => (
+        {orderedEvents.map(({ event, next }) => (
           <button
             type="button"
             key={event.id}
@@ -154,8 +158,10 @@ export function EventList() {
               <span className="ml-[10px] truncate">{event.title}</span>
             </span>
             <span className="ml-[28px] text-[12px] text-content-secondary">
-              {event.recurrence === "once"
-                ? dayjs(`${next!.date}T${next!.time}`).format("MMM D · HH:mm")
+              {event.recurrence === "someday"
+                ? dayjs(event.date).format("MMM D")
+                : event.recurrence === "once"
+                ? dayjs(`${event.date}T${event.time}`).format("MMM D · HH:mm")
                 : event.recurrence === "daily"
                   ? `Every day · ${event.time}`
                   : event.recurrence === "weekly"
