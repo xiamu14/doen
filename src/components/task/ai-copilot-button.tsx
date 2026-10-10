@@ -27,6 +27,11 @@ function CopilotForm({ activeDay, close, onApply }: {
   const [eventInstruction, setEventInstruction] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const activeDayLabel = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${activeDay}T12:00:00Z`));
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -52,7 +57,7 @@ function CopilotForm({ activeDay, close, onApply }: {
           id="copilot-task-instruction"
           value={taskInstruction}
           onChange={(event) => setTaskInstruction(event.target.value)}
-          placeholder="Task changes…"
+          placeholder={`Tell AI Copilot how to change ${activeDayLabel}'s tasks…`}
           rows={3}
           maxLength={2000}
           className="rounded-[8px] border border-[#e7e7e7] px-2.5 py-2 text-[14px] text-content outline-none focus:border-primary"
@@ -75,7 +80,7 @@ function CopilotForm({ activeDay, close, onApply }: {
         id="copilot-event-instruction"
         value={eventInstruction}
         onChange={(event) => setEventInstruction(event.target.value)}
-        placeholder="Event rules…"
+        placeholder="Tell AI Copilot how to schedule around events…"
         rows={2}
         maxLength={2000}
         disabled={busy || !eventConstraintsEnabled}
