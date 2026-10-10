@@ -64,8 +64,8 @@ export const TextArea = forwardRef<HTMLTextAreaElement, ComponentProps<"textarea
     const position = marker.getBoundingClientRect();
     mirror.remove();
 
-    caret.style.left = `${position.left - (textarea.value ? 0 : 6)}px`;
-    caret.style.top = `${position.top - (textarea.value ? 0 : 8)}px`;
+    caret.style.left = `${position.left}px`;
+    caret.style.top = `${position.top}px`;
     caret.style.height = `${position.height || parseFloat(style.fontSize) * 1.2}px`;
     caret.style.display = "block";
     textarea.style.caretColor = "transparent";
