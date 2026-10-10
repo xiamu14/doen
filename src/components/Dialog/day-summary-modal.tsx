@@ -239,7 +239,7 @@ export default function DaySummaryModal() {
                           <span className="w-[64px] truncate text-[12px] text-content">
                             {project.name}
                           </span>
-                          <div className="h-[10px] min-w-0 flex-1 overflow-hidden rounded-full bg-[#f3f3f3]">
+                          <div className="h-[10px] min-w-0 flex-1 overflow-hidden rounded-full">
                             <div
                               className="h-full rounded-full"
                               style={{
