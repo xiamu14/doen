@@ -176,12 +176,13 @@ export async function POST(request: NextRequest) {
     const openrouter = createOpenRouter({ apiKey });
     let resultTasks: ReturnType<typeof serializeTask>[] | undefined;
     let applyError = "The AI did not apply a schedule.";
+    let modelRejected = false;
 
-    const generateSchedule = (repairIncompleteToolCall = false) => generateText({
+    const generateSchedule = (correction = "") => generateText({
       model: openrouter.chat(modelName),
       system: [
         "You arrange existing tasks for one local calendar day. Return no user-facing prose; call apply_task_schedule exactly once. For action=apply include every task in tasks; for action=reject set tasks to an empty array and provide a short reason. If the user requests a task be moved to another date, reject and do not save anything. When an instruction names a project, apply it to tasks whose supplied projectName matches; if no project matches, reject with a short reason.",
-        ...(repairIncompleteToolCall ? ["Your previous tool call failed validation because required schedule fields were missing. Call the tool again with both action and tasks. For apply, include every supplied task ID exactly once, with id, startTime, and duration; for reject, use an empty tasks array and include a reason. Do not return only the action."] : []),
+        ...(correction ? [`Your previous attempt was rejected: ${correction} Correct the schedule and call the tool again with a complete result. For apply, include every supplied task ID exactly once, with id, startTime, and duration; for reject, use an empty tasks array and include a reason.`] : []),
         `The day is ${activeDay}. Tasks may start no earlier than ${FIRST_HOUR}:00, must end by ${LAST_HOUR}:00, last ${MIN_TASK_DURATION}-${MAX_TASK_DURATION} minutes in ${SLOT_MINUTES}-minute steps, and must not overlap or cross midnight. All supplied event times and task start times are already expressed in the active day's local clock; do not perform timezone conversion.`,
         `The current local date and time is ${currentLocalTime.date} ${currentLocalTime.time}. An incomplete task whose original time has passed is overdue, not completed: include it and reschedule it later today. Every incomplete task's new start time must be at or after the current time; never schedule one in the past.`,
         "Include every supplied task exactly once, keep its ID, and only choose a local startTime and duration. Never invent, delete, rename, or move a task to another date. Keep completed tasks unchanged. Completed tasks do not participate in tag-priority ordering, but remain fixed and occupy their time intervals, so no other task may overlap them.",
@@ -214,6 +215,7 @@ export async function POST(request: NextRequest) {
           execute: async (input) => {
             try {
               if (input.action === "reject") {
+                modelRejected = true;
                 applyError = input.reason || "This request cannot be completed within the day's constraints. Adjust your instructions or event constraints and try again.";
                 return { applied: false, reason: applyError };
               }
@@ -234,8 +236,15 @@ export async function POST(request: NextRequest) {
       step.toolCalls.some(({ toolName }) => toolName === "apply_task_schedule"));
     const hasInvalidToolInput = generation.steps.some((step) =>
       step.content.some((part) => part.type === "tool-call" && part.invalid));
-    if (!resultTasks && applyError === "The AI did not apply a schedule." && (!hasScheduleToolCall || hasInvalidToolInput)) {
-      generation = await generateSchedule(hasInvalidToolInput);
+    if (!resultTasks && !modelRejected) {
+      const correction = hasInvalidToolInput
+        ? "required schedule fields were missing"
+        : !hasScheduleToolCall
+          ? "the required scheduling tool was not called"
+          : applyError !== "The AI did not apply a schedule."
+            ? applyError
+            : "";
+      if (correction) generation = await generateSchedule(correction);
     }
 
     if (!resultTasks) {
