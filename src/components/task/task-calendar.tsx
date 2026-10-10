@@ -10,7 +10,7 @@ import { DialogUtils } from "../Dialog";
 import { modalsState } from "../Dialog/state";
 import TaskCalendarRow from "./task-calendar-row";
 import TaskCalendarCard from "./task-calendar-card";
-import { SLOT_HEIGHT, slotFromStart } from "./calendar-time";
+import { FIRST_HOUR, LAST_HOUR, SLOT_COUNT, SLOT_HEIGHT, slotFromStart } from "./calendar-time";
 import { toast } from "sonner";
 import { getEvents } from "@/client/api/event";
 import { eventOccursOn } from "@/lib/event-recurrence";
@@ -133,7 +133,7 @@ export default function TaskCalendar({ activeDay }: {
           className="w-[96px] flex-shrink-0 flex flex-col items-center"
           onDoubleClick={scrollToCurrentTime}
         >
-          {Array.from({ length: 16 }, (_, index) => index + 7).map(
+          {Array.from({ length: LAST_HOUR - FIRST_HOUR }, (_, index) => index + FIRST_HOUR).map(
             (hour, index) => {
               return (
                 <div key={`hour-${hour}`} className="flex flex-col items-end">
@@ -159,10 +159,11 @@ export default function TaskCalendar({ activeDay }: {
         </div>
         <div
           ref={bodyScrollRef}
-          className="flex-1 w-0 h-[1600px] overflow-x-auto scrollbar-hide"
+          className="flex-1 w-0 overflow-x-auto scrollbar-hide"
+          style={{ height: SLOT_COUNT * SLOT_HEIGHT }}
           onScroll={(event) => syncHorizontalScroll("body", event.currentTarget.scrollLeft)}
         >
-          <div className="w-[1050px] min-w-full h-[1600px]">
+          <div className="w-[1050px] min-w-full" style={{ height: SLOT_COUNT * SLOT_HEIGHT }}>
             <div
               id="task-calendar-draggable"
               className="relative h-full w-[1050px] flex flex-row"

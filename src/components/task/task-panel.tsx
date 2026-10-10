@@ -20,7 +20,7 @@ export default function TaskPanel() {
     <div className="flex-1 flex flex-col">
       <div className="flex justify-between mb-[20px]">
         <div className="flex items-center gap-2">
-          <AICopilotButton />
+          <AICopilotButton activeDay={activeDay.format("YYYY-MM-DD")} />
           <Popover className="relative">
             <PopoverButton className="flex h-[32px] items-center gap-1 rounded-[8px] border border-[#eee] px-[8px] text-[14px] font-semibold text-content outline-none">
               <Calendar size={14} color="#666" />

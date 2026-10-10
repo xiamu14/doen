@@ -8,6 +8,7 @@ import { Draggable } from "gsap/Draggable";
 import { useEffect, useRef } from "react";
 import { clampSlot, SLOT_COUNT, SLOT_HEIGHT, SLOT_MINUTES, slotFromStart, startFromSlot, taskModalX } from "./calendar-time";
 import { TASK_TAGS } from "@/lib/task-tags";
+import { MAX_TASK_DURATION, MIN_TASK_DURATION } from "@/lib/task-schedule-config";
 
 gsap.registerPlugin(Draggable);
 
@@ -25,8 +26,8 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
   taskRef.current = task;
   const durationSlots = task.duration / SLOT_MINUTES;
   const tag = TASK_TAGS.find((tag) => tag.name === (task.tagId ?? "easy|pressing")) ?? TASK_TAGS[0];
-  const minDurationSlots = 2;
-  const maxDurationSlots = 6;
+  const minDurationSlots = MIN_TASK_DURATION / SLOT_MINUTES;
+  const maxDurationSlots = MAX_TASK_DURATION / SLOT_MINUTES;
   const isDone = task.status === "done";
   const isOverdue = dayjs(task.start).add(task.duration, "minute").isBefore(dayjs());
 
@@ -113,6 +114,7 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
   return (
     <div
       ref={cardRef}
+      data-task-id={task.id}
       className={`absolute w-[120px] py-[3px] rounded-[6px] flex flex-col px-[10px] overflow-hidden z-12 ${task.status === "done" ? "cursor-default" : "cursor-pointer"}`}
       style={{ left: dayIndex * 150 + 15, top: slotFromStart(task.start) * SLOT_HEIGHT + 1, height: durationSlots * SLOT_HEIGHT - 2, backgroundColor: isDone || isOverdue ? "#eee" : tag.backgroundColor }}
       onClick={(event) => {

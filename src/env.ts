@@ -14,6 +14,8 @@ export const env = createEnv({
     // Google
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
+    OPENROUTER_API_KEY: z.string().optional(),
+    OPENROUTER_MODEL: z.string().optional(),
   },
   client: {},
   experimental__runtimeEnv: {},

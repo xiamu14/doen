@@ -23,11 +23,27 @@ export async function getTasks(): Promise<TaskRecord[]> {
   return (await response.json()).data;
 }
 
+export async function scheduleActiveDay(input: {
+  activeDay: string;
+  taskInstruction: string;
+  eventConstraintsEnabled: boolean;
+  eventInstruction: string;
+}): Promise<TaskRecord[]> {
+  const response = await fetch("/api/ai-copilot", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...input, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }),
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error || "Could not arrange tasks.");
+  return result.data as TaskRecord[];
+}
+
 async function writeTask(method: "POST" | "PATCH" | "DELETE", task: Partial<TaskRecord>) {
   const response = await fetch("/api/tasks", {
     method,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(task),
+    body: JSON.stringify({ ...task, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone }),
   });
   const result = await response.json();
   if (!response.ok) throw new Error(result.error || "Could not save task.");

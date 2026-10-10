@@ -15,6 +15,7 @@ import { modalsState } from "./state";
 import { DialogUtils } from "./utils";
 import type { Modals } from "./type";
 import { normalizeTaskTagId, TASK_TAGS, type TaskTagName } from "@/lib/task-tags";
+import { MAX_TASK_DURATION, MIN_TASK_DURATION } from "@/lib/task-schedule-config";
 
 export default function TaskModal() {
   const modal = useSnapshot(modalsState);
@@ -139,8 +140,8 @@ export default function TaskModal() {
     const endMinutes = Number(endTime.slice(0, 2)) * 60 + Number(endTime.slice(3));
     const duration = endMinutes - startMinutes;
     if (!title.trim() || !date || startMinutes < FIRST_HOUR * 60 || endMinutes > LAST_HOUR * 60 ||
-      duration < SLOT_MINUTES || duration > 90 || startMinutes % SLOT_MINUTES || duration % SLOT_MINUTES) {
-      setError("Use a title and 15-minute times up to 1h30 between 07:00 and 23:00.");
+      duration < MIN_TASK_DURATION || duration > MAX_TASK_DURATION || startMinutes % SLOT_MINUTES || duration % SLOT_MINUTES) {
+      setError(`Use a title and times between ${String(FIRST_HOUR).padStart(2, "0")}:00 and ${String(LAST_HOUR).padStart(2, "0")}:00 in ${SLOT_MINUTES}-minute steps (${MIN_TASK_DURATION}–${MAX_TASK_DURATION} minutes).`);
       return;
     }
     const start = new Date(`${date}T${startTime}:00`).toISOString();

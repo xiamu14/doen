@@ -2,7 +2,7 @@
 
 import type { EventRecord } from "@/client/api/event";
 import { DialogUtils } from "@/components/Dialog";
-import { FIRST_HOUR, SLOT_HEIGHT, SLOT_MINUTES } from "./calendar-time";
+import { FIRST_HOUR, LAST_HOUR, SLOT_HEIGHT, SLOT_MINUTES } from "./calendar-time";
 
 export default function EventCalendarMarker({ event, date, dayIndex }: {
   event: EventRecord;
@@ -11,7 +11,7 @@ export default function EventCalendarMarker({ event, date, dayIndex }: {
 }) {
   if (event.recurrence === "someday" || !event.time) return null;
   const [hour, minute] = event.time.split(":").map(Number);
-  const top = Math.min(((hour - FIRST_HOUR) * 60 + minute) * SLOT_HEIGHT / SLOT_MINUTES, ((23 - FIRST_HOUR) * 60 * SLOT_HEIGHT) / SLOT_MINUTES - 2);
+  const top = Math.min(((hour - FIRST_HOUR) * 60 + minute) * SLOT_HEIGHT / SLOT_MINUTES, ((LAST_HOUR - FIRST_HOUR) * 60 * SLOT_HEIGHT) / SLOT_MINUTES - 2);
 
   return (
     <button

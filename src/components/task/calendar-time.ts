@@ -1,6 +1,6 @@
-export const FIRST_HOUR = 7;
-export const LAST_HOUR = 23;
-export const SLOT_MINUTES = 15;
+import { FIRST_HOUR, LAST_HOUR, MIN_TASK_DURATION, SLOT_MINUTES } from "@/lib/task-schedule-config";
+
+export { FIRST_HOUR, LAST_HOUR, SLOT_MINUTES } from "@/lib/task-schedule-config";
 export const SLOT_HEIGHT = 25;
 export const SLOT_COUNT = ((LAST_HOUR - FIRST_HOUR) * 60) / SLOT_MINUTES;
 
@@ -28,7 +28,7 @@ export function taskModalX(columnLeft: number, columnRight: number, viewportWidt
 export function nearestFreeSlot(
   preferredSlot: number,
   occupied: { start: number; duration: number }[],
-  durationSlots = 2,
+  durationSlots = MIN_TASK_DURATION / SLOT_MINUTES,
 ) {
   const preferred = clampSlot(preferredSlot, durationSlots);
   const maxSlot = SLOT_COUNT - durationSlots;

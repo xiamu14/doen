@@ -4,14 +4,15 @@ import { and, eq, gt, lt, ne, sql } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { normalizeTaskTagId } from "@/lib/task-tags";
+import { FIRST_HOUR, LAST_HOUR, MAX_TASK_DURATION, MIN_TASK_DURATION, SLOT_MINUTES } from "@/lib/task-schedule-config";
+import { isValidTaskWindow } from "@/lib/task-schedule";
 
 const fields = z.object({
   title: z.string().trim().min(1).max(256),
   content: z.string().max(1024),
-  start: z.string().datetime({ offset: true }).refine((value) =>
-    new Date(value).getUTCMinutes() % 15 === 0 &&
-    new Date(value).getUTCSeconds() === 0 && new Date(value).getUTCMilliseconds() === 0),
-  duration: z.number().int().min(15).max(90).refine((value) => value % 15 === 0),
+  start: z.string().datetime({ offset: true }),
+  duration: z.number().int().min(MIN_TASK_DURATION).max(MAX_TASK_DURATION).refine((value) => value % SLOT_MINUTES === 0),
+  timeZone: z.string().min(1).max(100).optional(),
   status: z.enum(["idle", "doing", "done"]).optional(),
   projectId: z.string().uuid().nullable().optional(),
   tagId: z.preprocess(normalizeTaskTagId,
@@ -48,20 +49,27 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const body = fields.safeParse(await request.json().catch(() => null));
   if (!body.success) return NextResponse.json({ error: "Invalid task data." }, { status: 400 });
-  if (!await projectExists(body.data.projectId)) {
+  const { timeZone = "UTC", ...values } = body.data;
+  if (!isValidTaskWindow(values.start, values.duration, timeZone)) {
+    return NextResponse.json({ error: `Tasks must fit between ${String(FIRST_HOUR).padStart(2, "0")}:00 and ${String(LAST_HOUR).padStart(2, "0")}:00 on one day.` }, { status: 400 });
+  }
+  if (!await projectExists(values.projectId)) {
     return NextResponse.json({ error: "Project not found." }, { status: 400 });
   }
-  if (await overlapsTask(body.data.start, body.data.duration)) {
+  if (await overlapsTask(values.start, values.duration)) {
     return NextResponse.json({ error: "This time overlaps another task." }, { status: 409 });
   }
-  const [created] = await db.insert(task).values(body.data).returning();
+  const [created] = await db.insert(task).values(values).returning();
   return NextResponse.json({ data: serializeTask(created) }, { status: 201 });
 }
 
 export async function PATCH(request: NextRequest) {
   const body = fields.extend({ id: z.string().uuid() }).safeParse(await request.json().catch(() => null));
   if (!body.success) return NextResponse.json({ error: "Invalid task data." }, { status: 400 });
-  const { id, ...values } = body.data;
+  const { id, timeZone = "UTC", ...values } = body.data;
+  if (!isValidTaskWindow(values.start, values.duration, timeZone)) {
+    return NextResponse.json({ error: `Tasks must fit between ${String(FIRST_HOUR).padStart(2, "0")}:00 and ${String(LAST_HOUR).padStart(2, "0")}:00 on one day.` }, { status: 400 });
+  }
   if (!await projectExists(values.projectId)) {
     return NextResponse.json({ error: "Project not found." }, { status: 400 });
   }
