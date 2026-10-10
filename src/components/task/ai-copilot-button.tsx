@@ -34,7 +34,7 @@ function CopilotForm({ activeDay, close, onApply }: {
       await onApply({ taskInstruction, eventConstraintsEnabled, eventInstruction });
       close();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "安排失败，请重试。");
+      setError(cause instanceof Error ? cause.message : "Scheduling failed. Please try again.");
     } finally {
       setBusy(false);
     }
@@ -42,16 +42,16 @@ function CopilotForm({ activeDay, close, onApply }: {
 
   return (
     <form className="flex flex-col gap-3" onSubmit={submit}>
-      <p className="text-[13px] font-semibold text-content">重新安排 {activeDay}</p>
+      <p className="text-[13px] font-semibold text-content">AI Copilot · {activeDay.slice(5).replace("-", ".")}</p>
       <label className="flex flex-col gap-1 text-[12px] text-content-secondary">
-        任务调整
+        Task adjustments
         <textarea
           value={taskInstruction}
           onChange={(event) => setTaskInstruction(event.target.value)}
-          placeholder="例如：把准备周报安排在上午，设计评审延长到 1 小时"
+          placeholder="e.g. Schedule weekly planning in the morning and extend design review to 1 hour"
           rows={3}
           maxLength={2000}
-          className="resize-y rounded-[8px] border border-[#e7e7e7] px-2.5 py-2 text-[13px] text-content outline-none focus:border-[#b8a1f5]"
+          className="resize-y rounded-[8px] border border-[#e7e7e7] px-2.5 py-2 text-[13px] text-content outline-none focus:border-primary"
           disabled={busy}
         />
       </label>
@@ -61,26 +61,26 @@ function CopilotForm({ activeDay, close, onApply }: {
           checked={eventConstraintsEnabled}
           onChange={(event) => setEventConstraintsEnabled(event.target.checked)}
           disabled={busy}
-          className="accent-[#7547d8]"
+          className="accent-primary"
         />
-        考虑事件约束
+        Event constraints
       </label>
       <textarea
         value={eventInstruction}
         onChange={(event) => setEventInstruction(event.target.value)}
-        placeholder="例如：午餐到周会之间不安排任务；周会后不再安排任务"
+        placeholder="e.g. Leave no tasks between lunch and the weekly meeting; schedule nothing after the meeting"
         rows={2}
         maxLength={2000}
         disabled={busy || !eventConstraintsEnabled}
-        className="resize-y rounded-[8px] border border-[#e7e7e7] px-2.5 py-2 text-[13px] text-content outline-none focus:border-[#b8a1f5] disabled:bg-[#f7f7f7]"
+        className="resize-y rounded-[8px] border border-[#e7e7e7] px-2.5 py-2 text-[13px] text-content outline-none focus:border-primary disabled:bg-[#f7f7f7]"
       />
       {error && <p role="alert" className="text-[12px] text-red-600">{error}</p>}
       <button
         type="submit"
         disabled={busy}
-        className="flex h-[36px] items-center justify-center rounded-[8px] bg-[#7547d8] px-3 text-[13px] font-medium text-white disabled:opacity-60"
+        className="flex h-[40px] items-center justify-center rounded-[10px] bg-primary px-3 text-[13px] font-semibold text-white disabled:opacity-60"
       >
-        {busy ? "正在安排…" : "重新安排当天任务"}
+        {busy ? "Arranging…" : `Arrange ${activeDay.slice(5).replace("-", ".")} with AI`}
       </button>
     </form>
   );

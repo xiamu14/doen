@@ -260,7 +260,7 @@ export async function POST(request: NextRequest) {
           execute: async (input) => {
             try {
               if (input.action === "reject") {
-                applyError = "无法在当天约束内完成此请求，请调整描述或事件约束后重试。";
+                applyError = "This request cannot be completed within the day's constraints. Adjust your instructions or event constraints and try again.";
                 return { applied: false, reason: applyError };
               }
               resultTasks = await applySchedule(input, activeDay, timeZone, originalTasks, eventConstraintsEnabled, eventInstruction, !taskInstruction, relevantEvents);
