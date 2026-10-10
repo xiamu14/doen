@@ -30,12 +30,6 @@ export const TextArea = forwardRef<HTMLTextAreaElement, ComponentProps<"textarea
       textarea.style.caretColor = "";
       return;
     }
-    if (!textarea.value) {
-      caret.style.display = "none";
-      textarea.style.caretColor = "";
-      return;
-    }
-
     const bounds = textarea.getBoundingClientRect();
     const style = window.getComputedStyle(textarea);
     const mirror = document.createElement("div");
@@ -64,6 +58,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, ComponentProps<"textarea
     marker.textContent = "\u200b";
     Object.assign(marker.style, { display: "inline-block", width: "0", height: style.lineHeight === "normal" ? style.fontSize : style.lineHeight, verticalAlign: "baseline" });
     mirror.append(marker);
+    if (!textarea.value) mirror.append(document.createTextNode(textarea.placeholder));
     document.body.append(mirror);
     const position = marker.getBoundingClientRect();
     mirror.remove();
