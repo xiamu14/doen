@@ -26,7 +26,7 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
   const durationSlots = task.duration / SLOT_MINUTES;
   const tag = TASK_TAGS.find((tag) => tag.name === (task.tagId ?? "easy|pressing")) ?? TASK_TAGS[0];
   const minDurationSlots = 2;
-  const maxDurationSlots = 4;
+  const maxDurationSlots = 6;
   const isDone = task.status === "done";
   const isOverdue = dayjs(task.start).add(task.duration, "minute").isBefore(dayjs());
 

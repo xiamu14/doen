@@ -11,7 +11,7 @@ const fields = z.object({
   start: z.string().datetime({ offset: true }).refine((value) =>
     new Date(value).getUTCMinutes() % 15 === 0 &&
     new Date(value).getUTCSeconds() === 0 && new Date(value).getUTCMilliseconds() === 0),
-  duration: z.number().int().min(15).max(960).refine((value) => value % 15 === 0),
+  duration: z.number().int().min(15).max(90).refine((value) => value % 15 === 0),
   status: z.enum(["idle", "doing", "done"]).optional(),
   projectId: z.string().uuid().nullable().optional(),
   tagId: z.preprocess(normalizeTaskTagId,

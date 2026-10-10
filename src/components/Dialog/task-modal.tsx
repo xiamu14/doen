@@ -139,8 +139,8 @@ export default function TaskModal() {
     const endMinutes = Number(endTime.slice(0, 2)) * 60 + Number(endTime.slice(3));
     const duration = endMinutes - startMinutes;
     if (!title.trim() || !date || startMinutes < FIRST_HOUR * 60 || endMinutes > LAST_HOUR * 60 ||
-      duration < SLOT_MINUTES || startMinutes % SLOT_MINUTES || duration % SLOT_MINUTES) {
-      setError("Use a title and 15-minute times between 07:00 and 23:00.");
+      duration < SLOT_MINUTES || duration > 90 || startMinutes % SLOT_MINUTES || duration % SLOT_MINUTES) {
+      setError("Use a title and 15-minute times up to 1h30 between 07:00 and 23:00.");
       return;
     }
     const start = new Date(`${date}T${startTime}:00`).toISOString();
