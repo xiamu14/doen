@@ -17,15 +17,25 @@ function CurrentTimeLine({ date, onAutoScroll }: Pick<Props, "date" | "onAutoScr
   const lastAutoScroll = useRef(Date.now());
 
   useEffect(() => {
-    const interval = window.setInterval(() => {
+    const updateCurrentTime = (forceScroll = false) => {
       const time = new Date();
       setNow(time);
-      if (dayjs(time).format("YYYY-MM-DD") === date && time.getTime() - lastAutoScroll.current >= 15 * 60_000) {
+      if (dayjs(time).format("YYYY-MM-DD") === date &&
+        (forceScroll || time.getTime() - lastAutoScroll.current >= 5 * 60_000)) {
         lastAutoScroll.current = time.getTime();
         onAutoScroll(time);
       }
-    }, 60_000);
-    return () => window.clearInterval(interval);
+    };
+    updateCurrentTime(document.visibilityState === "visible");
+    const interval = window.setInterval(() => updateCurrentTime(), 60_000);
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") updateCurrentTime(true);
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, [date, onAutoScroll]);
 
   if (dayjs(now).format("YYYY-MM-DD") !== date) return null;
