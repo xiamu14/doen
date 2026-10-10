@@ -16,7 +16,7 @@ export default function RootProviders({
         disableTransitionOnChange
       >
         {children}
-        <Toaster />
+        <Toaster toastOptions={{ style: { paddingLeft: 30, paddingRight: 30 } }} />
       </ThemeProvider>
     </QueryProvider>
   );
