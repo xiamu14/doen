@@ -110,29 +110,26 @@ function CopilotForm({ activeDay, close, onApply }: {
         disabled={busy}
         className="rounded-[8px] border-0 bg-[#e8e8e8] px-2.5 py-2 text-[14px] text-[#333] placeholder:text-[#666] outline-none focus:outline-none focus-visible:outline-none disabled:bg-[#e8e8e8]"
       />
-      <div className="flex items-center justify-between text-[14px] text-content">
+      <div className="flex items-center gap-1 text-[14px] text-content">
         <Label.Root htmlFor="copilot-rest-instruction">Rest rules</Label.Root>
         {restInstruction !== DEFAULT_REST_RULE && (
-          <span className="flex items-center gap-1">
-            <span className="text-[14px] text-primary">Reset Rules</span>
-            <Button
-              type="button"
-              aria-label="Reset rest rules"
-              title="Reset rest rules"
-              disabled={busy}
-              onClick={() => {
-                setRestInstruction(DEFAULT_REST_RULE);
-                try {
-                  localStorage.setItem(restInstructionStorageKey, DEFAULT_REST_RULE);
-                } catch {
-                  // Keep the form usable when browser storage is unavailable.
-                }
-              }}
-              className="flex size-6 items-center justify-center rounded text-primary hover:bg-[#f6f6f6] disabled:opacity-50"
-            >
-              <RotateCcw size={16} aria-hidden="true" />
-            </Button>
-          </span>
+          <Button
+            type="button"
+            aria-label="Reset rest rules"
+            title="Reset rest rules"
+            disabled={busy}
+            onClick={() => {
+              setRestInstruction(DEFAULT_REST_RULE);
+              try {
+                localStorage.setItem(restInstructionStorageKey, DEFAULT_REST_RULE);
+              } catch {
+                // Keep the form usable when browser storage is unavailable.
+              }
+            }}
+            className="flex size-6 items-center justify-center rounded text-primary hover:bg-[#f6f6f6] disabled:opacity-50"
+          >
+            <RotateCcw size={16} aria-hidden="true" />
+          </Button>
         )}
       </div>
       <TextArea
