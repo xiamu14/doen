@@ -80,7 +80,7 @@ function CopilotForm({ activeDay, close, onApply }: {
         disabled={busy}
         className="flex h-[40px] items-center justify-center rounded-[10px] bg-primary px-3 text-[14px] font-semibold text-white disabled:opacity-60"
       >
-        {busy ? "Arranging…" : `Arrange ${activeDay.slice(5).replace("-", ".")} with AI`}
+        AI Copilot Boot
       </button>
     </form>
   );
