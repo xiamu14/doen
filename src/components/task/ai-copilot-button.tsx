@@ -56,7 +56,7 @@ function CopilotForm({ activeDay, close, onApply }: {
       toast.success("Your day is planned.", {
         position: "top-center",
         icon: <CircleCheck size={20} color="#69D571" strokeWidth={2.5} />,
-        style: { justifyContent: "center", alignItems: "center" },
+        style: { width: "fit-content", padding: "16px 20px", justifyContent: "center", alignItems: "center" },
       });
       close();
     } catch (cause) {
