@@ -113,7 +113,7 @@ export default function DaySummaryModal() {
               <section>
                   <div className="mb-3 flex items-baseline gap-2">
                     <h2 className="text-[15px] font-semibold text-content">Focus</h2>
-                    <span className="text-[14px] font-semibold text-content-secondary">{formatDuration(focusDuration)}</span>
+                    <span className="text-[14px] font-semibold text-content-secondary">{formatDuration(focusDuration)}/{formatDuration(DAY_MINUTES)}</span>
                   </div>
                   <div className="px-[10px]">
                     <div className="flex items-center gap-3">
