@@ -10,6 +10,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, ComponentProps<"textarea
 ) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const caretRef = useRef<HTMLDivElement>(null);
+  const focusUpdatePending = useRef(false);
   const resize = (textarea: HTMLTextAreaElement) => {
     textarea.style.height = "auto";
     const style = window.getComputedStyle(textarea);
@@ -19,7 +20,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, ComponentProps<"textarea
   const updateCaret = useCallback(() => {
     const textarea = textareaRef.current;
     const caret = caretRef.current;
-    if (!textarea || !caret) return;
+    if (!textarea || !caret || focusUpdatePending.current) return;
     if (document.activeElement !== textarea) {
       caret.style.display = "none";
       textarea.style.caretColor = "";
@@ -63,9 +64,8 @@ export const TextArea = forwardRef<HTMLTextAreaElement, ComponentProps<"textarea
     const position = marker.getBoundingClientRect();
     mirror.remove();
 
-    const emptyValueOffset = textarea.value ? 0 : 4;
-    caret.style.left = `${position.left - emptyValueOffset}px`;
-    caret.style.top = `${position.top - emptyValueOffset}px`;
+    caret.style.left = `${position.left - (textarea.value ? 0 : 6)}px`;
+    caret.style.top = `${position.top - (textarea.value ? 0 : 8)}px`;
     caret.style.height = `${position.height || parseFloat(style.fontSize) * 1.2}px`;
     caret.style.display = "block";
     textarea.style.caretColor = "transparent";
@@ -104,10 +104,17 @@ export const TextArea = forwardRef<HTMLTextAreaElement, ComponentProps<"textarea
           resize(event.currentTarget);
           updateCaret();
         }}
-        onFocus={updateCaret}
+        onFocus={() => {
+          focusUpdatePending.current = true;
+          requestAnimationFrame(() => {
+            focusUpdatePending.current = false;
+            updateCaret();
+          });
+        }}
         onSelect={updateCaret}
         onKeyUp={updateCaret}
         onBlur={() => {
+          focusUpdatePending.current = false;
           if (caretRef.current) caretRef.current.style.display = "none";
           if (textareaRef.current) textareaRef.current.style.caretColor = "";
         }}
