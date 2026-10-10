@@ -72,6 +72,7 @@ function CopilotForm({ activeDay, close, onApply }: {
       <div className="flex flex-col gap-1 text-[14px] text-content-secondary">
         <TextArea
           id="copilot-task-instruction"
+          autoFocus
           value={taskInstruction}
           onChange={(event) => setTaskInstruction(event.target.value)}
           placeholder={`Tell AI Copilot how to change ${activeDayLabel}'s tasks…`}
