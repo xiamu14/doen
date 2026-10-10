@@ -30,6 +30,11 @@ export const TextArea = forwardRef<HTMLTextAreaElement, ComponentProps<"textarea
       textarea.style.caretColor = "";
       return;
     }
+    if (!textarea.value) {
+      caret.style.display = "none";
+      textarea.style.caretColor = "";
+      return;
+    }
 
     const bounds = textarea.getBoundingClientRect();
     const style = window.getComputedStyle(textarea);
