@@ -264,12 +264,12 @@ export default function DaySummaryModal() {
 
               <section>
                   <h2 className="mb-3 text-[15px] font-semibold text-content">Plan</h2>
-                  <div className="flex items-center gap-3 px-[10px]">
+                  <div className="flex items-center justify-center gap-3 px-[10px]">
                     <div
                       role="img"
                       aria-label={`${formatDuration(focusDuration)} planned out of ${formatDuration(DAY_MINUTES)}`}
                       className="relative size-24 shrink-0 rounded-full"
-                      style={{ background: `conic-gradient(var(--primary-blue-500) ${planPercent}%, #eee ${planPercent}% 100%)` }}
+                      style={{ background: `conic-gradient(var(--primary-blue-300) ${planPercent}%, #eee ${planPercent}% 100%)` }}
                     >
                       <span className="absolute inset-0 flex items-center justify-center whitespace-nowrap text-[12px] font-semibold text-content">
                         {formatDuration(focusDuration)}
