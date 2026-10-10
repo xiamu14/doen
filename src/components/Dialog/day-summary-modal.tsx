@@ -114,7 +114,7 @@ export default function DaySummaryModal() {
                     <div className="flex items-center gap-3">
                     <div
                       aria-label={`Completed ${completed} minutes, unfinished ${unfinished} minutes, unplanned ${Math.max(0, DAY_MINUTES - planned)} minutes`}
-                      className="flex h-3.5 min-w-0 flex-1 overflow-hidden rounded-full border border-[#eee] bg-white"
+                      className="flex h-3.5 min-w-0 flex-1 overflow-hidden p-[1px] border border-[#eee] bg-white"
                     >
                       <span
                         className="h-full bg-[#69D571]"
@@ -123,7 +123,7 @@ export default function DaySummaryModal() {
                         }}
                       />
                       <span
-                        className="h-full bg-[#F4B4B4]"
+                        className="h-full bg-[oklch(93.6%_0.032_17.717)]"
                         style={{
                           width: `${(Math.min(unfinished, Math.max(0, DAY_MINUTES - completed)) / DAY_MINUTES) * 100}%`,
                         }}
@@ -139,7 +139,7 @@ export default function DaySummaryModal() {
                       Done
                     </span>
                     <span className="inline-flex items-center gap-1">
-                      <i className="size-2 rounded-full bg-[#F4B4B4]" />
+                      <i className="size-2 rounded-full bg-[oklch(93.6%_0.032_17.717)]" />
                       Unfinished
                     </span>
                     <span className="inline-flex items-center gap-1">
