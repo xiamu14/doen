@@ -3,18 +3,36 @@
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import dayjs from "dayjs";
 import { Calendar } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TaskCalendar from "./task-calendar";
 import MonthCalendar from "@/components/ui/month-calendar";
 import { useQuery } from "@tanstack/react-query";
 import { getEvents } from "@/client/api/event";
 import AICopilotButton from "./ai-copilot-button";
 
+const LAST_MANUAL_ACTIVE_DAY_CHANGE = "task-calendar:last-manual-active-day-change";
+
 export default function TaskPanel() {
   const [activeDay, setActiveDay] = useState(() => dayjs().startOf("day"));
   const [calendarMonth, setCalendarMonth] = useState(() => activeDay.format("YYYY-MM"));
   const { data: events = [] } = useQuery({ queryKey: ["events"], queryFn: getEvents });
   const somedayCount = events.filter((event) => event.recurrence === "someday" && event.date && event.date >= dayjs().format("YYYY-MM-DD")).length;
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== "visible") return;
+
+      const lastManualChange = Number(localStorage.getItem(LAST_MANUAL_ACTIVE_DAY_CHANGE));
+      if (Number.isFinite(lastManualChange) && Date.now() - lastManualChange <= 60 * 60_000) return;
+
+      const today = dayjs().startOf("day");
+      setActiveDay(today);
+      setCalendarMonth(today.format("YYYY-MM"));
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []);
 
   return (
     <div className="flex-1 flex flex-col">
@@ -38,6 +56,7 @@ export default function TaskPanel() {
                   onMonthChange={setCalendarMonth}
                   events={events}
                   onSelect={(date) => {
+                    localStorage.setItem(LAST_MANUAL_ACTIVE_DAY_CHANGE, String(Date.now()));
                     setActiveDay(dayjs(`${date}T00:00:00`));
                     close();
                   }}
