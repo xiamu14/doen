@@ -83,7 +83,7 @@ function CopilotForm({ activeDay, close, onApply }: {
         placeholder="Tell AI Copilot how to schedule around events…"
         rows={2}
         maxLength={2000}
-        disabled={busy || !eventConstraintsEnabled}
+        disabled={busy}
         className="rounded-[8px] border-0 bg-[#eee] px-2.5 py-2 text-[14px] text-content outline-none focus:outline-none focus-visible:outline-none disabled:bg-[#eee]"
       />
       {error && <p role="alert" className="text-[14px] text-red-600">{error}</p>}
