@@ -27,7 +27,9 @@ export default function MonthCalendar({ month, value, onMonthChange, onSelect }:
         {days.map((day, index) => {
           if (!day) return <span key={`blank-${index}`} />;
           const date = `${month}-${String(day).padStart(2, "0")}`;
-          return <button key={day} type="button" onClick={() => onSelect(date)} className={`h-8 rounded-full text-[12px] ${value === date ? "bg-primary text-white" : "text-content hover:bg-[#f6f6f6]"}`}>{day}</button>;
+          const isSelected = value === date;
+          const isToday = dayjs().format("YYYY-MM-DD") === date;
+          return <button key={day} type="button" onClick={() => onSelect(date)} className={`h-8 rounded-full text-[12px] ${isSelected ? "bg-primary text-white" : isToday ? "font-bold text-[#f05252] hover:bg-[#f6f6f6]" : "text-content hover:bg-[#f6f6f6]"}`}>{day}</button>;
         })}
       </div>
     </>
