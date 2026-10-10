@@ -32,7 +32,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, ComponentProps<"textarea
         onChange?.(event);
         resize(event.currentTarget);
       }}
-      className={cn(className, "resize-none overflow-hidden")}
+      className={cn(className, "resize-none overflow-hidden caret-primary")}
     />
   );
 });
