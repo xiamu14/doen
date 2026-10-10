@@ -60,7 +60,7 @@ function CopilotForm({ activeDay, close, onApply }: {
           placeholder={`Tell AI Copilot how to change ${activeDayLabel}'s tasks…`}
           rows={3}
           maxLength={2000}
-          className="rounded-[8px] border border-[#e7e7e7] px-2.5 py-2 text-[14px] text-content outline-none focus:border-primary"
+          className="rounded-[8px] border-0 bg-[#eee] px-2.5 py-2 text-[14px] text-content outline-none focus:outline-none focus-visible:outline-none"
           disabled={busy}
         />
       </div>
@@ -84,7 +84,7 @@ function CopilotForm({ activeDay, close, onApply }: {
         rows={2}
         maxLength={2000}
         disabled={busy || !eventConstraintsEnabled}
-        className="rounded-[8px] border border-[#e7e7e7] px-2.5 py-2 text-[14px] text-content outline-none focus:border-primary disabled:bg-[#f7f7f7]"
+        className="rounded-[8px] border-0 bg-[#eee] px-2.5 py-2 text-[14px] text-content outline-none focus:outline-none focus-visible:outline-none disabled:bg-[#eee]"
       />
       {error && <p role="alert" className="text-[14px] text-red-600">{error}</p>}
       <Button
