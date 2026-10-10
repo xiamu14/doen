@@ -1,6 +1,7 @@
 "use client";
 
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
+import * as Label from "@radix-ui/react-label";
 import { Sparkles } from "lucide-react";
 import { memo, useEffect, useRef, useState, type FormEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -8,6 +9,7 @@ import gsap from "gsap";
 import { Flip } from "gsap/Flip";
 import type { TaskRecord } from "@/client/api/task";
 import { scheduleActiveDay } from "@/client/api/task";
+import { Button, Checkbox, TextArea } from "@/components/ui/form-controls";
 import styles from "./ai-copilot-button.module.css";
 
 gsap.registerPlugin(Flip);
@@ -43,9 +45,10 @@ function CopilotForm({ activeDay, close, onApply }: {
   return (
     <form className="flex flex-col gap-3" onSubmit={submit}>
       <p className="text-[14px] font-semibold text-content">AI Copilot · {activeDay.slice(5).replace("-", ".")}</p>
-      <label className="flex flex-col gap-1 text-[14px] text-content-secondary">
-        Task adjustments
-        <textarea
+      <div className="flex flex-col gap-1 text-[14px] text-content-secondary">
+        <Label.Root htmlFor="copilot-task-instruction">Task adjustments</Label.Root>
+        <TextArea
+          id="copilot-task-instruction"
           value={taskInstruction}
           onChange={(event) => setTaskInstruction(event.target.value)}
           placeholder="Task changes…"
@@ -54,18 +57,19 @@ function CopilotForm({ activeDay, close, onApply }: {
           className="resize-y rounded-[8px] border border-[#e7e7e7] px-2.5 py-2 text-[14px] text-content outline-none focus:border-primary"
           disabled={busy}
         />
-      </label>
-      <label className="flex items-center gap-2 text-[14px] text-content">
-        <input
-          type="checkbox"
+      </div>
+      <div className="flex items-center gap-2 text-[14px] text-content">
+        <Checkbox
+          id="copilot-event-constraints"
           checked={eventConstraintsEnabled}
           onChange={(event) => setEventConstraintsEnabled(event.target.checked)}
           disabled={busy}
           className="accent-primary"
         />
-        Event constraints
-      </label>
-      <textarea
+        <Label.Root htmlFor="copilot-event-constraints">Event constraints</Label.Root>
+      </div>
+      <TextArea
+        id="copilot-event-instruction"
         value={eventInstruction}
         onChange={(event) => setEventInstruction(event.target.value)}
         placeholder="Event rules…"
@@ -75,13 +79,13 @@ function CopilotForm({ activeDay, close, onApply }: {
         className="resize-y rounded-[8px] border border-[#e7e7e7] px-2.5 py-2 text-[14px] text-content outline-none focus:border-primary disabled:bg-[#f7f7f7]"
       />
       {error && <p role="alert" className="text-[14px] text-red-600">{error}</p>}
-      <button
+      <Button
         type="submit"
         disabled={busy}
         className="flex h-[40px] items-center justify-center rounded-[10px] bg-primary px-3 text-[14px] font-semibold text-white disabled:opacity-60"
       >
         AI Copilot
-      </button>
+      </Button>
     </form>
   );
 }
