@@ -98,9 +98,14 @@ export default function TaskCalendar() {
               const showWeekendDot = isWeekend && !isActiveDay;
               const formatted = dateFn.format("ddd D");
               return (
-                <div
+                <button
+                  type="button"
                   key={`date-${index}`}
                   className={"w-[150px] flex-shrink-0 h-full center font-semibold text-[14px] "}
+                  onClick={(click) => {
+                    const rect = click.currentTarget.getBoundingClientRect();
+                    DialogUtils.show("daySummaryModal", { date: item.date, x: rect.left + rect.width / 2, y: rect.bottom + 8 });
+                  }}
                 >
                   {isActiveDay ? (
                     <div className="bg-[#DCECFF] w-[68px] h-[26px] rounded-[18px] center">
@@ -115,7 +120,7 @@ export default function TaskCalendar() {
                       {formatted}
                     </p>
                   )}
-                </div>
+                </button>
               );
             })}
           </div>

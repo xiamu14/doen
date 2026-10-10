@@ -1,5 +1,6 @@
 "use client";
 
+import { Dialog, DialogPanel } from "@headlessui/react";
 import * as Popover from "@radix-ui/react-popover";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useEffect, useMemo, useState } from "react";
@@ -139,19 +140,14 @@ export default function EventModal() {
   };
 
   return (
-    <Popover.Root open={isOpen} onOpenChange={(open) => { if (!open) close(); }}>
-      <Popover.Anchor
-        aria-hidden="true"
-        style={{ position: "fixed", left: data?.x ?? 0, top: data?.y ?? 0, width: 1, height: 1 }}
-      />
-      <Popover.Portal>
-        <Popover.Content
-          side="bottom"
-          align="start"
-          sideOffset={8}
-          collisionPadding={16}
-          className="z-50 w-[285px] max-w-[calc(100vw-32px)] rounded-[16px] border border-[#f1f1f1] bg-white p-5 shadow-modal outline-none"
-        >
+    <Dialog open={isOpen} as="div" className="relative z-50 focus:outline-none" onClose={close}>
+      <div className="fixed inset-0 z-50 w-screen overflow-y-auto">
+        <div className={`flex min-h-full relative ${data ? "justify-start items-start" : "justify-center items-center"}`}>
+          <DialogPanel
+            transition
+            className="w-[285px] max-w-[calc(100vw-32px)] flex-shrink-0 rounded-[16px] border border-[#f1f1f1] bg-white p-5 shadow-modal outline-none duration-300 ease-out data-closed:transform-[scale(95%)] data-closed:opacity-0"
+            style={data ? { position: "absolute", top: `${data.y}px`, left: `${Math.max(16, Math.min(data.x, window.innerWidth - 301))}px` } : {}}
+          >
           <form onSubmit={save} className="flex flex-col gap-[14px]">
             <div className="flex min-w-0 flex-1 flex-col gap-1.5">
               <CustomInput
@@ -196,7 +192,7 @@ export default function EventModal() {
                       <span className="text-[14px] font-semibold text-content">{firstOfMonth.format("MMMM YYYY")}</span>
                       <button type="button" aria-label="Next month" onClick={() => setCalendarMonth(firstOfMonth.add(1, "month").format("YYYY-MM"))} className="rounded p-1 hover:bg-[#f6f6f6]"><ChevronRight size={16} /></button>
                     </div>
-                    <div className="grid grid-cols-7 text-center text-[11px] text-content-secondary">
+                    <div className="grid grid-cols-7 text-center text-[12px] text-content-secondary">
                       {["S", "M", "T", "W", "T", "F", "S"].map((weekday, index) => <span key={`${weekday}-${index}`} className="py-1">{weekday}</span>)}
                       {dayCells.map((day, index) => day ? (
                         <button key={day} type="button" onClick={() => chooseDate(day)} className={`h-8 rounded-full text-[12px] ${date === `${calendarMonth}-${String(day).padStart(2, "0")}` ? "bg-primary text-white" : "text-content hover:bg-[#f6f6f6]"}`}>{day}</button>
@@ -243,9 +239,9 @@ export default function EventModal() {
               <button type="submit" disabled={isSaving || !title.trim()} className="h-[34px] flex-1 rounded-full bg-primary text-[13px] font-semibold text-white disabled:opacity-50">{isSaving ? "Saving..." : currentEvent ? "Apply" : "Create"}</button>
             </div>
           </form>
-          <Popover.Arrow className="fill-white" />
-        </Popover.Content>
-      </Popover.Portal>
-    </Popover.Root>
+          </DialogPanel>
+        </div>
+      </div>
+    </Dialog>
   );
 }
