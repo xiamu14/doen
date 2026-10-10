@@ -2,7 +2,7 @@
 
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getList, getTasks, updateTask, type TaskRecord } from "@/client/api/task";
 import { useSnapshot } from "valtio";
@@ -30,17 +30,17 @@ export default function TaskCalendar({ activeDay }: {
     const target = source === "header" ? bodyScrollRef.current : headerScrollRef.current;
     if (target && target.scrollLeft !== scrollLeft) target.scrollLeft = scrollLeft;
   };
-  const scrollToCurrentTime = () => {
+  const scrollToCurrentTime = useCallback((time = new Date()) => {
     const scroll = calendarScrollRef.current;
     if (!scroll) return;
-    const currentTop = slotFromStart(new Date().toISOString()) * SLOT_HEIGHT;
+    const currentTop = slotFromStart(time.toISOString()) * SLOT_HEIGHT;
     const centeredTop = currentTop - (scroll.clientHeight - SLOT_HEIGHT) / 2;
     const maxTop = scroll.scrollHeight - scroll.clientHeight;
     scroll.scrollTo({
       top: Math.max(0, Math.min(centeredTop, maxTop)),
       behavior: "smooth",
     });
-  };
+  }, []);
   const { data: tasks = [] } = useQuery({ queryKey: ["tasks"], queryFn: getTasks });
   const { data: events = [] } = useQuery({ queryKey: ["events"], queryFn: getEvents });
   const { data: list } = useQuery({ queryKey: ["list"], queryFn: getList });
@@ -131,7 +131,7 @@ export default function TaskCalendar({ activeDay }: {
       <div ref={calendarScrollRef} className="w-full h-[500px] mt-5 overflow-y-scroll flex scrollbar-hide">
         <div
           className="w-[96px] flex-shrink-0 flex flex-col items-center"
-          onDoubleClick={scrollToCurrentTime}
+          onDoubleClick={() => scrollToCurrentTime()}
         >
           {Array.from({ length: LAST_HOUR - FIRST_HOUR }, (_, index) => index + FIRST_HOUR).map(
             (hour, index) => {
@@ -175,6 +175,7 @@ export default function TaskCalendar({ activeDay }: {
                   key={`date-col-${index}`}
                   isNow={isToday}
                   date={item.date}
+                  onAutoScroll={scrollToCurrentTime}
                   tasks={tasks.filter((task) => dayjs(task.start).format("YYYY-MM-DD") === item.date)}
                   onCreateTask={openDraftTask}
                 />

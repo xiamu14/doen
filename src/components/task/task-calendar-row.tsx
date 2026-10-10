@@ -1,15 +1,38 @@
 "use client";
 
+import dayjs from "dayjs";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/components/ui/utils";
 import type { TaskRecord } from "@/client/api/task";
 import { nearestFreeSlot, SLOT_HEIGHT, SLOT_MINUTES, slotFromStart, startFromSlot, taskModalX } from "./calendar-time";
 type Props = {
   isNow: boolean;
   date: string;
+  onAutoScroll: (time: Date) => void;
   tasks: TaskRecord[];
   onCreateTask: (start: string, x: number, y: number, top: number, bottom: number) => void;
 };
-export default function TaskCalendarRow({ isNow, date, tasks, onCreateTask }: Props) {
+function CurrentTimeLine({ date, onAutoScroll }: Pick<Props, "date" | "onAutoScroll">) {
+  const [now, setNow] = useState(() => new Date());
+  const lastAutoScroll = useRef(Date.now());
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      const time = new Date();
+      setNow(time);
+      if (dayjs(time).format("YYYY-MM-DD") === date && time.getTime() - lastAutoScroll.current >= 15 * 60_000) {
+        lastAutoScroll.current = time.getTime();
+        onAutoScroll(time);
+      }
+    }, 60_000);
+    return () => window.clearInterval(interval);
+  }, [date, onAutoScroll]);
+
+  if (dayjs(now).format("YYYY-MM-DD") !== date) return null;
+  return <div className="w-full h-[1px] absolute left-0 bg-[#f16767] z-10" style={{ top: slotFromStart(now.toISOString()) * SLOT_HEIGHT }} />;
+}
+
+export default function TaskCalendarRow({ isNow, date, onAutoScroll, tasks, onCreateTask }: Props) {
   return (
     <div
       data-calendar-day
@@ -31,9 +54,7 @@ export default function TaskCalendarRow({ isNow, date, tasks, onCreateTask }: Pr
         );
       }}
     >
-      {isNow && (
-        <div className="w-full h-[1px] absolute left-[0] bg-[#f16767] z-10" style={{ top: slotFromStart(new Date().toISOString()) * SLOT_HEIGHT }}></div>
-      )}
+      {isNow && <CurrentTimeLine date={date} onAutoScroll={onAutoScroll} />}
     </div>
   );
 }
