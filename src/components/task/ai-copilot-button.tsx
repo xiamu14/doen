@@ -42,8 +42,8 @@ function CopilotForm({ activeDay, close, onApply }: {
 
   return (
     <form className="flex flex-col gap-3" onSubmit={submit}>
-      <p className="text-[13px] font-semibold text-content">AI Copilot · {activeDay.slice(5).replace("-", ".")}</p>
-      <label className="flex flex-col gap-1 text-[12px] text-content-secondary">
+      <p className="text-[14px] font-semibold text-content">AI Copilot · {activeDay.slice(5).replace("-", ".")}</p>
+      <label className="flex flex-col gap-1 text-[14px] text-content-secondary">
         Task adjustments
         <textarea
           value={taskInstruction}
@@ -51,11 +51,11 @@ function CopilotForm({ activeDay, close, onApply }: {
           placeholder="e.g. Schedule weekly planning in the morning and extend design review to 1 hour"
           rows={3}
           maxLength={2000}
-          className="resize-y rounded-[8px] border border-[#e7e7e7] px-2.5 py-2 text-[13px] text-content outline-none focus:border-primary"
+          className="resize-y rounded-[8px] border border-[#e7e7e7] px-2.5 py-2 text-[14px] text-content outline-none focus:border-primary"
           disabled={busy}
         />
       </label>
-      <label className="flex items-center gap-2 text-[12px] text-content">
+      <label className="flex items-center gap-2 text-[14px] text-content">
         <input
           type="checkbox"
           checked={eventConstraintsEnabled}
@@ -72,13 +72,13 @@ function CopilotForm({ activeDay, close, onApply }: {
         rows={2}
         maxLength={2000}
         disabled={busy || !eventConstraintsEnabled}
-        className="resize-y rounded-[8px] border border-[#e7e7e7] px-2.5 py-2 text-[13px] text-content outline-none focus:border-primary disabled:bg-[#f7f7f7]"
+        className="resize-y rounded-[8px] border border-[#e7e7e7] px-2.5 py-2 text-[14px] text-content outline-none focus:border-primary disabled:bg-[#f7f7f7]"
       />
-      {error && <p role="alert" className="text-[12px] text-red-600">{error}</p>}
+      {error && <p role="alert" className="text-[14px] text-red-600">{error}</p>}
       <button
         type="submit"
         disabled={busy}
-        className="flex h-[40px] items-center justify-center rounded-[10px] bg-primary px-3 text-[13px] font-semibold text-white disabled:opacity-60"
+        className="flex h-[40px] items-center justify-center rounded-[10px] bg-primary px-3 text-[14px] font-semibold text-white disabled:opacity-60"
       >
         {busy ? "Arranging…" : `Arrange ${activeDay.slice(5).replace("-", ".")} with AI`}
       </button>
