@@ -1,6 +1,7 @@
 "use client";
 
 import dayjs from "dayjs";
+import type { Dayjs } from "dayjs";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getList, getTasks, updateTask, type TaskRecord } from "@/client/api/task";
@@ -15,11 +16,12 @@ import { getEvents } from "@/client/api/event";
 import { eventOccursOn } from "@/lib/event-recurrence";
 import EventCalendarMarker from "./event-calendar-marker";
 
-export default function TaskCalendar() {
+export default function TaskCalendar({ activeDay }: {
+  activeDay: Dayjs;
+}) {
   const queryClient = useQueryClient();
   const pendingSaves = useRef(new Map<string, Promise<void>>());
   const modal = useSnapshot(modalsState);
-  const [activeDay] = useState(() => dayjs().startOf("day"));
   const [draftTask, setDraftTask] = useState<TaskRecord | null>(null);
   const headerScrollRef = useRef<HTMLDivElement>(null);
   const bodyScrollRef = useRef<HTMLDivElement>(null);

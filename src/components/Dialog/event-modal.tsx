@@ -3,11 +3,12 @@
 import { Dialog, DialogPanel } from "@headlessui/react";
 import * as Popover from "@radix-ui/react-popover";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
-import { CalendarDays, ChevronLeft, ChevronRight, Clock3 } from "lucide-react";
+import { CalendarDays, Clock3 } from "lucide-react";
 import CustomInput from "@/components/custom-input";
+import MonthCalendar from "@/components/ui/month-calendar";
 import { createEvent, deleteEvent, updateEvent, type EventRecord, type EventRecurrence } from "@/client/api/event";
 import { modalsState } from "./state";
 import { DialogUtils } from "./utils";
@@ -39,12 +40,6 @@ export default function EventModal() {
   const [error, setError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const currentEvent = data?.event;
-  const firstOfMonth = dayjs(`${calendarMonth}-01T00:00:00`);
-  const daysInMonth = firstOfMonth.daysInMonth();
-  const dayCells = useMemo(() => [
-    ...Array.from({ length: firstOfMonth.day() }, () => null),
-    ...Array.from({ length: daysInMonth }, (_, index) => index + 1),
-  ], [calendarMonth, daysInMonth, firstOfMonth]);
 
   const clearDefaultOnFocus = (event: React.FocusEvent<HTMLDivElement>, defaultValue: string, setValue: (value: string) => void) => {
     if (event.currentTarget.textContent !== defaultValue) return;
@@ -117,8 +112,8 @@ export default function EventModal() {
     }
   };
 
-  const chooseDate = (day: number) => {
-    setDate(`${calendarMonth}-${String(day).padStart(2, "0")}`);
+  const chooseDate = (selectedDate: string) => {
+    setDate(selectedDate);
     setCalendarOpen(false);
   };
 
@@ -187,17 +182,7 @@ export default function EventModal() {
                 </Popover.Trigger>
                 <Popover.Portal>
                   <Popover.Content side="bottom" align="start" sideOffset={6} className="z-[60] w-[260px] rounded-[12px] border border-[#eee] bg-white p-3 outline-none">
-                    <div className="mb-3 flex items-center justify-between">
-                      <button type="button" aria-label="Previous month" onClick={() => setCalendarMonth(firstOfMonth.subtract(1, "month").format("YYYY-MM"))} className="rounded p-1 hover:bg-[#f6f6f6]"><ChevronLeft size={16} /></button>
-                      <span className="text-[14px] font-semibold text-content">{firstOfMonth.format("MMMM YYYY")}</span>
-                      <button type="button" aria-label="Next month" onClick={() => setCalendarMonth(firstOfMonth.add(1, "month").format("YYYY-MM"))} className="rounded p-1 hover:bg-[#f6f6f6]"><ChevronRight size={16} /></button>
-                    </div>
-                    <div className="grid grid-cols-7 text-center text-[12px] text-content-secondary">
-                      {["S", "M", "T", "W", "T", "F", "S"].map((weekday, index) => <span key={`${weekday}-${index}`} className="py-1">{weekday}</span>)}
-                      {dayCells.map((day, index) => day ? (
-                        <button key={day} type="button" onClick={() => chooseDate(day)} className={`h-8 rounded-full text-[12px] ${date === `${calendarMonth}-${String(day).padStart(2, "0")}` ? "bg-primary text-white" : "text-content hover:bg-[#f6f6f6]"}`}>{day}</button>
-                      ) : <span key={`blank-${index}`} />)}
-                    </div>
+                    <MonthCalendar month={calendarMonth} value={date} onMonthChange={setCalendarMonth} onSelect={chooseDate} />
                   </Popover.Content>
                 </Popover.Portal>
               </Popover.Root>}
