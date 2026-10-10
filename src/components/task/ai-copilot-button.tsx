@@ -72,7 +72,6 @@ function CopilotForm({ activeDay, close, onApply }: {
       <div className="flex flex-col gap-1 text-[14px] text-content-secondary">
         <TextArea
           id="copilot-task-instruction"
-          autoFocus
           value={taskInstruction}
           onChange={(event) => setTaskInstruction(event.target.value)}
           placeholder={`Tell AI Copilot how to change ${activeDayLabel}'s tasks…`}
@@ -223,6 +222,7 @@ function AICopilotButton({ activeDay }: { activeDay: string }) {
           </PopoverButton>
           <PopoverPanel
             anchor="bottom start"
+            focus
             transition
             className="z-20 mt-[6px] w-[340px] rounded-[12px] border border-[#f1f1f1] bg-white p-4 text-content shadow-modal outline-none duration-300 ease-out data-closed:transform-[scale(95%)] data-closed:opacity-0"
           >
