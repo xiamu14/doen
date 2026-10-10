@@ -3,7 +3,7 @@
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import * as Checkbox from "@radix-ui/react-checkbox";
 import * as Label from "@radix-ui/react-label";
-import { Check, CircleCheck, LoaderCircle, Sparkles } from "lucide-react";
+import { Check, CircleCheck, LoaderCircle, RotateCcw, Sparkles } from "lucide-react";
 import { memo, useEffect, useRef, useState, type FormEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -113,21 +113,26 @@ function CopilotForm({ activeDay, close, onApply }: {
       <div className="flex items-center justify-between text-[14px] text-content">
         <Label.Root htmlFor="copilot-rest-instruction">Rest rules</Label.Root>
         {restInstruction !== DEFAULT_REST_RULE && (
-          <Button
-            type="button"
-            disabled={busy}
-            onClick={() => {
-              setRestInstruction(DEFAULT_REST_RULE);
-              try {
-                localStorage.setItem(restInstructionStorageKey, DEFAULT_REST_RULE);
-              } catch {
-                // Keep the form usable when browser storage is unavailable.
-              }
-            }}
-            className="text-[14px] text-primary disabled:opacity-50"
-          >
-            Reset
-          </Button>
+          <span className="flex items-center gap-1">
+            <span className="text-[14px] text-primary">Reset Rules</span>
+            <Button
+              type="button"
+              aria-label="Reset rest rules"
+              title="Reset rest rules"
+              disabled={busy}
+              onClick={() => {
+                setRestInstruction(DEFAULT_REST_RULE);
+                try {
+                  localStorage.setItem(restInstructionStorageKey, DEFAULT_REST_RULE);
+                } catch {
+                  // Keep the form usable when browser storage is unavailable.
+                }
+              }}
+              className="flex size-6 items-center justify-center rounded text-primary hover:bg-[#f6f6f6] disabled:opacity-50"
+            >
+              <RotateCcw size={16} aria-hidden="true" />
+            </Button>
+          </span>
         )}
       </div>
       <TextArea
