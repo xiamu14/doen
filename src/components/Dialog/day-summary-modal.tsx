@@ -268,10 +268,13 @@ export default function DaySummaryModal() {
                     <div
                       role="img"
                       aria-label={`${formatDuration(focusDuration)} planned out of ${formatDuration(DAY_MINUTES)}`}
-                      className="size-12 shrink-0 rounded-full"
+                      className="relative size-24 shrink-0 rounded-full"
                       style={{ background: `conic-gradient(var(--primary-blue-500) ${planPercent}%, #eee ${planPercent}% 100%)` }}
-                    />
-                    <span className="text-[14px] font-semibold text-content-secondary">{formatDuration(focusDuration)}/{formatDuration(DAY_MINUTES)}</span>
+                    >
+                      <span className="absolute inset-2 flex items-center justify-center whitespace-nowrap rounded-full bg-white/90 text-[12px] font-semibold text-content-secondary">
+                        {formatDuration(focusDuration)}/{formatDuration(DAY_MINUTES)}
+                      </span>
+                    </div>
                   </div>
                 </section>
               </div>
