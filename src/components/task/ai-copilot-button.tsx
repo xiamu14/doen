@@ -1,15 +1,16 @@
 "use client";
 
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
+import * as Checkbox from "@radix-ui/react-checkbox";
 import * as Label from "@radix-ui/react-label";
-import { Sparkles } from "lucide-react";
+import { Check, Sparkles } from "lucide-react";
 import { memo, useEffect, useRef, useState, type FormEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import gsap from "gsap";
 import { Flip } from "gsap/Flip";
 import type { TaskRecord } from "@/client/api/task";
 import { scheduleActiveDay } from "@/client/api/task";
-import { Button, Checkbox, TextArea } from "@/components/ui/form-controls";
+import { Button, TextArea } from "@/components/ui/form-controls";
 import styles from "./ai-copilot-button.module.css";
 
 gsap.registerPlugin(Flip);
@@ -59,13 +60,15 @@ function CopilotForm({ activeDay, close, onApply }: {
         />
       </div>
       <div className="flex items-center gap-2 text-[14px] text-content">
-        <Checkbox
+        <Checkbox.Root
           id="copilot-event-constraints"
           checked={eventConstraintsEnabled}
-          onChange={(event) => setEventConstraintsEnabled(event.target.checked)}
+          onCheckedChange={(checked) => setEventConstraintsEnabled(checked === true)}
           disabled={busy}
-          className="accent-primary"
-        />
+          className="flex size-5 shrink-0 items-center justify-center rounded-[4px] border border-primary bg-white text-primary data-[state=checked]:bg-primary data-[state=checked]:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50"
+        >
+          <Checkbox.Indicator><Check size={14} strokeWidth={3} /></Checkbox.Indicator>
+        </Checkbox.Root>
         <Label.Root htmlFor="copilot-event-constraints">Event constraints</Label.Root>
       </div>
       <TextArea
