@@ -6,6 +6,7 @@ import { z } from "zod";
 import { normalizeTaskTagId } from "@/lib/task-tags";
 import { FIRST_HOUR, LAST_HOUR, MAX_TASK_DURATION, MIN_TASK_DURATION, SLOT_MINUTES } from "@/lib/task-schedule-config";
 import { isValidTaskWindow } from "@/lib/task-schedule";
+import { queueCalendarChanges } from "@/lib/google-calendar/sync";
 
 const fields = z.object({
   title: z.string().trim().min(1).max(256),
@@ -60,6 +61,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "This time overlaps another task." }, { status: 409 });
   }
   const [created] = await db.insert(task).values(values).returning();
+  await queueCalendarChanges([{ kind: "task", id: created.id }]);
   return NextResponse.json({ data: serializeTask(created) }, { status: 201 });
 }
 
@@ -78,6 +80,7 @@ export async function PATCH(request: NextRequest) {
   }
   const [updated] = await db.update(task).set(values).where(eq(task.id, id)).returning();
   if (!updated) return NextResponse.json({ error: "Task not found." }, { status: 404 });
+  await queueCalendarChanges([{ kind: "task", id: updated.id }]);
   return NextResponse.json({ data: serializeTask(updated) });
 }
 
@@ -86,5 +89,6 @@ export async function DELETE(request: NextRequest) {
   if (!body.success) return NextResponse.json({ error: "Invalid task ID." }, { status: 400 });
   const [deleted] = await db.delete(task).where(eq(task.id, body.data.id)).returning();
   if (!deleted) return NextResponse.json({ error: "Task not found." }, { status: 404 });
+  await queueCalendarChanges([{ kind: "task", id: deleted.id }]);
   return NextResponse.json({ data: deleted });
 }

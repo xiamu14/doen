@@ -23,6 +23,7 @@
 # misc
 .DS_Store
 *.pem
+/.secrets/
 
 # debug
 npm-debug.log*
@@ -42,3 +43,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+thematic-acumen-448704-s1-981ce4fd98ad.json

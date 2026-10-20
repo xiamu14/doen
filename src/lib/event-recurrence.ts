@@ -1,5 +1,9 @@
 import dayjs from "dayjs";
-import type { EventRecord } from "@/client/api/event";
+import type { EventRecord, EventRecurrence } from "@/client/api/event";
+
+export function eventHasTime(recurrence: EventRecurrence) {
+  return recurrence === "once" || recurrence === "daily";
+}
 
 function localDate(value: string) {
   const [year, month, day] = value.split("-").map(Number);
@@ -34,8 +38,9 @@ export function nextEventOccurrence(event: EventRecord, now = new Date()) {
   }
   for (let offset = 0; offset <= 366; offset += 1) {
     const date = addEventDays(today, offset);
-    if (eventOccursOn(event, date) && (date > today || (event.time && event.time >= currentTime))) {
-      return { date, time: event.time };
+    const time = eventHasTime(event.recurrence) ? event.time : null;
+    if (eventOccursOn(event, date) && (date > today || time === null || time >= currentTime)) {
+      return { date, time };
     }
   }
   return null;

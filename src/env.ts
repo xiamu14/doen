@@ -14,6 +14,8 @@ export const env = createEnv({
     // Google
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
+    GOOGLE_SERVICE_ACCOUNT_FILE: z.string().optional(),
+    GOOGLE_CALENDAR_ID: z.string().optional(),
     OPENROUTER_API_KEY: z.string().optional(),
     OPENROUTER_MODEL: z.string().optional(),
   },

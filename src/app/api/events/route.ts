@@ -4,6 +4,9 @@ import { asc, count, eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { PROJECT_COLORS } from "@/lib/project-colors";
+import { eventHasTime } from "@/lib/event-recurrence";
+import type { EventRecurrence } from "@/client/api/event";
+import { queueCalendarChanges } from "@/lib/google-calendar/sync";
 
 const fields = z.object({
   title: z.string().trim().min(1).max(256),
@@ -24,14 +27,17 @@ const fields = z.object({
       : recurrence === "daily"
       ? date === null && time !== null && repeatDay === null
       : recurrence === "weekly"
-        ? date === null && time !== null && repeatDay !== null && repeatDay >= 0 && repeatDay <= 6
-        : date === null && time !== null && repeatDay !== null && repeatDay >= 1 && repeatDay <= 31;
+        ? date === null && time === null && repeatDay !== null && repeatDay >= 0 && repeatDay <= 6
+        : date === null && time === null && repeatDay !== null && repeatDay >= 1 && repeatDay <= 31;
   if (!valid) context.addIssue({ code: z.ZodIssueCode.custom, message: "Invalid repeat settings." });
 });
 
 export async function GET() {
   const events = await db.select().from(event).orderBy(asc(event.date), asc(event.time));
-  return NextResponse.json({ data: events });
+  return NextResponse.json({ data: events.map((item) => ({
+    ...item,
+    time: eventHasTime(item.recurrence as EventRecurrence) ? item.time : null,
+  })) });
 }
 
 export async function POST(request: NextRequest) {
@@ -40,6 +46,7 @@ export async function POST(request: NextRequest) {
   const [{ eventCount }] = await db.select({ eventCount: count() }).from(event);
   const color = PROJECT_COLORS[Number(eventCount) % PROJECT_COLORS.length];
   const [created] = await db.insert(event).values({ ...body.data, color }).returning();
+  await queueCalendarChanges([{ kind: "event", id: created.id }]);
   return NextResponse.json({ data: created }, { status: 201 });
 }
 
@@ -49,6 +56,7 @@ export async function PATCH(request: NextRequest) {
   const { id, ...values } = body.data;
   const [updated] = await db.update(event).set(values).where(eq(event.id, id)).returning();
   if (!updated) return NextResponse.json({ error: "Event not found." }, { status: 404 });
+  await queueCalendarChanges([{ kind: "event", id: updated.id }]);
   return NextResponse.json({ data: updated });
 }
 
@@ -57,5 +65,6 @@ export async function DELETE(request: NextRequest) {
   if (!body.success) return NextResponse.json({ error: "Invalid event ID." }, { status: 400 });
   const [deleted] = await db.delete(event).where(eq(event.id, body.data.id)).returning();
   if (!deleted) return NextResponse.json({ error: "Event not found." }, { status: 404 });
+  await queueCalendarChanges([{ kind: "event", id: deleted.id }]);
   return NextResponse.json({ data: deleted });
 }

@@ -4,6 +4,7 @@ import { project, task } from "@/lib/db/schema/task";
 import { asc, count, eq } from "drizzle-orm";
 import { z } from "zod";
 import { PROJECT_COLORS } from "@/lib/project-colors";
+import { queueCalendarChanges } from "@/lib/google-calendar/sync";
 
 export async function GET(request: NextRequest) {
   const projects = await db.select().from(project).orderBy(asc(project.createdAt), asc(project.id));
@@ -57,10 +58,12 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: "A valid project ID is required." }, { status: 400 });
   }
 
+  let changedTasks: { id: string }[] = [];
   const [deleted] = await db.transaction(async (tx) => {
-    await tx.update(task).set({ projectId: null }).where(eq(task.projectId, id.data));
+    changedTasks = await tx.update(task).set({ projectId: null }).where(eq(task.projectId, id.data)).returning();
     return tx.delete(project).where(eq(project.id, id.data)).returning();
   });
   if (!deleted) return NextResponse.json({ error: "Project not found." }, { status: 404 });
+  await queueCalendarChanges(changedTasks.map(({ id }) => ({ kind: "task", id })));
   return NextResponse.json({ data: deleted });
 }

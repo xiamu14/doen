@@ -7,11 +7,12 @@ import { env } from "@/env";
 import { db } from "@/lib/db";
 import { event } from "@/lib/db/schema/event";
 import { project, task } from "@/lib/db/schema/task";
-import { eventOccursOn } from "@/lib/event-recurrence";
+import { eventHasTime, eventOccursOn } from "@/lib/event-recurrence";
 import { normalizeTaskTagId } from "@/lib/task-tags";
 import type { EventRecord } from "@/client/api/event";
 import { DEFAULT_REST_RULE, FIRST_HOUR, LAST_HOUR, MAX_TASK_DURATION, MIN_TASK_DURATION, SLOT_MINUTES } from "@/lib/task-schedule-config";
 import { getZonedParts, isTimeZone, isValidTaskWindow, localTimeToISOString } from "@/lib/task-schedule";
+import { queueCalendarChanges } from "@/lib/google-calendar/sync";
 
 const requestSchema = z.object({
   activeDay: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine((value) => {
@@ -140,6 +141,7 @@ async function applySchedule(
     const durationCase = sql<number>`case ${task.id} ${sql.join(updates.map(({ id, duration }) => sql`when ${id} then ${duration}`), sql` `)} else ${task.duration} end`;
     await db.update(task).set({ start: startCase, duration: durationCase, updatedAt: new Date() })
       .where(inArray(task.id, updates.map(({ id }) => id)));
+    await queueCalendarChanges(updates.map(({ id }) => ({ kind: "task", id })));
   }
 
   return (await getDayTasks(activeDay, timeZone)).map(serializeTask);
@@ -169,7 +171,7 @@ export async function POST(request: NextRequest) {
     const relevantEvents = allEvents
       .filter((item) => eventOccursOn(item as EventRecord, activeDay))
       .map(({ id, title, description, date, time, recurrence, repeatDay }) => ({
-        id, title, description, date, time, recurrence, repeatDay,
+        id, title, description, date, time: eventHasTime(recurrence as EventRecord["recurrence"]) ? time : null, recurrence, repeatDay,
       }));
     const currentLocalTime = getZonedParts(new Date(), timeZone);
     const openrouter = createOpenRouter({ apiKey });

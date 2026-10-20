@@ -165,8 +165,8 @@ export function EventList() {
                 : event.recurrence === "daily"
                   ? `Every day · ${event.time}`
                   : event.recurrence === "weekly"
-                    ? `Every ${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][event.repeatDay ?? 0]} · ${event.time}`
-                    : `Day ${event.repeatDay ?? 1} each month · ${event.time}`}
+                    ? `Every ${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][event.repeatDay ?? 0]}`
+                    : `Day ${event.repeatDay ?? 1} each month`}
             </span>
           </button>
         ))}

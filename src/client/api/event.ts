@@ -1,3 +1,5 @@
+import { refreshCalendarStatus } from "./google-calendar";
+
 export type EventRecurrence = "once" | "someday" | "daily" | "weekly" | "monthly";
 
 export type EventRecord = {
@@ -27,6 +29,7 @@ async function writeEvent(method: "POST" | "PATCH" | "DELETE", event: Partial<Ev
   });
   const result = await response.json();
   if (!response.ok) throw new Error(result.error || "Could not save event.");
+  refreshCalendarStatus();
   return result.data as EventRecord;
 }
 

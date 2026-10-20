@@ -14,9 +14,10 @@ import { modalsState } from "./state";
 import { DialogUtils } from "./utils";
 import type { Modals } from "./type";
 import { useSnapshot } from "valtio";
+import { eventHasTime } from "@/lib/event-recurrence";
 
 const repeatLabels: Record<EventRecurrence, string> = {
-  once: "Once",
+  once: "Sometime",
   someday: "Someday",
   daily: "Every day",
   weekly: "Every week",
@@ -84,7 +85,7 @@ export default function EventModal() {
     setIsSaving(true);
     setError("");
     try {
-      const values = { title: title.trim(), description: description.trim(), date, time: recurrence === "someday" ? null : time, recurrence, repeatDay };
+      const values = { title: title.trim(), description: description.trim(), date, time: eventHasTime(recurrence) ? time : null, recurrence, repeatDay };
       const saved = currentEvent
         ? await updateEvent({ ...currentEvent, ...values })
         : await createEvent(values);
@@ -201,7 +202,7 @@ export default function EventModal() {
                   {Array.from({ length: 31 }, (_, index) => index + 1).map((day) => <DropdownMenu.Item key={day} onSelect={() => setRepeatDay(day)} className="cursor-pointer rounded px-3 py-2 text-[14px] text-content outline-none data-[highlighted]:bg-[#f6f6f6]">Day {day}</DropdownMenu.Item>)}
                 </DropdownMenu.Content></DropdownMenu.Portal>
               </DropdownMenu.Root>}
-              {recurrence !== "someday" && <Popover.Root open={timeOpen} onOpenChange={setTimeOpen}>
+              {eventHasTime(recurrence) && <Popover.Root open={timeOpen} onOpenChange={setTimeOpen}>
                 <Popover.Trigger asChild>
                   <button type="button" className="flex h-[34px] flex-shrink-0 items-center gap-1 rounded-[8px] bg-[#f6f6f6] px-2.5 text-[14px] text-content"><Clock3 size={14} />{time}</button>
                 </Popover.Trigger>

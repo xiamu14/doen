@@ -1,3 +1,5 @@
+import { refreshCalendarStatus } from "./google-calendar";
+
 export type ProjectRecord = { id: string; name: string; color: string };
 
 export async function getList(): Promise<{ data: { project: ProjectRecord[] } }> {
@@ -37,6 +39,7 @@ export async function scheduleActiveDay(input: {
   });
   const result = await response.json();
   if (!response.ok) throw new Error(result.error || "Could not arrange tasks.");
+  refreshCalendarStatus();
   return result.data as TaskRecord[];
 }
 
@@ -48,6 +51,7 @@ async function writeTask(method: "POST" | "PATCH" | "DELETE", task: Partial<Task
   });
   const result = await response.json();
   if (!response.ok) throw new Error(result.error || "Could not save task.");
+  refreshCalendarStatus();
   return result.data as TaskRecord;
 }
 

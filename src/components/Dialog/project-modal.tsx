@@ -8,6 +8,7 @@ import { Modals } from "./type";
 import { cn } from "@/components/ui/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { PROJECT_COLORS } from "@/lib/project-colors";
+import { refreshCalendarStatus } from "@/client/api/google-calendar";
 
 export default function ProjectModal() {
   const modalsSnap = useSnapshot(modalsState);
@@ -75,6 +76,7 @@ export default function ProjectModal() {
       }
       await queryClient.invalidateQueries({ queryKey: ["list"] });
       await queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      refreshCalendarStatus();
       close();
     } catch {
       setError("Could not delete project.");

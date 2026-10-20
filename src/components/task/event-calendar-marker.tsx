@@ -3,13 +3,14 @@
 import type { EventRecord } from "@/client/api/event";
 import { DialogUtils } from "@/components/Dialog";
 import { FIRST_HOUR, LAST_HOUR, SLOT_HEIGHT, SLOT_MINUTES } from "./calendar-time";
+import { eventHasTime } from "@/lib/event-recurrence";
 
 export default function EventCalendarMarker({ event, date, dayIndex }: {
   event: EventRecord;
   date: string;
   dayIndex: number;
 }) {
-  if (event.recurrence === "someday" || !event.time) return null;
+  if (!eventHasTime(event.recurrence) || !event.time) return null;
   const [hour, minute] = event.time.split(":").map(Number);
   const top = Math.min(((hour - FIRST_HOUR) * 60 + minute) * SLOT_HEIGHT / SLOT_MINUTES, ((LAST_HOUR - FIRST_HOUR) * 60 * SLOT_HEIGHT) / SLOT_MINUTES - 2);
 
