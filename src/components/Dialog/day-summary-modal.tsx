@@ -133,7 +133,7 @@ export default function DaySummaryModal() {
                       />
                     </div>
                     <span className="flex-shrink-0 whitespace-nowrap text-[12px] font-semibold text-content">
-                      {Math.round((completed / DAY_MINUTES) * 100)}%
+                        {Math.round((completed / DAY_MINUTES) * 100)}%
                     </span>
                   </div>
                     <div className="mt-2 flex gap-3 text-[12px] text-content">
@@ -155,7 +155,7 @@ export default function DaySummaryModal() {
 
               <section>
                   <h2 className="mb-3 text-[15px] font-semibold text-content">
-                    Tasks
+                    Task
                   </h2>
                   <div className="px-[10px]">
                     <div className="relative mx-auto flex w-full justify-center py-5">
@@ -225,7 +225,7 @@ export default function DaySummaryModal() {
 
               <section>
                   <h2 className="mb-3 text-[15px] font-semibold text-content">
-                    Projects
+                    Project
                   </h2>
                   <div className="px-[10px]">
                     <div className="flex flex-col gap-1">

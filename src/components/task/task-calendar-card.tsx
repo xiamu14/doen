@@ -22,6 +22,7 @@ type Props = {
 export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Props) {
   const cardRef = useRef<HTMLDivElement>(null);
   const resizeRef = useRef<HTMLDivElement>(null);
+  const gestureRef = useRef({ x: 0, y: 0, dragged: false });
   const taskRef = useRef(task);
   taskRef.current = task;
   const durationSlots = task.duration / SLOT_MINUTES;
@@ -58,6 +59,9 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
         gsap.killTweensOf(card);
         this.update();
       },
+      onDragStart() {
+        gestureRef.current.dragged = true;
+      },
       onDragEnd() {
         const column = columnFor(this.x);
         const slot = clampSlot((card.offsetTop + this.y) / SLOT_HEIGHT, durationSlots);
@@ -90,6 +94,9 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
         initialY = this.y;
         main[0].disable();
       },
+      onDragStart() {
+        gestureRef.current.dragged = true;
+      },
       onDrag() {
         const remainingSlots = SLOT_COUNT - slotFromStart(task.start);
         const maxSlots = Math.min(maxDurationSlots, remainingSlots);
@@ -117,8 +124,20 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
       data-task-id={task.id}
       className={`absolute w-[128px] py-[3px] rounded-[6px] flex flex-col px-[10px] overflow-hidden z-12 ${task.status === "done" ? "cursor-default" : "cursor-pointer"}`}
       style={{ left: dayIndex * 150 + 11, top: slotFromStart(task.start) * SLOT_HEIGHT + 1, height: durationSlots * SLOT_HEIGHT - 2, backgroundColor: isDone || isOverdue ? "#eee" : tag.backgroundColor }}
+      onPointerDownCapture={(event) => {
+        gestureRef.current = { x: event.clientX, y: event.clientY, dragged: false };
+      }}
+      onPointerMoveCapture={(event) => {
+        if (event.buttons === 0) return;
+        const gesture = gestureRef.current;
+        // Track pointer movement even when liveSnap keeps the card in the same slot.
+        if (Math.hypot(event.clientX - gesture.x, event.clientY - gesture.y) > 3) {
+          gesture.dragged = true;
+        }
+      }}
       onClick={(event) => {
         event.stopPropagation();
+        if (gestureRef.current.dragged) return;
         const rect = event.currentTarget.getBoundingClientRect();
         const column = event.currentTarget.parentElement!.querySelectorAll<HTMLElement>("[data-calendar-day]")[dayIndex];
         const columnRect = column.getBoundingClientRect();
