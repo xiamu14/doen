@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Popover, PopoverButton, PopoverPanel, Switch } from "@headlessui/react";
 import * as Avatar from "@radix-ui/react-avatar";
 import { useQuery } from "@tanstack/react-query";
-import { CalendarDays, LogOut, RefreshCw } from "lucide-react";
+import { CalendarDays, LoaderCircle } from "lucide-react";
 import { signIn, signOut, useSession } from "@/lib/auth-client";
 import { Button } from "@/components/ui/form-controls";
 import { calendarFeedback, changeCalendar, getCalendarStatus } from "@/client/api/google-calendar";
@@ -98,8 +98,8 @@ export default function UserMenu() {
         <div className="flex items-center justify-between gap-3">
           <span className="flex items-center gap-2 text-[14px] font-medium"><CalendarDays size={16} />Google Calendar</span>
           <Switch checked={calendar?.enabled ?? false} disabled={busy || !calendar?.connected} onChange={(enabled) => void run({ action: "toggle", enabled })}
-            aria-label="Google Calendar sync" className="group inline-flex h-[22px] w-[38px] shrink-0 items-center rounded-full bg-[#ddd] p-[3px] outline-none transition data-checked:bg-primary disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
-            <span className="size-4 rounded-full bg-white transition group-data-checked:translate-x-4" />
+            aria-label="Google Calendar sync" className="group inline-flex h-[20px] w-[36px] shrink-0 items-center rounded-full bg-[#ddd] p-[3px] outline-none transition data-checked:bg-primary disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
+            <span className="size-[14px] rounded-full bg-white transition group-data-checked:translate-x-4" />
           </Switch>
         </div>
         {!feedback.message && syncStatus && <p aria-live="polite" className="mt-3 text-[12px] text-content-secondary">
@@ -108,12 +108,9 @@ export default function UserMenu() {
         {feedback.message && <p role="alert" className="mt-2 text-[12px] text-red-600">{feedback.message}</p>}
         {(canSync || (calendar?.configured && !calendar.connected)) && <div className="mt-3 flex gap-2">
           {canSync && <Button onClick={() => void run({ action: "sync" })} disabled={syncing} aria-busy={syncing}
-            className="flex h-[32px] flex-1 items-center justify-center gap-1.5 rounded-[8px] border border-[#eee] text-[12px] font-medium disabled:opacity-50 text-[#333]">
-            {syncing ? "Syncing…" : "Sync"}
-          </Button>}
-          {calendar?.configured && !calendar.connected && <Button onClick={() => void run({ action: "connect" })} disabled={busy || calendar.running}
-            className="h-[32px] flex-1 rounded-[8px] bg-primary px-2 text-[12px] font-medium text-white disabled:opacity-50">
-            Set up sync
+            className="flex h-[38px] flex-1 items-center justify-center rounded-full bg-primary px-3 text-[14px]  text-white disabled:opacity-60 mt-2">
+            {syncing && <LoaderCircle size={16} aria-hidden="true" className="mr-2 animate-spin" />}
+           <span className="font-bold">{syncing ? "Syncing…" : "Sync"}</span>
           </Button>}
         </div>}
 
