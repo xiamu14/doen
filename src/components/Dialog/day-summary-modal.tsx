@@ -9,6 +9,7 @@ import { TASK_TAGS } from "@/lib/task-tags";
 import { modalsState } from "./state";
 import { DialogUtils } from "./utils";
 import type { Modals } from "./type";
+import SummaryRings from "./summary-rings";
 
 const DAY_MINUTES = 16 * 60;
 
@@ -41,11 +42,6 @@ export default function DaySummaryModal() {
   const unfinished = dayTasks
     .filter((task) => task.status !== "done")
     .reduce((sum, task) => sum + task.duration, 0);
-  const now = dayjs();
-  const focusDuration = dayTasks
-    .filter((task) => task.status === "done" || !dayjs(task.start).add(task.duration, "minute").isBefore(now))
-    .reduce((sum, task) => sum + task.duration, 0);
-  const planPercent = Math.min(focusDuration, DAY_MINUTES) / DAY_MINUTES * 100;
   const planned = completed + unfinished;
   const totalTaskDuration = dayTasks.reduce(
     (sum, task) => sum + task.duration,
@@ -263,19 +259,8 @@ export default function DaySummaryModal() {
                 </section>
 
               <section>
-                  <h2 className="mb-3 text-[15px] font-semibold text-content">Plan</h2>
-                  <div className="flex items-center justify-center gap-3 px-[10px]">
-                    <div
-                      role="img"
-                      aria-label={`${formatDuration(focusDuration)} planned out of ${formatDuration(DAY_MINUTES)}`}
-                      className="relative size-24 shrink-0 rounded-full"
-                      style={{ background: `conic-gradient(var(--primary-blue-300) ${planPercent}%, #eee ${planPercent}% 100%)` }}
-                    >
-                      <span className="absolute inset-0 flex items-center justify-center whitespace-nowrap text-[12px] font-semibold text-content">
-                        {formatDuration(focusDuration)}
-                      </span>
-                    </div>
-                  </div>
+                  <h2 className="mb-3 text-[15px] font-semibold text-content">Summary</h2>
+                  <SummaryRings planned={planned} completed={completed} total={DAY_MINUTES} />
                 </section>
               </div>
             </div>
