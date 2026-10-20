@@ -112,13 +112,13 @@ export default function TaskCalendar({ activeDay }: {
                   {isActiveDay ? (
                     <div className="bg-[#DCECFF] w-[68px] h-[26px] rounded-[18px] center">
                       <p className="inline-flex items-center gap-[4px] text-calender-main">
-                        {showWeekendDot && <span className="size-[6px] rounded-full bg-orange-500" />}
+                        {showWeekendDot && <span className="size-[6px] rounded-full bg-[#69D571]" />}
                         {formatted}
                       </p>
                     </div>
                   ) : (
                     <p className="inline-flex items-center gap-[4px] text-calendar-date">
-                      {showWeekendDot && <span className="size-[6px] rounded-full bg-orange-500" />}
+                      {showWeekendDot && <span className="size-[6px] rounded-full bg-[#69D571]" />}
                       {formatted}
                     </p>
                   )}
