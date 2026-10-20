@@ -34,9 +34,9 @@ export default function ProjectItem({
     onProjectChange?: (id: string) => void;
   }) {
   return (
-    <div className={cn("cursor-pointer", variants({ tight }), className)}>
+    <div className={cn("cursor-pointer", variants({ tight }), tight && "min-w-0 flex-1", className)}>
       <div
-        className={cn("w-[12px] h-[6px] rounded-[3px]")}
+        className={cn("w-[12px] h-[6px] shrink-0 rounded-[3px]")}
         style={{ backgroundColor: item.color }}
       ></div>
       {isSelection ? (
@@ -44,7 +44,7 @@ export default function ProjectItem({
           value={projectId ?? ""}
           onChange={(event) => onProjectChange?.(event.target.value)}
           className={cn(
-            "text-[16px] font-medium focus:not-data-focus:outline-none data-focus:outline-2 appearance-none cursor-pointer",
+            "min-w-0 flex-1 truncate text-[16px] font-medium focus:not-data-focus:outline-none data-focus:outline-2 appearance-none cursor-pointer",
             //   `${index === 0 ? "text-content" : ""}`,
             className
           )}
@@ -56,7 +56,7 @@ export default function ProjectItem({
       ) : (
         <p
           className={cn(
-            "text-[16px] font-medium",
+            "min-w-0 flex-1 truncate text-[16px] font-medium",
             //   `${index === 0 ? "text-content" : ""}`,
             className
           )}

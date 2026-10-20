@@ -238,16 +238,16 @@ export default function TaskModal() {
                 <div className="flex items-center justify-start gap-[16px] mt-[14px]">
                   {isCompleted ? (
                     <>
-                      <div className="flex items-center gap-[8px]">
+                      <div className="flex min-w-0 flex-1 items-center gap-[8px]">
                         <div
-                          className="w-[12px] h-[6px] rounded-[3px]"
+                          className="w-[12px] h-[6px] shrink-0 rounded-[3px]"
                           style={{ backgroundColor: selectedProject?.color ?? "#B9B9B9" }}
                         />
-                        <span className="text-[16px] font-medium text-[#B9B9B9]">{selectedProject?.name ?? "No project"}</span>
+                        <span className="min-w-0 truncate text-[16px] font-medium text-[#B9B9B9]">{selectedProject?.name ?? "No project"}</span>
                       </div>
-                      <div className="flex items-center gap-[8px]">
-                        <div className="w-[10px] h-[10px] rounded-full bg-[#69D571]" />
-                        <span className="text-[16px] font-medium text-[#B9B9B9]">{selectedTag.name}</span>
+                      <div className="flex min-w-0 flex-1 items-center gap-[8px]">
+                        <div className="w-[10px] h-[10px] shrink-0 rounded-full bg-[#69D571]" />
+                        <span className="min-w-0 truncate text-[16px] font-medium text-[#B9B9B9]">{selectedTag.label}</span>
                       </div>
                     </>
                   ) : (

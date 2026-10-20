@@ -9,6 +9,7 @@ import { useEffect, useRef } from "react";
 import { clampSlot, SLOT_COUNT, SLOT_HEIGHT, SLOT_MINUTES, slotFromStart, startFromSlot, taskModalX } from "./calendar-time";
 import { TASK_TAGS } from "@/lib/task-tags";
 import { MAX_TASK_DURATION, MIN_TASK_DURATION } from "@/lib/task-schedule-config";
+import { calendarTimeUpdates } from "./calendar-time-updates";
 
 gsap.registerPlugin(Draggable);
 
@@ -31,6 +32,17 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
   const maxDurationSlots = MAX_TASK_DURATION / SLOT_MINUTES;
   const isDone = task.status === "done";
   const isOverdue = dayjs(task.start).add(task.duration, "minute").isBefore(dayjs());
+
+  useEffect(() => {
+    if (isDone) return;
+    const card = cardRef.current;
+    if (!card) return;
+    const taskEnd = dayjs(task.start).add(task.duration, "minute");
+    return calendarTimeUpdates.subscribe((now) => {
+      const overdue = String(taskEnd.isBefore(dayjs(now)));
+      if (card.dataset.overdue !== overdue) card.dataset.overdue = overdue;
+    });
+  }, [task.start, task.duration, isDone]);
 
   useEffect(() => {
     if (task.status === "done") return;
@@ -122,7 +134,9 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
     <div
       ref={cardRef}
       data-task-id={task.id}
-      className={`absolute w-[128px] py-[3px] rounded-[6px] flex flex-col px-[10px] overflow-hidden z-12 ${task.status === "done" ? "cursor-default" : "cursor-pointer"}`}
+      data-task-done={isDone}
+      data-overdue={isOverdue}
+      className={`task-calendar-card absolute w-[128px] py-[3px] rounded-[6px] flex flex-col px-[10px] overflow-hidden z-12 ${task.status === "done" ? "cursor-default" : "cursor-pointer"}`}
       style={{ left: dayIndex * 150 + 11, top: slotFromStart(task.start) * SLOT_HEIGHT + 1, height: durationSlots * SLOT_HEIGHT - 2, backgroundColor: isDone || isOverdue ? "#eee" : tag.backgroundColor }}
       onPointerDownCapture={(event) => {
         gestureRef.current = { x: event.clientX, y: event.clientY, dragged: false };
@@ -150,8 +164,8 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
         });
       }}
     >
-      <p className="text-[14px] font-semibold truncate flex-shrink-0" style={{ color: isDone ? "#999" : isOverdue ? "oklch(70.4% 0.191 22.216)" : tag.name === "easy|pressing" ? "lab(66.9756% -58.27 19.5419)" : tag.name === "difficulty|later" ? "lab(76.3898% 14.5258 98.4589)" : tag.color }}>{task.title}</p>
-      <p className="text-[12px] mt-[2px] my-0" style={{ color: isDone ? "#999" : isOverdue ? "oklch(70.4% 0.191 22.216)" : tag.name === "easy|pressing" ? "lab(66.9756% -58.27 19.5419)" : tag.name === "difficulty|later" ? "lab(76.3898% 14.5258 98.4589)" : tag.color }}>
+      <p className="task-calendar-card-text text-[14px] font-semibold truncate flex-shrink-0" style={{ color: isDone ? "#999" : isOverdue ? "oklch(70.4% 0.191 22.216)" : tag.name === "easy|pressing" ? "lab(66.9756% -58.27 19.5419)" : tag.name === "difficulty|later" ? "lab(76.3898% 14.5258 98.4589)" : tag.color }}>{task.title}</p>
+      <p className="task-calendar-card-text text-[12px] mt-[2px] my-0" style={{ color: isDone ? "#999" : isOverdue ? "oklch(70.4% 0.191 22.216)" : tag.name === "easy|pressing" ? "lab(66.9756% -58.27 19.5419)" : tag.name === "difficulty|later" ? "lab(76.3898% 14.5258 98.4589)" : tag.color }}>
         {dayjs(task.start).format("H:mm")} - {dayjs(task.start).add(task.duration, "minute").format("H:mm")}
       </p>
       <div ref={resizeRef} className="absolute left-0 bottom-0 w-full h-[10px] cursor-s-resize" />

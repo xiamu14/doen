@@ -15,12 +15,14 @@ import { toast } from "sonner";
 import { getEvents } from "@/client/api/event";
 import { eventOccursOn } from "@/lib/event-recurrence";
 import EventCalendarMarker from "./event-calendar-marker";
+import { calendarTimeUpdates } from "./calendar-time-updates";
 
 export default function TaskCalendar({ activeDay }: {
   activeDay: Dayjs;
 }) {
   const queryClient = useQueryClient();
   const pendingSaves = useRef(new Map<string, Promise<void>>());
+  const lastAutoScroll = useRef(Date.now());
   const modal = useSnapshot(modalsState);
   const [draftTask, setDraftTask] = useState<TaskRecord | null>(null);
   const headerScrollRef = useRef<HTMLDivElement>(null);
@@ -79,6 +81,28 @@ export default function TaskCalendar({ activeDay }: {
     }));
     return days;
   }, [activeDay]);
+
+  useEffect(() => {
+    const updateCurrentTime = (forceScroll = false) => {
+      const time = new Date();
+      calendarTimeUpdates.publish(time);
+      if (dates.some((day) => day.date === dayjs(time).format("YYYY-MM-DD")) &&
+        (forceScroll || time.getTime() - lastAutoScroll.current >= 5 * 60_000)) {
+        lastAutoScroll.current = time.getTime();
+        scrollToCurrentTime(time);
+      }
+    };
+    updateCurrentTime(document.visibilityState === "visible");
+    const interval = window.setInterval(() => updateCurrentTime(), 60_000);
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") updateCurrentTime(true);
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [dates, scrollToCurrentTime]);
 
   return (
     <div className="w-full">
@@ -175,7 +199,6 @@ export default function TaskCalendar({ activeDay }: {
                   key={`date-col-${index}`}
                   isNow={isToday}
                   date={item.date}
-                  onAutoScroll={scrollToCurrentTime}
                   tasks={tasks.filter((task) => dayjs(task.start).format("YYYY-MM-DD") === item.date)}
                   onCreateTask={openDraftTask}
                 />

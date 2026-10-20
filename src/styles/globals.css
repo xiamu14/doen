@@ -165,6 +165,14 @@
   background: var(--foreground);
 }
 
+.task-calendar-card[data-overdue="true"]:not([data-task-done="true"]) {
+  background-color: #eee !important;
+}
+
+.task-calendar-card[data-overdue="true"]:not([data-task-done="true"]) .task-calendar-card-text {
+  color: oklch(70.4% 0.191 22.216) !important;
+}
+
 /* tailwind styles */
 .head-text-lg {
   @apply text-3xl md:text-5xl lg:text-6xl font-bold font-heading tracking-tight leading-[1.5];

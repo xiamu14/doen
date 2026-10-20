@@ -21,18 +21,18 @@ export default function TagItem({
     <div
       className={cn(
         "flex justify-start items-center gap-[16px] cursor-pointer",
-        { "gap-[8px]": tight }
+        { "gap-[8px] min-w-0 flex-1": tight }
       )}
     >
       <div
-        className={cn("w-[10px] h-[10px] rounded-full")}
+        className={cn("w-[10px] h-[10px] shrink-0 rounded-full")}
         style={{ backgroundColor: item.color }}
       ></div>
       {isSelection ? (
         <Select
           value={tagId}
           onChange={(event) => onTagChange?.(event.target.value as TaskTagName)}
-          className="text-[16px] font-medium focus:not-data-focus:outline-none data-focus:outline-2 appearance-none cursor-pointer"
+          className="min-w-0 flex-1 truncate text-[16px] font-medium focus:not-data-focus:outline-none data-focus:outline-2 appearance-none cursor-pointer"
           style={{ color: textColor }}
         >
           {TASK_TAGS.map((tag) => (
@@ -40,7 +40,7 @@ export default function TagItem({
           ))}
         </Select>
       ) : (
-        <p className="text-[16px] font-medium" style={{ color: textColor }}>
+        <p className="min-w-0 flex-1 truncate text-[16px] font-medium" style={{ color: textColor }}>
           {item.label ?? item.name}
         </p>
       )}
