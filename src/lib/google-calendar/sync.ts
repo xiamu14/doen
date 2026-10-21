@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { isDeepStrictEqual } from "node:util";
 import { after } from "next/server";
 import { and, eq, inArray, isNull, lt, or, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
@@ -46,16 +47,26 @@ async function filterSyncChanges(changes: Change[]) {
   const [tasks, events, entries] = await Promise.all([
     taskIds.length ? db.select().from(task).where(inArray(task.id, taskIds)) : [],
     eventIds.length ? db.select().from(event).where(inArray(event.id, eventIds)) : [],
-    db.select({ kind: calendarEntry.kind, id: calendarEntry.sourceId }).from(calendarEntry)
+    db.select().from(calendarEntry)
       .where(inArray(calendarEntry.sourceId, changes.map(({ id }) => id))),
   ]);
-  // Existing mappings still need updates or deletion, even when their source is past or excluded.
-  const eligible = new Set(entries.map(({ kind, id }) => `${kind}:${id}`));
   const now = Date.now();
-  for (const source of tasks) if (planTask(source as TaskRecord, now).length) eligible.add(`task:${source.id}`);
-  for (const source of events) if (planEvent(source as EventRecord, now).length) eligible.add(`event:${source.id}`);
-  return changes.filter(({ kind, id }) => eligible.has(`${kind}:${id}`));
+  return changes.filter(({ kind, id }) => {
+    const existing = entries.filter((row) => row.kind === kind && row.sourceId === id);
+    const main = existing.find(({ variant }) => variant === "main");
+    const source = kind === "task" ? tasks.find((row) => row.id === id) : events.find((row) => row.id === id);
+    const planned = !source ? [] : kind === "task"
+      ? planTask(source as TaskRecord, now, Boolean(main))
+      : planEvent(source as EventRecord, now, main?.body);
+    return planned.some((item) => !existing.some((row) => row.variant === item.variant && row.synced && isDeepStrictEqual(row.body, item.body)))
+      || existing.some((row) => !planned.some((item) => item.variant === row.variant)
+        && !(planned.length && pastEnding(row, now)));
+  });
 }
+
+// Elapsed end markers are history, not changes waiting to be synced.
+const pastEnding = (row: typeof calendarEntry.$inferSelect, now: number) => row.kind === "task"
+  && row.variant === "ending" && Date.parse(row.body.end.dateTime) <= now;
 
 export async function getPendingCalendarJobs() {
   const jobs = await db.select().from(calendarQueue);
@@ -143,21 +154,23 @@ async function syncSource(client: CalendarClient, calendarId: string, job: typeo
   let planned;
   if (job.kind === "task") {
     const [source] = await db.select().from(task).where(eq(task.id, job.sourceId));
-    planned = source ? planTask(source as TaskRecord, Date.now(), Boolean(main?.synced)) : [];
+    planned = source ? planTask(source as TaskRecord, Date.now(), Boolean(main)) : [];
   } else {
     const [source] = await db.select().from(event).where(eq(event.id, job.sourceId));
-    planned = source ? planEvent(source as EventRecord, Date.now(), main?.synced ? main.body : undefined) : [];
+    planned = source ? planEvent(source as EventRecord, Date.now(), main?.body) : [];
   }
   for (const row of existing) {
     if (planned.some(({ variant }) => variant === row.variant)) continue;
+    if (planned.length && pastEnding(row, Date.now())) continue;
     await missing(() => client(`/calendars/${encodeURIComponent(calendarId)}/events/${row.googleId}`, "DELETE"));
     await db.delete(calendarEntry).where(eq(calendarEntry.key, row.key));
   }
   for (const item of planned) {
+    if (existing.some((row) => row.variant === item.variant && row.synced && isDeepStrictEqual(row.body, item.body))) continue;
     const key = `${job.kind}:${job.sourceId}:${item.variant}`;
     const [row] = await db.insert(calendarEntry).values({ key, kind: job.kind, sourceId: job.sourceId,
       variant: item.variant, googleId: newGoogleId(), body: item.body,
-    }).onConflictDoUpdate({ target: calendarEntry.key, set: { body: item.body } }).returning();
+    }).onConflictDoUpdate({ target: calendarEntry.key, set: { body: item.body, synced: false } }).returning();
     await writeEntry(client, calendarId, row);
     await db.update(calendarEntry).set({ synced: true }).where(eq(calendarEntry.key, row.key));
   }
@@ -181,10 +194,6 @@ export async function drainCalendarQueue() {
           if (connection.calendarId !== credentials.calendarId || connection.serviceAccountEmail !== credentials.client_email) {
             throw new CalendarSyncError("Initialize the configured service account calendar first.");
           }
-          const client = await calendarClient();
-          const calendarId = credentials.calendarId;
-          const access = await client<{ accessRole?: string }>(`/calendars/${encodeURIComponent(calendarId)}/events?maxResults=1&fields=accessRole`);
-          if (access.accessRole !== "writer" && access.accessRole !== "owner") throw new CalendarSyncError("Share the calendar with the service account and allow event changes.");
           const queued = await db.select().from(calendarQueue);
           const eligible = new Set((await filterSyncChanges(queued.map(({ kind, sourceId }) => ({ kind, id: sourceId }))))
             .map(({ kind, id }) => `${kind}:${id}`));
@@ -193,12 +202,18 @@ export async function drainCalendarQueue() {
             if (!eligible.has(job.key)) await db.delete(calendarQueue)
               .where(and(eq(calendarQueue.key, job.key), eq(calendarQueue.version, job.version)));
           }
+          const client = jobs.length ? await calendarClient() : null;
+          const calendarId = credentials.calendarId;
+          if (client) {
+            const access = await client<{ accessRole?: string }>(`/calendars/${encodeURIComponent(calendarId)}/events?maxResults=1&fields=accessRole`);
+            if (access.accessRole !== "writer" && access.accessRole !== "owner") throw new CalendarSyncError("Share the calendar with the service account and allow event changes.");
+          }
           for (const job of jobs) {
             const [current] = await db.update(calendarConnection).set({ leaseUntil: lease() }).where(owned).returning();
             if (!current) return;
             if (current.enabled !== connection.enabled) break;
             try {
-              await syncSource(client, calendarId, job);
+              await syncSource(client!, calendarId, job);
               await db.delete(calendarQueue).where(and(eq(calendarQueue.key, job.key), eq(calendarQueue.version, job.version)));
             } catch (error) {
               failure = failureMessage(error);

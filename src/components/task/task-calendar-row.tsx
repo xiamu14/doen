@@ -7,7 +7,6 @@ import type { TaskRecord } from "@/client/api/task";
 import { nearestFreeSlot, SLOT_HEIGHT, SLOT_MINUTES, slotFromStart, startFromSlot, taskModalX } from "./calendar-time";
 import { calendarTimeUpdates } from "./calendar-time-updates";
 type Props = {
-  isNow: boolean;
   date: string;
   tasks: TaskRecord[];
   onCreateTask: (start: string, x: number, y: number, top: number, bottom: number) => void;
@@ -15,19 +14,20 @@ type Props = {
 function CurrentTimeLine({ date }: Pick<Props, "date">) {
   const lineRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    return calendarTimeUpdates.subscribe((time) => {
+    const update = (time: Date) => {
       const line = lineRef.current;
       if (!line) return;
       line.hidden = dayjs(time).format("YYYY-MM-DD") !== date;
       if (!line.hidden) line.style.top = `${slotFromStart(time.toISOString()) * SLOT_HEIGHT}px`;
-    });
+    };
+    update(new Date());
+    return calendarTimeUpdates.subscribe(update);
   }, [date]);
 
-  if (dayjs().format("YYYY-MM-DD") !== date) return null;
-  return <div ref={lineRef} className="w-full h-[1px] absolute left-0 bg-[#f16767] z-10" style={{ top: slotFromStart(new Date().toISOString()) * SLOT_HEIGHT }} />;
+  return <div ref={lineRef} hidden className="w-full h-[1px] absolute left-0 bg-[#f16767] z-10" />;
 }
 
-export default function TaskCalendarRow({ isNow, date, tasks, onCreateTask }: Props) {
+export default function TaskCalendarRow({ date, tasks, onCreateTask }: Props) {
   return (
     <div
       data-calendar-day
@@ -49,7 +49,7 @@ export default function TaskCalendarRow({ isNow, date, tasks, onCreateTask }: Pr
         );
       }}
     >
-      {isNow && <CurrentTimeLine date={date} />}
+      <CurrentTimeLine date={date} />
     </div>
   );
 }

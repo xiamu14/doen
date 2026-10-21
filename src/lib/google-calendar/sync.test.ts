@@ -108,6 +108,7 @@ test("persistent calendar queue", async (t) => {
 
   await t.test("read-only calendar sharing stops writes and leaves work queued", async () => {
     accessRole = "reader";
+    await db.update(task).set({ title: "Needs calendar access" }).where(eq(task.id, id));
     await queueCalendarChanges(changes);
     const before = requests;
     await drainCalendarQueue();
@@ -120,6 +121,7 @@ test("persistent calendar queue", async (t) => {
   });
 
   await t.test("coalesces changes and writes the latest source only once", async () => {
+    await db.update(task).set({ title: "First edit" }).where(eq(task.id, id));
     await queueCalendarChanges(changes);
     await db.update(task).set({ title: "Latest" }).where(eq(task.id, id));
     await queueCalendarChanges(changes);
@@ -155,6 +157,7 @@ test("persistent calendar queue", async (t) => {
       await drainCalendarQueue();
       assert.equal(requests, before, "a second worker must not acquire the lease");
     };
+    await db.update(task).set({ title: "Before concurrent edit" }).where(eq(task.id, id));
     await queueCalendarChanges(changes);
     await drainCalendarQueue();
     assert.ok(active().some((body) => body.summary === "Concurrent latest"));
@@ -168,6 +171,8 @@ test("persistent calendar queue", async (t) => {
     assert.equal(active().length, 2);
     const main = (await db.select().from(calendarEntry)).find((row) => row.kind === "task")!;
     assert.equal("reminders" in main.body, false);
+    await requestCalendarSync(true);
+    assert.equal((await db.select().from(calendarQueue)).length, 0, "unchanged completed tasks stay out of the queue");
     await db.update(task).set({ status: "idle" }).where(eq(task.id, id));
     await queueCalendarChanges(changes);
     await drainCalendarQueue();
@@ -178,6 +183,7 @@ test("persistent calendar queue", async (t) => {
     const realNow = Date.now();
     const clock = t.mock.method(Date, "now", () => realNow + 3601_000);
     try {
+      await db.update(task).set({ content: "Requires renewed token" }).where(eq(task.id, id));
       await queueCalendarChanges(changes);
       await drainCalendarQueue();
       assert.equal(tokenRequests, 2);
@@ -188,11 +194,18 @@ test("persistent calendar queue", async (t) => {
 
   await t.test("unexpected errors never expose token or database details in status", async () => {
     onWrite = async () => { throw new Error("private-token-do-not-expose"); };
+    await db.update(task).set({ content: "Failed update" }).where(eq(task.id, id));
     await queueCalendarChanges(changes);
     await drainCalendarQueue();
     assert.equal((await db.select().from(calendarConnection))[0].lastError,
       "Calendar sync failed. Sync manually or wait for the next change.");
     assert.equal((await db.select().from(calendarQueue)).length, 1);
+    assert.equal((await getPendingCalendarJobs()).length, 1, "a persisted body is not acknowledged until Google succeeds");
+    assert.equal((await db.select().from(calendarEntry)).find((row) => row.kind === "task" && row.variant === "main")!.synced, false);
+    await requestCalendarSync(true);
+    await drainCalendarQueue();
+    assert.ok(active().some((body) => body.description === "Failed update"));
+    assert.equal((await db.select().from(calendarQueue)).length, 0);
   });
 
   await t.test("pausing makes no Google requests and keeps entries and personal reminders intact", async () => {
@@ -214,12 +227,34 @@ test("persistent calendar queue", async (t) => {
     assert.equal((await db.select().from(calendarQueue)).length, 0);
   });
 
-  await t.test("manual full sync restores Google edits and deleted IDs", async () => {
+  await t.test("unchanged tasks and recurring events are skipped by automatic and manual sync, including stale jobs", async () => {
+    await db.insert(calendarQueue).values([
+      { key: `task:${id}`, kind: "task", sourceId: id },
+      { key: `event:${eventId}`, kind: "event", sourceId: eventId },
+    ]);
+    assert.equal((await getPendingCalendarJobs()).length, 0);
+    await queueCalendarChanges([...changes, { kind: "event", id: eventId }]);
+    await requestCalendarSync(true);
+    assert.ok((await db.select().from(calendarQueue)).every((row) => row.version === 1));
+    const before = requests;
+    await drainCalendarQueue();
+    assert.equal(requests, before, "no token or calendar request is needed for unchanged sources");
+    assert.equal((await db.select().from(calendarQueue)).length, 0);
+    const clock = t.mock.method(Date, "now", () => Date.parse((active().find((body) => body.summary === "Edited while paused")!.end as { dateTime: string }).dateTime) + 86400_000);
+    try {
+      await requestCalendarSync(true);
+      assert.equal((await db.select().from(calendarQueue)).length, 0, "elapsed markers and recurring anchors do not create changes");
+    } finally { clock.mock.restore(); }
+  });
+
+  await t.test("changed sources restore Google edits and deleted IDs", async () => {
     const entries = await db.select().from(calendarEntry);
     const main = entries.find((row) => row.kind === "task" && row.variant === "main")!;
     records.set(main.googleId, { status: "cancelled" });
     const weekly = entries.find((row) => row.kind === "event")!;
     records.set(weekly.googleId, { ...records.get(weekly.googleId), summary: "Google edit" });
+    await db.update(task).set({ content: "Restore deleted record" }).where(eq(task.id, id));
+    await db.update(event).set({ description: "Restore edited record" }).where(eq(event.id, eventId));
     await requestCalendarSync(true);
     await drainCalendarQueue();
     assert.equal(active().length, 3);
@@ -237,6 +272,7 @@ test("persistent calendar queue", async (t) => {
     await drainCalendarQueue();
     assert.equal(active().length, 3);
     assert.equal((await db.select().from(calendarQueue)).length, 1);
+    assert.equal((await getPendingCalendarJobs()).length, 1);
     await requestCalendarSync(true);
     await drainCalendarQueue();
     assert.equal(active().length, 3);

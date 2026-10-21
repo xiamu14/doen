@@ -193,11 +193,9 @@ export default function TaskCalendar({ activeDay }: {
               className="relative h-full w-[1050px] flex flex-row"
             >
             {dates.map((item, index) => {
-              const isToday = dayjs().isSame(item.date, "day");
               return (
                 <TaskCalendarRow
                   key={`date-col-${index}`}
-                  isNow={isToday}
                   date={item.date}
                   tasks={tasks.filter((task) => dayjs(task.start).format("YYYY-MM-DD") === item.date)}
                   onCreateTask={openDraftTask}
