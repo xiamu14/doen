@@ -64,14 +64,14 @@ test("persistent calendar queue", async (t) => {
   await db.insert(task).values({ id, title: "Original", content: "", start: new Date(Date.now() + 86400_000).toISOString(), duration: 60 });
   const changes = [{ kind: "task" as const, id }];
 
-  await t.test("full sync and pending exclude past, ongoing and daily sources, including stale queue jobs", async () => {
+  await t.test("full sync and pending exclude ended and daily sources, including stale queue jobs", async () => {
     const pastTask = randomUUID();
-    const ongoingTask = randomUUID();
+    const endedTask = randomUUID();
     const pastEvent = randomUUID();
     const dailyEvent = randomUUID();
     await db.insert(task).values([
       { id: pastTask, title: "Past", content: "", start: new Date(Date.now() - 86400_000).toISOString(), duration: 60 },
-      { id: ongoingTask, title: "Ongoing", content: "", start: new Date(Date.now() - 60_000).toISOString(), duration: 60 },
+      { id: endedTask, title: "Ended", content: "", start: new Date(Date.now() - 61 * 60_000).toISOString(), duration: 60 },
     ]);
     await db.insert(event).values([
       { id: pastEvent, title: "Past event", recurrence: "once", date: "2000-01-01", time: "08:00" },
@@ -104,6 +104,26 @@ test("persistent calendar queue", async (t) => {
       ...events.map(({ id }) => ({ kind: "event" as const, id })),
     ]);
     assert.equal((await db.select().from(calendarQueue)).length, 0);
+  });
+
+  await t.test("new ongoing tasks sync automatically and manual sync recovers missing queue jobs", async () => {
+    const ongoingId = randomUUID();
+    await db.insert(task).values({ id: ongoingId, title: "AI practice", content: "", start: new Date(Date.now() - 60_000).toISOString(), duration: 60 });
+    await queueCalendarChanges([{ kind: "task", id: ongoingId }]);
+    assert.equal((await getPendingCalendarJobs()).length, 1);
+    await db.delete(calendarQueue);
+    await requestCalendarSync(true);
+    assert.equal((await getPendingCalendarJobs()).length, 1);
+    await drainCalendarQueue();
+    const entries = await db.select().from(calendarEntry).where(eq(calendarEntry.sourceId, ongoingId));
+    assert.equal(entries.length, 2);
+    assert.ok(entries.every((entry) => entry.synced));
+    await requestCalendarSync(true);
+    assert.equal((await getPendingCalendarJobs()).length, 0);
+    await db.delete(task).where(eq(task.id, ongoingId));
+    await queueCalendarChanges([{ kind: "task", id: ongoingId }]);
+    await drainCalendarQueue();
+    assert.equal(active().length, 2);
   });
 
   await t.test("read-only calendar sharing stops writes and leaves work queued", async () => {

@@ -28,8 +28,8 @@ function entry(key: string, title: string, description: string, at: string, dura
 
 export function planTask(task: TaskRecord, now: number, existing = false): PlannedEntry[] {
   const start = Date.parse(task.start);
-  if (!Number.isFinite(start) || (start <= now && !existing)) return [];
   const active = task.status !== "done";
+  if (!Number.isFinite(start) || (!existing && (start + task.duration * 60_000 <= now || (!active && start <= now)))) return [];
   const entries: PlannedEntry[] = [{ variant: "main", body: entry(`task:${task.id}:main`, task.title, task.content,
     task.start, task.duration, true) }];
   const endingAt = start + (task.duration - 5) * 60_000;

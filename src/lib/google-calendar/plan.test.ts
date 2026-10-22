@@ -28,11 +28,14 @@ test("tasks use two correctly timed entries; completed tasks only keep their rec
   assert.equal("reminders" in done[0].body, false);
 });
 
-test("initial sync excludes ongoing and past tasks, but preserves synced records and future end reminders", () => {
-  assert.deepEqual(planTask(task, Date.parse(task.start)), []);
-  const ongoing = planTask(task, Date.parse(task.start) + 10_000, true);
+test("initial sync includes ongoing active tasks until their end and preserves existing history", () => {
+  assert.equal(planTask(task, Date.parse(task.start)).length, 2);
+  const ongoing = planTask(task, Date.parse(task.start) + 10_000);
   assert.equal(ongoing.length, 2);
   assert.equal("reminders" in ongoing[0].body, false);
+  assert.equal(planTask(task, Date.parse(task.start) + 55 * 60_000).length, 1);
+  assert.deepEqual(planTask(task, Date.parse(task.start) + 60 * 60_000), []);
+  assert.deepEqual(planTask({ ...task, status: "done" }, Date.parse(task.start) + 10_000), []);
   assert.equal(planTask(task, Date.parse(task.start) + 60 * 60_000, true).length, 1);
 });
 

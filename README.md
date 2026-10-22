@@ -89,7 +89,7 @@ The service account uses `calendar.events` and a signed JWT to obtain a short-li
 
 Sync behavior:
 
-- Initial import includes only tasks that have not started and future events; Every day events are excluded.
+- Initial import includes tasks that have not started, ongoing unfinished tasks, and future events; ended tasks and Every day events are excluded.
 - Tasks occupy their full duration, plus a separate free entry five minutes before the end. Completing a task removes the future end marker and retains the main record; reopening restores a future marker.
 - Sometime keeps its selected time. Someday, Every week and Every month use one free entry at 08:00 in `Asia/Shanghai`. Monthly dates clamp to the last day of short months.
 - Notification settings belong to your Google account. Doen does not write reminder overrides, guarantee a particular notification offset, or cancel your personal reminders when a task is completed or sync is paused.
