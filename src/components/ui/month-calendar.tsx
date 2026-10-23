@@ -39,7 +39,7 @@ export default function MonthCalendar({ month, value, onMonthChange, onSelect, e
             const minutes = completedMinutes[date] ?? 0;
             const label = `${date}: ${Math.floor(minutes / 60)}h ${minutes % 60}m completed (${Math.round(minutes / 960 * 100)}%)`;
             return <button key={day} type="button" aria-label={label} aria-pressed={isSelected} title={label} onClick={() => onSelect(date)} className="flex h-[45px] items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-primary">
-              <span className="block aspect-square w-[60%] max-w-[25.5px] rounded-full" style={{ backgroundColor: heatmapColor(minutes) }} />
+              <span className="block aspect-square w-[50%] max-w-[25.5px] rounded-full" style={{ backgroundColor: heatmapColor(minutes) }} />
             </button>;
           }
           const isToday = dayjs().format("YYYY-MM-DD") === date;
