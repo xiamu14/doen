@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import { Calendar } from "lucide-react";
 import { useEffect, useState } from "react";
 import TaskCalendar from "./task-calendar";
-import MonthCalendar from "@/components/ui/month-calendar";
+import CalendarPopoverContent from "./calendar-popover-content";
 import { useQuery } from "@tanstack/react-query";
 import { getEvents } from "@/client/api/event";
 import AICopilotButton from "./ai-copilot-button";
@@ -47,10 +47,10 @@ export default function TaskPanel() {
             <PopoverPanel
               anchor="bottom start"
               transition
-              className="z-20 mt-[6px] w-[280px] rounded-[12px] border border-[#f1f1f1] bg-white p-3 text-content shadow-modal outline-none duration-300 ease-out data-closed:transform-[scale(95%)] data-closed:opacity-0"
+              className="z-20 mt-[6px] w-[330px] max-w-[calc(100vw-32px)] rounded-[12px] border border-[#f1f1f1] bg-white p-[12px] pt-[18px] text-content shadow-modal outline-none duration-300 ease-out data-closed:transform-[scale(95%)] data-closed:opacity-0"
             >
               {({ close }) => (
-                <MonthCalendar
+                <CalendarPopoverContent
                   month={calendarMonth}
                   value={activeDay.format("YYYY-MM-DD")}
                   onMonthChange={setCalendarMonth}
