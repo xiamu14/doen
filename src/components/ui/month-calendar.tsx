@@ -44,7 +44,7 @@ export default function MonthCalendar({ month, value, onMonthChange, onSelect, e
           }
           const isToday = dayjs().format("YYYY-MM-DD") === date;
           const someDayEvent = events.find((event) => event.recurrence === "someday" && event.date === date);
-          return <button key={day} type="button" onClick={() => onSelect(date)} className={`${large ? "aspect-square w-full max-w-[45px] self-center justify-self-center text-[17px]" : "h-9 text-[14px]"} rounded-full ${isSelected ? "bg-primary text-white" : isToday ? "font-bold text-[#f05252] hover:bg-[#f6f6f6]" : someDayEvent ? "font-bold hover:bg-[#f6f6f6]" : "text-content hover:bg-[#f6f6f6]"}`} style={!isSelected && !isToday && someDayEvent ? { color: someDayEvent.color } : undefined}>{day}</button>;
+          return <button key={day} type="button" onClick={() => onSelect(date)} className={`${large ? "aspect-square w-full max-w-[45px] self-center justify-self-center text-[17px] border-4 border-white" : "h-9 text-[14px]"} rounded-full ${isSelected ? "bg-primary text-white" : isToday ? "font-bold text-primary hover:bg-[#f6f6f6]" : someDayEvent ? "font-bold hover:bg-[#f6f6f6]" : "text-content hover:bg-[#f6f6f6]"}`} style={!isSelected && !isToday && someDayEvent ? { color: someDayEvent.color } : undefined}>{day}</button>;
         })}
       </div>
     </>

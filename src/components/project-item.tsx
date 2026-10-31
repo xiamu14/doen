@@ -36,7 +36,7 @@ export default function ProjectItem({
   return (
     <div className={cn("cursor-pointer", variants({ tight }), tight && "min-w-0 flex-1", className)}>
       <div
-        className={cn("w-[12px] h-[6px] shrink-0 rounded-[3px]")}
+        className={cn("w-[12px] h-[6px] shrink-0 rounded-[3px]", tight && "mx-[3px]")}
         style={{ backgroundColor: item.color }}
       ></div>
       {isSelection ? (

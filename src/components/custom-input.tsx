@@ -11,6 +11,7 @@ type Props = {
   disable?: boolean;
   className?: ClassNameValue;
   ariaLabel?: string;
+  placeholder?: string;
   singleLine?: boolean;
   onFocus?: React.FocusEventHandler<HTMLDivElement>;
 };
@@ -21,6 +22,7 @@ export default function CustomInput({
   onChange,
   className,
   ariaLabel,
+  placeholder,
   singleLine = false,
   onFocus,
 }: Props) {
@@ -72,10 +74,13 @@ export default function CustomInput({
     <>
       <div
         contentEditable={disable ? "false" : "true"}
-        className={cn("outline-none caret-primary", caret && "caret-transparent", singleLine && "whitespace-nowrap overflow-x-auto scrollbar-hide", className)}
+        className={cn("outline-none caret-primary", placeholder && "data-[empty=true]:before:content-[attr(data-placeholder)] before:pointer-events-none focus:before:hidden", caret && "caret-transparent", singleLine && "whitespace-nowrap overflow-x-auto scrollbar-hide", className)}
         ref={editableRef}
         role="textbox"
         aria-label={ariaLabel}
+        aria-placeholder={placeholder}
+        data-placeholder={placeholder}
+        data-empty={!value.trim()}
         aria-multiline={!singleLine}
         onFocus={(event) => {
           onFocus?.(event);

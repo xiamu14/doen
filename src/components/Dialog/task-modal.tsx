@@ -226,10 +226,10 @@ export default function TaskModal() {
                   value={content}
                   onChange={(event) => setContent((event.target as HTMLDivElement).textContent ?? "")}
                   onFocus={(event) => clearDefaultOnFocus(event, "about this task", setContent)}
-                  className="px-[4px] py-[2px] min-h-[20px] text-[14px] font-medium text-content-description rounded-[6px] ml-[24px] focus:bg-[#eee] focus:text-[#666]"
+                  className="px-[4px] py-[2px] min-h-[20px] text-[14px] font-medium text-content-date rounded-[6px] ml-[22px] focus:bg-[#eee]"
                 />
                 <div className="flex items-center gap-[8px] relative top-[-4px] mt-[14px]">
-                  <Clock size={17} color="#8A8A8A" className="relative" />
+                  <Clock size={18} color="#8A8A8A" className="relative shrink-0" />
                   <div className="flex flex-col">
                     <p className="text-[18px] font-medium text-content">{startTime} - {endTime}</p>
                   </div>
@@ -240,7 +240,7 @@ export default function TaskModal() {
                     <>
                       <div className="flex min-w-0 flex-1 items-center gap-[8px]">
                         <div
-                          className="w-[12px] h-[6px] shrink-0 rounded-[3px]"
+                          className="mx-[3px] w-[12px] h-[6px] shrink-0 rounded-[3px]"
                           style={{ backgroundColor: selectedProject?.color ?? "#B9B9B9" }}
                         />
                         <span className="min-w-0 truncate text-[16px] font-medium text-[#B9B9B9]">{selectedProject?.name ?? "No project"}</span>

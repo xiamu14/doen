@@ -61,7 +61,7 @@ export default function EventModal() {
     const now = dayjs();
     const defaultTime = now.hour() < 7 ? "07:00" : now.hour() >= 23 ? "23:00" : now.format("HH:mm");
     setTitle(currentEvent?.title ?? "New Event");
-    setDescription(currentEvent?.description ?? "about this event");
+    setDescription(currentEvent?.description ?? "");
     const selectedDate = currentEvent?.date ?? data?.date ?? now.format("YYYY-MM-DD");
     setDate(currentEvent ? currentEvent.recurrence === "once" || currentEvent.recurrence === "someday" ? currentEvent.date ?? selectedDate : null : selectedDate);
     setTime(currentEvent?.time ?? defaultTime);
@@ -159,9 +159,9 @@ export default function EventModal() {
               />
               <CustomInput
                 ariaLabel="Event description"
+                placeholder="about the event"
                 value={description}
                 onChange={(event) => setDescription((event.target as HTMLDivElement).textContent ?? "")}
-                onFocus={(event) => clearDefaultOnFocus(event, "about this event", setDescription)}
                 className="min-h-[28px] rounded-[6px] px-[4px] py-[2px] text-[14px] font-medium text-content-description focus:bg-[#eee] focus:text-[#666]"
               />
             </div>
