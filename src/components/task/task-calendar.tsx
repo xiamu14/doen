@@ -215,7 +215,7 @@ export default function TaskCalendar({ activeDay }: {
             })}
             {dates.flatMap((day, dayIndex) => events
               .filter((event) => eventOccursOn(event, day.date))
-              .map((event) => <EventCalendarMarker key={`${event.id}-${day.date}`} event={event} date={day.date} dayIndex={dayIndex} />))}
+              .map((event) => <EventCalendarMarker key={`${event.id}-${day.date}`} event={event} dayIndex={dayIndex} />))}
             {draftTask && (
               <TaskCalendarCard
                 key={draftTask.id}
