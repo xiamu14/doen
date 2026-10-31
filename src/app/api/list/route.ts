@@ -1,13 +1,13 @@
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { project, task } from "@/lib/db/schema/task";
-import { asc, count, eq } from "drizzle-orm";
+import { and, asc, count, eq, gt, sql } from "drizzle-orm";
 import { z } from "zod";
 import { PROJECT_COLORS } from "@/lib/project-colors";
 import { queueCalendarChanges } from "@/lib/google-calendar/sync";
 
 export async function GET(request: NextRequest) {
-  const projects = await db.select().from(project).orderBy(asc(project.createdAt), asc(project.id));
+  const projects = await db.select().from(project).where(eq(project.deleted, false)).orderBy(asc(project.createdAt), asc(project.id));
 
   return NextResponse.json({ data: { project: projects } });
 }
@@ -39,7 +39,7 @@ export async function PATCH(request: NextRequest) {
   }
 
   try {
-    const [updated] = await db.update(project).set({ name }).where(eq(project.id, id.data)).returning();
+    const [updated] = await db.update(project).set({ name }).where(and(eq(project.id, id.data), eq(project.deleted, false))).returning();
     if (!updated) return NextResponse.json({ error: "Project not found." }, { status: 404 });
     return NextResponse.json({ data: updated });
   } catch (error) {
@@ -59,9 +59,15 @@ export async function DELETE(request: NextRequest) {
   }
 
   let changedTasks: { id: string }[] = [];
-  const [deleted] = await db.transaction(async (tx) => {
-    changedTasks = await tx.update(task).set({ projectId: null }).where(eq(task.projectId, id.data)).returning();
-    return tx.delete(project).where(eq(project.id, id.data)).returning();
+  const deleted = await db.transaction(async (tx) => {
+    const [deleted] = await tx.update(project).set({ deleted: true })
+      .where(and(eq(project.id, id.data), eq(project.deleted, false))).returning();
+    if (!deleted) return undefined;
+    changedTasks = await tx.delete(task).where(and(
+      eq(task.projectId, id.data),
+      gt(sql`${task.start} + ${task.duration} * interval '1 minute'`, new Date().toISOString()),
+    )).returning();
+    return deleted;
   });
   if (!deleted) return NextResponse.json({ error: "Project not found." }, { status: 404 });
   await queueCalendarChanges(changedTasks.map(({ id }) => ({ kind: "task", id })));

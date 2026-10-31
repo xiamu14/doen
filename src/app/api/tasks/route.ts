@@ -38,7 +38,7 @@ async function overlapsTask(start: string, duration: number, excludeId?: string)
 
 async function projectExists(projectId?: string | null) {
   if (!projectId) return true;
-  const [found] = await db.select({ id: project.id }).from(project).where(eq(project.id, projectId)).limit(1);
+  const [found] = await db.select({ id: project.id }).from(project).where(and(eq(project.id, projectId), eq(project.deleted, false))).limit(1);
   return Boolean(found);
 }
 
@@ -73,7 +73,11 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: `Tasks must fit between ${String(FIRST_HOUR).padStart(2, "0")}:00 and ${String(LAST_HOUR).padStart(2, "0")}:00 on one day.` }, { status: 400 });
   }
   if (!await projectExists(values.projectId)) {
-    return NextResponse.json({ error: "Project not found." }, { status: 400 });
+    const [existing] = await db.select().from(task).where(eq(task.id, id)).limit(1);
+    if (!existing || existing.projectId !== values.projectId ||
+      new Date(existing.start).getTime() !== new Date(values.start).getTime() || existing.duration !== values.duration) {
+      return NextResponse.json({ error: "Deleted projects cannot be assigned or rescheduled." }, { status: 400 });
+    }
   }
   if (await overlapsTask(values.start, values.duration, id)) {
     return NextResponse.json({ error: "This time overlaps another task." }, { status: 409 });

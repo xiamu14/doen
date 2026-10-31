@@ -64,6 +64,13 @@
       "when": 1792454460000,
       "tag": "0008_calendar_service_account",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793455200000,
+      "tag": "0009_project_soft_delete",
+      "breakpoints": true
     }
   ]
 }

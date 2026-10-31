@@ -1,4 +1,5 @@
 import {
+  boolean,
   integer,
   pgEnum,
   pgTable,
@@ -12,6 +13,7 @@ export const project = pgTable("project", {
   id: uuid().defaultRandom().primaryKey(),
   name: varchar("name", { length: 20 }).notNull().unique(),
   color: varchar("color", { length: 10 }).notNull(),
+  deleted: boolean("deleted").notNull().default(false),
 
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")

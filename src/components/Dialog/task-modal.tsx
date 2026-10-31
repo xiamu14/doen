@@ -243,7 +243,7 @@ export default function TaskModal() {
                           className="mx-[3px] w-[12px] h-[6px] shrink-0 rounded-[3px]"
                           style={{ backgroundColor: selectedProject?.color ?? "#B9B9B9" }}
                         />
-                        <span className="min-w-0 truncate text-[16px] font-medium text-[#B9B9B9]">{selectedProject?.name ?? "No project"}</span>
+                        <span className="min-w-0 truncate text-[16px] font-medium text-[#B9B9B9]">{selectedProject?.name ?? (selectedProjectId ? "Deleted project" : "No project")}</span>
                       </div>
                       <div className="flex min-w-0 flex-1 items-center gap-[8px]">
                         <div className="w-[10px] h-[10px] shrink-0 rounded-full bg-[#69D571]" />
@@ -253,7 +253,7 @@ export default function TaskModal() {
                   ) : (
                     <>
                       <ProjectItem
-                        item={selectedProject ?? { name: "No project", color: "#B9B9B9" }}
+                        item={selectedProject ?? { name: selectedProjectId ? "Deleted project" : "No project", color: "#B9B9B9" }}
                         projects={projects}
                         projectId={selectedProjectId}
                         onProjectChange={(id) => setProjectId(id || null)}

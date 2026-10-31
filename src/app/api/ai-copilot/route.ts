@@ -1,6 +1,6 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { generateText, stepCountIs, tool } from "ai";
-import { and, gte, inArray, lt, sql } from "drizzle-orm";
+import { and, eq, gte, inArray, lt, sql } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { env } from "@/env";
@@ -137,6 +137,10 @@ async function applySchedule(
   const updates = planned.filter(({ original, start, duration }) =>
     new Date(original.start).getTime() !== new Date(start).getTime() || original.duration !== duration);
   if (updates.length) {
+    const projectIds = updates.flatMap(({ original }) => original.projectId ? [original.projectId] : []);
+    const deletedProjects = projectIds.length ? await db.select({ id: project.id }).from(project)
+      .where(and(inArray(project.id, projectIds), eq(project.deleted, true))) : [];
+    if (deletedProjects.length) throw new Error("Tasks in deleted projects cannot be rescheduled.");
     const startCase = sql<string>`case ${task.id} ${sql.join(updates.map(({ id, start }) => sql`when ${id} then ${start}`), sql` `)} else ${task.start} end`;
     const durationCase = sql<number>`case ${task.id} ${sql.join(updates.map(({ id, duration }) => sql`when ${id} then ${duration}`), sql` `)} else ${task.duration} end`;
     await db.update(task).set({ start: startCase, duration: durationCase, updatedAt: new Date() })
