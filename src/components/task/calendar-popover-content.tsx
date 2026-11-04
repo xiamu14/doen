@@ -131,12 +131,12 @@ export default function CalendarPopoverContent(props: Props) {
 
   return <>
     <div className="mb-[15px] flex items-center justify-between">
-      <button type="button" aria-label="Previous month" onClick={() => props.onMonthChange(month.subtract(1, "month").format("YYYY-MM"))} className="rounded p-1 hover:bg-[#f6f6f6]"><ChevronLeft size={22} /></button>
+      <button type="button" aria-label="Previous month" onClick={() => props.onMonthChange(month.subtract(1, "month").format("YYYY-MM"))} className="rounded p-1 hover:bg-[#f6f6f6]"><ChevronLeft size={20} /></button>
       <span className="text-[18px] font-semibold">{month.format("MMMM YYYY")}</span>
-      <button type="button" aria-label="Next month" onClick={() => props.onMonthChange(month.add(1, "month").format("YYYY-MM"))} className="rounded p-1 hover:bg-[#f6f6f6]"><ChevronRight size={22} /></button>
+      <button type="button" aria-label="Next month" onClick={() => props.onMonthChange(month.add(1, "month").format("YYYY-MM"))} className="rounded p-1 hover:bg-[#f6f6f6]"><ChevronRight size={20} /></button>
     </div>
-    <div className="grid grid-cols-7 text-center text-[17px] text-content-secondary">
-      {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((weekday) => <span key={weekday} className="py-1">{weekday}</span>)}
+    <div className="grid grid-cols-7 text-center text-[14px] text-content-secondary">
+      {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((weekday) => <span key={weekday} className="mb-[5px] rounded-[20px] py-1 font-semibold">{weekday}</span>)}
     </div>
     <div ref={viewportRef} tabIndex={0} role="region" aria-label={`${page === 0 ? "Calendar" : "Heat map"}. Use left and right arrow keys to switch views.`} className="overflow-hidden focus-visible:outline-2 focus-visible:outline-primary" style={{ touchAction: "pan-y" }} onKeyDown={(event) => {
       if (event.key === "ArrowLeft" || event.key === "ArrowRight") {

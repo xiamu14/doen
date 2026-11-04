@@ -30,7 +30,7 @@ export default function MonthCalendar({ month, value, onMonthChange, onSelect, e
         <button type="button" aria-label="Next month" onClick={() => onMonthChange(firstOfMonth.add(1, "month").format("YYYY-MM"))} className="rounded p-1 hover:bg-[#f6f6f6]"><ChevronRight size={18} /></button>
       </div>}
       <div className={`grid grid-cols-7 text-center text-[12px] text-content-secondary ${large && hideWeekdays ? "auto-rows-[45px]" : ""}`}>
-        {!hideWeekdays && ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((weekday, index) => <span key={`${weekday}-${index}`} className={`py-1 ${large ? "text-[17px]" : "text-[14px]"}`}>{weekday}</span>)}
+        {!hideWeekdays && ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((weekday, index) => <span key={`${weekday}-${index}`} className="mb-[5px] rounded-[20px] py-1 text-[14px] font-semibold">{weekday}</span>)}
         {days.map((day, index) => {
           if (!day) return <span key={`blank-${index}`} />;
           const date = `${month}-${String(day).padStart(2, "0")}`;
