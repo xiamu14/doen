@@ -35,6 +35,7 @@ export default function TaskModal() {
   const [isStatusSaving, setIsStatusSaving] = useState(false);
   const [error, setError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const savingRef = useRef<object | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const [modalPosition, setModalPosition] = useState<{ placement: "top" | "middle" | "bottom"; offset: number }>({ placement: "top", offset: 0 });
   const isCompleted = status === "done";
@@ -66,6 +67,9 @@ export default function TaskModal() {
     setStartTime(start.format("HH:mm"));
     setEndTime(start.add(data?.task?.duration ?? 30, "minute").format("HH:mm"));
     setError("");
+    setIsSaving(false);
+    savingRef.current = null;
+    return () => { savingRef.current = null; };
   }, [isOpen, data?.task?.id, data?.task?.status, data?.start]);
 
   useLayoutEffect(() => {
@@ -74,7 +78,6 @@ export default function TaskModal() {
     const clickY = data.y;
     const cardTop = data.top ?? clickY;
     const cardBottom = data.bottom ?? clickY;
-    setModalPosition({ placement: "top", offset: Math.max(margin, cardTop) });
     let frame = 0;
     const updatePosition = () => {
       const panel = panelRef.current;
@@ -96,13 +99,13 @@ export default function TaskModal() {
         setModalPosition({ placement: "middle", offset: Math.max(margin, Math.min(clickY - height / 2, viewportHeight - height - margin)) });
       }
     };
-    frame = requestAnimationFrame(updatePosition);
+    updatePosition();
     window.addEventListener("resize", updatePosition);
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("resize", updatePosition);
     };
-  }, [isOpen, data?.x, data?.y, data?.top, data?.bottom, data?.task?.id, status, error, isSaving]);
+  }, [isOpen, data?.x, data?.y, data?.top, data?.bottom, data?.task?.id, status, error]);
 
   const close = () => DialogUtils.hide("taskModal");
   const selectedProjectId = projectId === undefined ? projects[0]?.id ?? null : projectId;
@@ -110,7 +113,7 @@ export default function TaskModal() {
   const selectedTag = TASK_TAGS.find((tag) => tag.name === tagId) ?? TASK_TAGS[0];
 
   const toggleStatus = async () => {
-    if (isStatusSaving) return;
+    if (isStatusSaving || savingRef.current) return;
     const nextStatus = status === "done" ? "idle" : "done";
     const previousStatus = status;
     setStatus(nextStatus);
@@ -129,9 +132,41 @@ export default function TaskModal() {
     }
   };
 
+  const runSave = async (action: () => Promise<void>, errorMessage: string) => {
+    if (savingRef.current || isStatusSaving) return;
+    const operation = {};
+    savingRef.current = operation;
+    let shownAt: number | undefined;
+    const timer = setTimeout(() => {
+      if (savingRef.current !== operation) return;
+      shownAt = Date.now();
+      setIsSaving(true);
+    }, 500);
+    const finishFeedback = async () => {
+      clearTimeout(timer);
+      if (shownAt !== undefined) {
+        const remaining = 500 - (Date.now() - shownAt);
+        if (remaining > 0) await new Promise((resolve) => setTimeout(resolve, remaining));
+      }
+      return savingRef.current === operation;
+    };
+    setError("");
+    try {
+      await action();
+      if (await finishFeedback()) close();
+    } catch (cause) {
+      if (await finishFeedback()) {
+        setIsSaving(false);
+        setError(cause instanceof Error ? cause.message : errorMessage);
+      }
+    } finally {
+      if (savingRef.current === operation) savingRef.current = null;
+    }
+  };
+
   const save = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (isSaving || isCompleted) return;
+    if (savingRef.current || isStatusSaving || isCompleted) return;
     if (!list) {
       setError("Could not load projects. Try again.");
       return;
@@ -145,9 +180,7 @@ export default function TaskModal() {
       return;
     }
     const start = new Date(`${date}T${startTime}:00`).toISOString();
-    setIsSaving(true);
-    setError("");
-    try {
+    await runSave(async () => {
       const values = { title: title.trim(), content: content.trim(), start, duration, status, projectId: selectedProjectId, tagId };
       const task = data?.task
         ? await updateTask({ ...data.task, ...values })
@@ -155,28 +188,17 @@ export default function TaskModal() {
       queryClient.setQueryData<TaskRecord[]>(["tasks"], (current = []) => data?.task
         ? current.map((item) => item.id === task.id ? task : item)
         : [...current, task]);
-      close();
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not save task.");
-    } finally {
-      setIsSaving(false);
-    }
+    }, "Could not save task.");
   };
 
   const remove = async () => {
-    if (!data?.task || isSaving || isCompleted) return;
-    setIsSaving(true);
-    setError("");
-    try {
-      await deleteTask(data.task.id);
+    const task = data?.task;
+    if (!task || isCompleted) return;
+    await runSave(async () => {
+      await deleteTask(task.id);
       queryClient.setQueryData<TaskRecord[]>(["tasks"], (current = []) =>
-        current.filter((item) => item.id !== data.task?.id));
-      close();
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Could not delete task.");
-    } finally {
-      setIsSaving(false);
-    }
+        current.filter((item) => item.id !== task.id));
+    }, "Could not delete task.");
   };
 
   return (
