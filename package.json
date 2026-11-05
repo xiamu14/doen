@@ -6,6 +6,8 @@
     "dev": " next dev --turbopack",
     "build": "next build",
     "start": "next start",
+    "nohub": "bun scripts/dev-background.ts start",
+    "kill:nohub": "bun scripts/dev-background.ts stop",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
