@@ -10,6 +10,7 @@ import { clampSlot, SLOT_COUNT, SLOT_HEIGHT, SLOT_MINUTES, slotFromStart, startF
 import { TASK_TAGS } from "@/lib/task-tags";
 import { MAX_TASK_DURATION, MIN_TASK_DURATION } from "@/lib/task-schedule-config";
 import { calendarTimeUpdates } from "./calendar-time-updates";
+import { AnimatedTaskTime, type TaskTimeHandle } from "./animated-task-time";
 
 gsap.registerPlugin(Draggable);
 
@@ -22,6 +23,7 @@ type Props = {
 
 export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Props) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const timeRef = useRef<TaskTimeHandle>(null);
   const resizeRef = useRef<HTMLDivElement>(null);
   const gestureRef = useRef({ x: 0, y: 0, dragged: false });
   const taskRef = useRef(task);
@@ -80,6 +82,7 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
         const left = column.offsetLeft + (column.offsetWidth - card.offsetWidth) / 2;
         const top = slot * SLOT_HEIGHT;
         const start = startFromSlot(dates[columns.indexOf(column)], slot);
+        timeRef.current?.update(start, taskRef.current.duration);
         gsap.to(card, {
           x: left - card.offsetLeft,
           y: top - card.offsetTop,
@@ -166,7 +169,7 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
     >
       <p className="task-calendar-card-text text-[14px] font-semibold truncate flex-shrink-0" style={{ color: isDone ? "#999" : isOverdue ? "oklch(70.4% 0.191 22.216)" : tag.name === "easy|pressing" ? "lab(66.9756% -58.27 19.5419)" : tag.name === "difficulty|later" ? "lab(76.3898% 14.5258 98.4589)" : tag.color }}>{task.title}</p>
       <p className="task-calendar-card-text text-[12px] mt-[2px] my-0" style={{ color: isDone ? "#999" : isOverdue ? "oklch(70.4% 0.191 22.216)" : tag.name === "easy|pressing" ? "lab(66.9756% -58.27 19.5419)" : tag.name === "difficulty|later" ? "lab(76.3898% 14.5258 98.4589)" : tag.color }}>
-        {dayjs(task.start).format("H:mm")} - {dayjs(task.start).add(task.duration, "minute").format("H:mm")}
+        <AnimatedTaskTime ref={timeRef} start={task.start} duration={task.duration} />
       </p>
       <div ref={resizeRef} className="absolute left-0 bottom-0 w-full h-[10px] cursor-s-resize" />
     </div>

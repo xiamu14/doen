@@ -27,6 +27,8 @@ vm.runInNewContext(outputText, {
       useRef: (current) => ({ current: current === null ? card : current }),
       useEffect: (effect) => effects.push(effect),
     };
+    if (name === "./calendar-time-updates") return { calendarTimeUpdates: { subscribe: () => () => {} } };
+    if (name === "./animated-task-time") return { AnimatedTaskTime: () => null };
     if (name === "gsap") return animation;
     if (name === "gsap/Draggable") return { Draggable: { create: (_target, options) => {
       draggables.push(options);
