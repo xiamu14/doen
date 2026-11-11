@@ -140,7 +140,7 @@ export default function TaskCalendarCard({ task, dates, dayIndex, onChange }: Pr
       data-task-done={isDone}
       data-overdue={isOverdue}
       className={`task-calendar-card absolute w-[128px] py-[3px] rounded-[6px] flex flex-col px-[10px] overflow-hidden z-12 ${task.status === "done" ? "cursor-default" : "cursor-pointer"}`}
-      style={{ left: dayIndex * 150 + 11, top: slotFromStart(task.start) * SLOT_HEIGHT + 1, height: durationSlots * SLOT_HEIGHT - 2, backgroundColor: isDone || isOverdue ? "#eee" : tag.backgroundColor }}
+      style={{ left: dayIndex * 150 + 11, top: slotFromStart(task.start) * SLOT_HEIGHT + 1, height: durationSlots * SLOT_HEIGHT - 2, backgroundColor: isDone ? "#eeeeee4d" : isOverdue ? "#eee" : tag.backgroundColor }}
       onPointerDownCapture={(event) => {
         gestureRef.current = { x: event.clientX, y: event.clientY, dragged: false };
       }}

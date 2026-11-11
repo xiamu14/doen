@@ -109,7 +109,7 @@ export default function TaskCalendar({ activeDay }: {
       {/* 日期区域 */}
       <div className="calendar-header w-full h-[46px] bg-[rgba(238,238,238,.3)] rounded-[12px] overflow-hidden flex items-center">
         <div className="w-[96px] flex-shrink-0 h-full center font-bold text-[18px] text-calender-main">
-          {activeDay.format("MMMM")}
+          {activeDay.locale("en").format("MMM")}
         </div>
         <div
           ref={headerScrollRef}
