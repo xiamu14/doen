@@ -5,7 +5,7 @@ import type { Dayjs } from "dayjs";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getList, getTasks, updateTask, type TaskRecord } from "@/client/api/task";
-import { useSnapshot } from "valtio";
+import { subscribe, useSnapshot } from "valtio";
 import { DialogUtils } from "../Dialog";
 import { modalsState } from "../Dialog/state";
 import TaskCalendarRow from "./task-calendar-row";
@@ -23,6 +23,7 @@ export default function TaskCalendar({ activeDay }: {
   const queryClient = useQueryClient();
   const pendingSaves = useRef(new Map<string, Promise<void>>());
   const lastAutoScroll = useRef(Date.now());
+  const resumeAutoScrollAt = useRef(0);
   const modal = useSnapshot(modalsState);
   const [draftTask, setDraftTask] = useState<TaskRecord | null>(null);
   const headerScrollRef = useRef<HTMLDivElement>(null);
@@ -83,11 +84,24 @@ export default function TaskCalendar({ activeDay }: {
   }, [activeDay]);
 
   useEffect(() => {
+    let wasOpen = modalsState.activeModalId === "taskModal";
+    return subscribe(modalsState, () => {
+      const isOpen = modalsState.activeModalId === "taskModal";
+      if (wasOpen && !isOpen) resumeAutoScrollAt.current = Date.now() + 2 * 60_000;
+      wasOpen = isOpen;
+    }, true);
+  }, []);
+
+  useEffect(() => {
     const updateCurrentTime = (forceScroll = false) => {
       const time = new Date();
       calendarTimeUpdates.publish(time);
-      if (dates.some((day) => day.date === dayjs(time).format("YYYY-MM-DD")) &&
-        (forceScroll || time.getTime() - lastAutoScroll.current >= 5 * 60_000)) {
+      if (modalsState.activeModalId !== "taskModal" &&
+        time.getTime() >= resumeAutoScrollAt.current &&
+        dates.some((day) => day.date === dayjs(time).format("YYYY-MM-DD")) &&
+        (forceScroll || resumeAutoScrollAt.current !== 0 ||
+          time.getTime() - lastAutoScroll.current >= 5 * 60_000)) {
+        resumeAutoScrollAt.current = 0;
         lastAutoScroll.current = time.getTime();
         scrollToCurrentTime(time);
       }
