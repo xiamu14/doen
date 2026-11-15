@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   experimental: {
     nodeMiddleware: true,
   },
+  allowedDevOrigins: ["doen.local"],
   images: {
     remotePatterns: [
       {

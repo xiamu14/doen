@@ -17,9 +17,11 @@ function isRunning(pid: number) {
 }
 
 async function main() {
-  const action = process.argv[2];
-  if (action !== "start" && action !== "stop") {
-    throw new Error("Usage: bun scripts/dev-background.ts start|stop");
+  const args = process.argv.slice(2);
+  const action = args[0];
+  const useLan = args.includes("--lan");
+  if ((action !== "start" && action !== "stop") || args.length > 2) {
+    throw new Error("Usage: bun scripts/dev-background.ts start|stop [--lan]");
   }
 
   const pid = fs.existsSync(pidFile)
@@ -48,7 +50,8 @@ async function main() {
 
   fs.rmSync(pidFile, { force: true });
   const log = fs.openSync(logFile, "w");
-  const child = spawn(process.execPath, ["run", "dev"], {
+  const command = useLan ? "dev:lan" : "dev";
+  const child = spawn(process.execPath, ["run", command], {
     cwd: path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."),
     detached: true,
     stdio: ["ignore", log, log],
@@ -67,7 +70,11 @@ async function main() {
     fs.rmSync(pidFile, { force: true });
     throw new Error(`Dev server failed to start. See ${logFile}`);
   }
-  console.log(`Started background dev server (PID ${child.pid}). Logs: ${logFile}`);
+  console.log(
+    useLan
+      ? `Started background dev server (PID ${child.pid}) at http://doen.local:1355. Logs: ${logFile}`
+      : `Started background dev server (PID ${child.pid}). Logs: ${logFile}`,
+  );
 }
 
 main().catch((error) => {

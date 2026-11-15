@@ -248,7 +248,7 @@ export default function TaskModal() {
                   value={content}
                   onChange={(event) => setContent((event.target as HTMLDivElement).textContent ?? "")}
                   onFocus={(event) => clearDefaultOnFocus(event, "about this task", setContent)}
-                  className="px-[4px] py-[2px] min-h-[20px] text-[14px] font-medium text-content-date rounded-[6px] ml-[22px] focus:bg-[#eee]"
+                  className="px-[4px] py-[2px] min-h-[20px] text-[14px] font-medium text-content-date rounded-[6px] ml-[22px] focus:bg-[#eee] focus:px-2 focus:py-1 focus:text-[#666]"
                 />
                 <div className="flex items-center gap-[8px] relative top-[-4px] mt-[14px]">
                   <Clock size={18} color="#8A8A8A" className="relative shrink-0" />

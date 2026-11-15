@@ -65,6 +65,17 @@ bun dev
 
 6. Open the browser and navigate to `http://localhost:3000`
 
+### Portless LAN access (`http://doen.local:1355`)
+
+The same dev server can be reached through the shared portless proxy at `http://doen.local:1355` (also reachable from other devices on the LAN via mDNS). `bun run nohub` starts this mode in the background; `bun run nohub:plain` starts plain `bun dev` in the background instead, and `bun run kill:nohub` stops either one. Logs go to `/tmp/doen.log`.
+
+Requirements:
+
+- The global `portless` CLI (0.13+; `bun x portless --version` or `npm ls -g portless`). Portless 0.15+ additionally requires Node.js 24+.
+- `doen.local` must resolve to this machine. The script tries `portless hosts sync` (needs sudo) and prints a reminder if it cannot write `/etc/hosts`; run `portless hosts sync` manually in a terminal in that case.
+
+The script registers `doen.local -> localhost:41741` on the shared proxy on port 1355 and sets `BETTER_AUTH_URL=http://doen.local:1355` for the dev server it starts. Google OAuth needs `http://doen.local:1355/api/auth/callback/google` registered in the Google Cloud console; sign-in from `localhost:3000` keeps using its own callback URL. The proxy is shared with other projects on this machine (`codexaccount.local`, `zendocs.local`, …), so the script reuses it when it is already running and only restarts it when its LAN/TLS config differs from what Doen needs.
+
 ## Google Calendar
 
 The app remains usable without signing in. Google sign-in only supplies identity, name and avatar; it no longer requests Calendar access or offline user consent. Signed-in users manage sync in the avatar popover. Calendar access uses a server-side service account and a private calendar that you share with it.

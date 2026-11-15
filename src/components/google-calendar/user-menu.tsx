@@ -31,8 +31,7 @@ export default function UserMenu() {
   const feedback = calendarFeedback(error || calendar?.error || status.error?.message);
   const canSync = calendar?.connected && calendar.enabled && calendar.configured && !status.isError && !feedback.blocked;
   const syncing = busy || Boolean(calendar?.running || (calendar?.enabled && calendar.pending > 0 && !calendar.error));
-  const syncStatus = !calendar?.connected ? "Not connected" : !calendar.enabled ? "Sync paused"
-    : calendar.lastSyncedAt ? `Last synced ${new Date(calendar.lastSyncedAt).toLocaleString()}` : null;
+  const syncStatus = !calendar?.connected ? "Not connected" :   calendar.lastSyncedAt && calendar.enabled ? `Last synced ${new Date(calendar.lastSyncedAt).toLocaleString()}` : null;
   const run = async (action: Parameters<typeof changeCalendar>[0]) => {
     if (commandRunning.current) return;
     commandRunning.current = true;
@@ -71,7 +70,7 @@ export default function UserMenu() {
       </Avatar.Fallback>
     </Avatar.Root>
   );
-  const name = user ? Array.from(user.name).slice(0, 5).join("") : "Unauthorized";
+  const name = user ? Array.from(user.name).slice(0, 5).join("") : "Joe";
   if (!user) return (
     <div className="relative flex flex-col items-end">
       <Button onClick={login} disabled={isPending || busy} aria-label="Authorize Google" className="flex items-center justify-end outline-none focus-visible:underline disabled:opacity-60">

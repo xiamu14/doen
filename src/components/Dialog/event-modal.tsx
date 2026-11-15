@@ -162,7 +162,7 @@ export default function EventModal() {
                 placeholder="about the event"
                 value={description}
                 onChange={(event) => setDescription((event.target as HTMLDivElement).textContent ?? "")}
-                className="min-h-[28px] rounded-[6px] px-[4px] py-[2px] text-[14px] font-medium text-content-description focus:bg-[#eee] focus:text-[#666]"
+                className="min-h-[28px] rounded-[6px] px-[4px] py-[2px] text-[14px] font-medium text-content-description focus:bg-[#eee] focus:px-2 focus:py-1 focus:text-[#666]"
               />
             </div>
             <div className="flex items-center gap-[6px]">
