@@ -67,14 +67,9 @@ bun dev
 
 ### Portless LAN access (`http://doen.local:1355`)
 
-The same dev server can be reached through the shared portless proxy at `http://doen.local:1355` (also reachable from other devices on the LAN via mDNS). `bun run nohub` starts this mode in the background; `bun run nohub:plain` starts plain `bun dev` in the background instead, and `bun run kill:nohub` stops either one. Logs go to `/tmp/doen.log`.
+`bun run nohub` starts the development server on port 41741 and sets `BETTER_AUTH_URL=http://doen.local:1355`. LAN routing is managed separately from the workspace `portlan` directory; after starting this server, run `bun run start` there. `bun run nohub:plain` starts plain `bun dev` instead, and `bun run kill:nohub` stops either server. Logs go to `/tmp/doen.log`.
 
-Requirements:
-
-- The global `portless` CLI (0.13+; `bun x portless --version` or `npm ls -g portless`). Portless 0.15+ additionally requires Node.js 24+.
-- `doen.local` must resolve to this machine. The script tries `portless hosts sync` (needs sudo) and prints a reminder if it cannot write `/etc/hosts`; run `portless hosts sync` manually in a terminal in that case.
-
-The script registers `doen.local -> localhost:41741` on the shared proxy on port 1355 and sets `BETTER_AUTH_URL=http://doen.local:1355` for the dev server it starts. Google OAuth needs `http://doen.local:1355/api/auth/callback/google` registered in the Google Cloud console; sign-in from `localhost:3000` keeps using its own callback URL. The proxy is shared with other projects on this machine (`codexaccount.local`, `zendocs.local`, …), so the script reuses it when it is already running and only restarts it when its LAN/TLS config differs from what Doen needs.
+Google OAuth needs `http://doen.local:1355/api/auth/callback/google` registered in the Google Cloud console; sign-in from `localhost:3000` uses its own callback URL.
 
 ## Google Calendar
 
