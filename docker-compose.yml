@@ -1,7 +1,8 @@
+name: doen
+
 services:
   postgres:
     image: postgres:17
-    container_name: postgres_db
     restart: always
     environment:
       POSTGRES_USER: postgres
