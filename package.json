@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "PORT=41741 next dev --turbopack",
+    "dev": "PORT=3013 next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "nohub": "bun scripts/dev-background.ts start",

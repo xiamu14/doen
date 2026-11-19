@@ -67,7 +67,7 @@ bun dev
 
 ### Portless LAN access (`http://doen.local:1355`)
 
-`bun run nohub` starts the development server on port 41741 and sets `BETTER_AUTH_URL=http://doen.local:1355`. LAN routing is managed separately from the workspace `portlan` directory; after starting this server, run `bun run start` there. `bun run nohub:plain` starts plain `bun dev` instead, and `bun run kill:nohub` stops either server. Logs go to `/tmp/doen.log`.
+`bun run nohub` starts the development server on port 3013 and sets `BETTER_AUTH_URL=http://doen.local:1355`. LAN routing is managed separately from the workspace `portlan` directory; after starting this server, run `bun run start` there. `bun run nohub:plain` starts plain `bun dev` instead, and `bun run kill:nohub` stops either server. Logs go to `/tmp/doen.log`.
 
 Google OAuth needs `http://doen.local:1355/api/auth/callback/google` registered in the Google Cloud console; sign-in from `localhost:3000` uses its own callback URL.
 

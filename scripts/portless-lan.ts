@@ -7,7 +7,7 @@ const child = spawn(process.execPath, ["run", "dev"], {
   cwd: projectRoot,
   env: {
     ...process.env,
-    PORT: "41741",
+    PORT: "3013",
     BETTER_AUTH_URL: process.env.BETTER_AUTH_URL ?? "http://doen.local:1355",
   },
   stdio: "inherit",
