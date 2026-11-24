@@ -28,13 +28,13 @@ export default function Container({
         list.data
       );
     }
-    orpcClient.hello({ name: "world" }).then((res) => {
-      console.log(
-        "%c res",
-        "background: #69c0ff; color: white; padding: 4px",
-        res
-      );
-    });
+    // orpcClient.hello({ name: "world" }).then((res) => {
+    //   console.log(
+    //     "%c res",
+    //     "background: #69c0ff; color: white; padding: 4px",
+    //     res
+    //   );
+    // });
   }, [list]);
 
   return (

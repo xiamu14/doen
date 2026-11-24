@@ -13,7 +13,10 @@ const DEFAULT_AVATAR = "https://images.unsplash.com/photo-1599566150163-29194dca
 
 export default function UserMenu() {
   const { data: session, isPending } = useSession();
-  const user = session?.user;
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
+
+  const user = hydrated ? session?.user : undefined;
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const initializedConnection = useRef(false);
@@ -73,7 +76,7 @@ export default function UserMenu() {
   const name = user ? Array.from(user.name).slice(0, 5).join("") : "Joe";
   if (!user) return (
     <div className="relative flex flex-col items-end">
-      <Button onClick={login} disabled={isPending || busy} aria-label="Authorize Google" className="flex items-center justify-end outline-none focus-visible:underline disabled:opacity-60">
+      <Button onClick={login} disabled={!hydrated || isPending || busy} aria-label="Authorize Google" className="flex items-center justify-end outline-none focus-visible:underline disabled:opacity-60">
         <span className="mr-[10px] text-[18px] font-medium text-content-secondary">{name}</span>{avatar}
       </Button>
       {error && <p role="alert" className="absolute right-0 top-full mt-2 w-[280px] rounded-[8px] bg-white p-2 text-[12px] text-red-600 shadow-modal">Could not sign in. Try again.</p>}
